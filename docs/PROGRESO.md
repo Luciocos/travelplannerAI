@@ -6,6 +6,10 @@ Resumen para el equipo de qué está hecho y qué falta. Es el punto de entrada 
 
 ---
 
+## ⚠️ Bloqueo que el equipo tiene que resolver, no es técnico
+
+Los destinos piloto que trae la consigna del equipo son "Europa, Miami, Caribe". **Miami sirve tal cual, pero "Europa" y "Caribe" no**: la fuente de datos (OpenTripMap) busca alrededor de una coordenada puntual, no de un continente ni de una región. Hay que decidir a qué ciudad puntual se reduce cada uno (por ejemplo, una capital europea y una ciudad caribeña) antes de poder generar los corpus de esos dos destinos. Ver `docs/DECISIONES.md` (D-04) y `docs/DIFICULTADES.md` (P-01) para el detalle. El código de ingesta ya está listo y funciona con cualquier ciudad que se elija, no hace falta tocarlo.
+
 ## Hecho (Fase 0, scaffolding)
 
 - Estructura completa del repo (`src/asistente_viajes/`, `sql/`, `data/`, `scripts/`, `tests/`, `docs/`).
@@ -24,7 +28,19 @@ Resumen para el equipo de qué está hecho y qué falta. Es el punto de entrada 
 - Lint (`ruff check`) y tests (`pytest`) corren en verde en local.
 - Hook de commits verificado: rechaza un mensaje con trailer `Co-Authored-By` (probado a mano).
 
-Todo esto vive en la rama `fase/0-scaffolding`, **todavía no mergeado a `main`**.
+Todo esto vive en la rama `fase/0-scaffolding` (pusheada a GitHub), **todavía no mergeada a `main`**.
+
+## Hecho (Fase 1, ingesta, arrancada en paralelo, sin datos reales todavía)
+
+- `src/asistente_viajes/ingesta/opentripmap.py`: cliente de los dos pasos (búsqueda por radio + detalle por `xid`), guarda crudo en `data/raw/` antes de normalizar, sigue funcionando desde el cache si la API cae.
+- `src/asistente_viajes/ingesta/normalizar.py`: filtra POIs con menos de 200 caracteres de texto real, separa en corpus `atractivos` / `comercios` según `kind`, y normaliza también los registros curados a mano.
+- `src/asistente_viajes/embeddings.py`: wrapper de `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (384 dim, normalizado).
+- `src/asistente_viajes/db.py` y `src/asistente_viajes/ingesta/cargar_vectores.py`: conexión a Postgres y upsert en `documento_rag` con embedding, implementado contra la tabla propia del esquema (ver decisión D-04 de `arquitectura.md` sobre PGVector vs tabla propia, sigue abierta pero esto ya funciona).
+- `scripts/ingestar_destino.py`: CLI, `python -m scripts.ingestar_destino --destino <nombre> --lat <lat> --lon <lon>`.
+- `data/reference/paises.json`: idioma y moneda de los países más probables (para RF8 en Fase 7), a completar cuando se definan las ciudades finales.
+- 12 tests en total (`pytest`), todos mockeados, ninguno toca la red ni Postgres real.
+
+**No se corrió contra la API real, no hay datos cargados todavía.** Falta `OPENTRIPMAP_API_KEY` en `.env` y, sobre todo, resolver el bloqueo de destinos de arriba.
 
 ## Falta para cerrar la Fase 0
 
@@ -35,9 +51,17 @@ Todo esto vive en la rama `fase/0-scaffolding`, **todavía no mergeado a `main`*
 5. Correr `python -m scripts.inicializar_db` contra la base elegida (Supabase) y `python -m scripts.smoke_llm` una vez a mano, para confirmar que la rotación de claves funciona de punta a punta.
 6. Mergear `fase/0-scaffolding` a `main` con el CI en verde.
 
+## Falta para cerrar la Fase 1
+
+1. Resolver el bloqueo de destinos (arriba).
+2. Completar `OPENTRIPMAP_API_KEY` en `.env`.
+3. Correr `python -m scripts.ingestar_destino` para cada destino ya con coordenadas concretas.
+4. Curar a mano en `data/curated/` los lugares importantes que la API no cubra bien (ej. mercados artesanales), marcados con `fuente='curado'`.
+5. Llegar al mínimo de 25 documentos de atractivos y 15 de comercios por destino, todos con texto real (criterio de aceptación de Fase 1 en `plan-de-fases.md`).
+
 ## No arrancar todavía
 
-Fases 1 a 9 (ingesta de datos, vector store, retrievers, slot filling, orquestador, `armar_plan`, extensiones, notebook, documentación final). El detalle de cada una, con criterios de aceptación, está en `.claude/skills/tp2-asistente-viajes/references/plan-de-fases.md`. **No se avanza a la Fase 1 sin que el dueño del proyecto lo confirme.**
+Fases 2 a 9 (vector store en pgvector, retrievers, slot filling, orquestador, `armar_plan`, extensiones, notebook, documentación final). El detalle de cada una, con criterios de aceptación, está en `.claude/skills/tp2-asistente-viajes/references/plan-de-fases.md`. **No se avanza de fase sin que el dueño del proyecto lo confirme**, salvo el trabajo de scaffolding/código base que no depende de una decisión de producto, que se hizo en paralelo para no perder tiempo de sesión.
 
 ## Cómo retomar
 

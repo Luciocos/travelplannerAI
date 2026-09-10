@@ -41,3 +41,12 @@ Formato de cada entrada:
 - **Decisión:** se deja `gemini-2.5-flash-lite` como valor por defecto en `.env.example` y en los workflows, configurable por variable de entorno (`GEMINI_MODEL`), sin hardcodear el ID en el código.
 - **Alternativas descartadas:** hardcodear un ID sin verificar. Una búsqueda rápida mostró fuentes de terceros con datos inconsistentes entre sí (algunas ya mencionan generaciones "Gemini 3.x Flash-Lite" con límites distintos, 1000 RPD vs otras cifras) y ninguna confirmación limpia contra `ai.google.dev`. No se quiso asumir el dato.
 - **Consecuencias:** **queda como bloqueo abierto, ver `estado.md` de la skill.** Antes de usar cuota real (correr `smoke_llm.py` o cargar los tres `GEMINI_API_KEY_n`), alguien del equipo tiene que entrar a `https://ai.google.dev/gemini-api/docs/models` y `https://ai.google.dev/gemini-api/docs/rate-limits`, confirmar el ID vigente y el límite diario real, y actualizar `GEMINI_MODEL` en `.env.example`, los cuatro workflows y `estado.md`.
+
+## D-04, Destinos piloto "Europa" y "Caribe" no son utilizables tal cual para la ingesta
+
+- **Fecha:** 2026-09-10
+- **Fase:** 1
+- **Contexto:** el handoff fija como destinos piloto "Europa, Miami, Caribe". OpenTripMap busca por radio alrededor de una coordenada puntual (`lat`/`lon` + radio en metros), no acepta un continente ni una región como unidad de búsqueda. Miami es una ciudad y funciona sin cambios; "Europa" y "Caribe" no.
+- **Decisión:** no se resolvió unilateralmente. Se escribió el pipeline de ingesta (`opentripmap.py`, `normalizar.py`, `scripts/ingestar_destino.py`) parametrizado por destino + coordenadas concretas, para que funcione apenas se elijan ciudades puntuales. No se curó ni se ingirió ningún dato todavía bajo el nombre "Europa" o "Caribe".
+- **Alternativas descartadas:** elegir una ciudad representativa por mi cuenta (ej. Roma para Europa, Punta Cana para Caribe) sin confirmación del equipo. Se descartó porque cambia el caso de negocio y la curaduría manual que se apoya en esa elección, y la consigna pide no resolver ambigüedades de alcance sin avisar.
+- **Consecuencias:** **bloqueo abierto.** El equipo tiene que decidir a qué ciudad o ciudades puntuales se resuelven "Europa" y "Caribe" (puede ser una ciudad por destino, o abrir a 2-3 ciudades si el volumen de POIs de una sola no alcanza para el mínimo de 25 atractivos / 15 comercios de la Fase 1). Una vez decidido, correr `python -m scripts.ingestar_destino --destino <nombre> --lat <lat> --lon <lon>` para cada uno.
