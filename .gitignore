@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Proyecto: asistente de viajes
+.cache/
+data/raw/*.json
+

@@ -1,0 +1,15 @@
+langchain
+langchain-core
+langchain-community
+langchain-postgres
+langchain-google-genai
+sentence-transformers
+psycopg[binary]
+pgvector
+pydantic
+python-dotenv
+httpx
+jupyter
+pytest
+pytest-mock
+ruff

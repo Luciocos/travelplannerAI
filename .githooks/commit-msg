@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+mensaje_archivo="$1"
+
+if grep -qiE '^Co-Authored-By:' "$mensaje_archivo"; then
+    echo "ERROR: este repo no admite trailers Co-Authored-By." >&2
+    exit 1
+fi
+
+if grep -qiE 'generated with|claude code|noreply@anthropic' "$mensaje_archivo"; then
+    echo "ERROR: el mensaje menciona la herramienta generadora. Sacalo." >&2
+    exit 1
+fi
+
+primera_linea=$(head -n 1 "$mensaje_archivo")
+if ! echo "$primera_linea" | grep -qE '^(feat|fix|docs|test|refactor|data|ci|chore)(\([a-z-]+\))?: .+'; then
+    echo "ERROR: formato invalido. Usar: tipo(alcance): descripcion" >&2
+    echo "Tipos: feat, fix, docs, test, refactor, data, ci, chore" >&2
+    exit 1
+fi
