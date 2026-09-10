@@ -21,11 +21,16 @@
 
 ## Fase actual
 
-**Fase 0 (scaffolding) cerrada en código, pendiente de merge. Fase 1 (ingesta) arrancada en paralelo, también en código, sin datos reales todavía.**
+**Código de las Fases 0, 1 y arranque de 2/3/4/8(RF8) escrito y con tests en verde, todo sin mergear a `main` y sin datos ni infraestructura real todavía.** El agente decidió avanzar código base en paralelo (autorizado explícitamente por el usuario, "seguí sin pedirme permiso") mientras las claves/infra que solo el usuario puede cargar se completaban. Nada de esto se corrió contra una API real ni una base real, y las fases no se consideran cerradas en el sentido del plan (`plan-de-fases.md`) hasta validarlas con datos e infraestructura reales y con confirmación del usuario.
 
-Fase 0: estructura del repo, hook de commits, workflows de CI, `docker-compose.yml`, `config.py`, rotador de claves (`llm.py`), scripts de smoke test e inicialización de DB, esquema SQL, `docs/DECISIONES.md` / `docs/DIFICULTADES.md` armados.
+- **Fase 0** (scaffolding): estructura del repo, hook de commits, workflows de CI, `docker-compose.yml`, `config.py`, rotador de claves con failover (`llm.py`), scripts de smoke test e inicialización de DB, esquema SQL, `docs/DECISIONES.md` / `docs/DIFICULTADES.md` armados.
+- **Fase 1** (ingesta, sin datos reales): cliente de OpenTripMap en dos pasos, normalización (filtro 200 caracteres, separación atractivos/comercios), CLI `scripts/ingestar_destino.py`, `data/reference/paises.json`. **Bloqueada para generar datos reales por D-04 (ver abajo) y por falta de `OPENTRIPMAP_API_KEY`.**
+- **Fase 2** (vector store, adelantada parcialmente): `embeddings.py` (sentence-transformers) y `db.py` + `ingesta/cargar_vectores.py` contra la tabla propia, sin correr contra Postgres real todavía.
+- **Fase 3** (retrievers y tools de RAG, RF3/RF4): `recuperacion/atractivos.py`, `comercios.py`, `faq.py` con la consulta canónica (filtro + similitud en una sola query), y las tools `recomendar_actividades` / `recomendar_locales` con justificación por LLM solo sobre el texto recuperado. Verificado por test llamando las tools directo, sin agente, tal como pide el criterio de aceptación de esta fase — pero con retriever y LLM mockeados, no contra datos reales.
+- **Fase 4** (estado y slot filling, RF1/RF2): `estado.py` (`PreferenciasViaje`, merge no destructivo, máximo 2 slots por turno) y la tool `completar_slots` con extracción estructurada. El caso de ejemplo de la consigna se cubre por test con el LLM mockeado.
+- **RF8** (clima + idioma/moneda, de Fase 7, adelantado): `tools/info_destino.py`, clima en vivo de Open-Meteo (sin key) con el límite real de ~16 días manejado explícitamente, e idioma/moneda desde `data/reference/paises.json`.
 
-Fase 1: cliente de OpenTripMap en dos pasos (`ingesta/opentripmap.py`), normalización con filtro de 200 caracteres y separación en corpus atractivos/comercios (`ingesta/normalizar.py`), embeddings locales (`embeddings.py`), carga a la tabla `documento_rag` (`ingesta/cargar_vectores.py`, contra la tabla propia, ver D-04 de arquitectura), CLI `scripts/ingestar_destino.py`, y `data/reference/paises.json` con idioma/moneda de los países más probables. 12 tests, todos mockeados, sin tocar la red. **No se corrió contra la API real ni se cargó ningún dato: falta `OPENTRIPMAP_API_KEY` y, más importante, resolver a qué ciudades puntuales se reducen "Europa" y "Caribe" (bloqueo D-04, ver abajo).**
+39 tests en total (`pytest`), todos mockeados, ninguno toca la red ni una base real. Lint (`ruff`) en verde.
 
 Todo en la rama `fase/0-scaffolding`, pusheada a origin, todavía no mergeada a `main`.
 
@@ -33,7 +38,7 @@ Falta para cerrar Fase 0 del todo: completar `OPENTRIPMAP_API_KEY`, `AMADEUS_CLI
 
 ## Fases cerradas
 
-(ninguna todavía formalmente, el código de Fase 0 y el arranque de Fase 1 están listos pero sin mergear a `main`)
+(ninguna todavía formalmente — hay código y tests en verde de varias fases, pero cerrar una fase requiere el criterio de aceptación real con datos e infraestructura, mas confirmación del usuario, ver arriba)
 
 ## Decisiones tomadas
 
@@ -59,12 +64,12 @@ Decisiones tomadas en Fase 0:
 
 Decisiones tomadas en Fase 1 (arranque):
 
-- `cargar_vectores.py` se implementó contra la tabla propia (`documento_rag` de `sql/001_schema.sql`), no contra `langchain_postgres.PGVector`, para tener el pipeline de ingesta terminado de punta a punta sin esperar la decisión formal de Fase 2. Migrar a `PGVector` sigue abierto si conviene (ver decisiones abiertas).
+- `cargar_vectores.py` se implementó contra la tabla propia (`documento_rag` de `sql/001_schema.sql`), no contra `langchain_postgres.PGVector`, para tener el pipeline de ingesta terminado de punta a punta sin esperar la decisión formal de Fase 2. Los retrievers de Fase 3 (`recuperacion/*.py`) siguen la misma consulta canónica sobre esa tabla. Migrar a `PGVector` sigue abierto si conviene (ver decisiones abiertas).
 
 ## Decisiones abiertas
 
-- **Fase 2:** `langchain_postgres.PGVector` contra tabla propia envuelta en un `BaseRetriever`. Default recomendado, `PGVector`.
-- **Fase 5:** agente de tools plano contra LangGraph con nodos explícitos. Se decide cuando el flujo lo pida, no antes.
+- **Fase 2:** `langchain_postgres.PGVector` contra tabla propia envuelta en un `BaseRetriever`. En la práctica ya se avanzó con la tabla propia (ver arriba) porque destrabó Fase 3 sin esperar; sigue abierto si el equipo prefiere migrar a `PGVector` antes de la defensa.
+- **Fase 5:** agente de tools plano contra LangGraph con nodos explícitos. Todavía no se escribió `agente.py`. Se decide cuando el flujo lo pida, no antes.
 - **CrewAI:** sólo si el usuario trae confirmación explícita del profesor. Por defecto, no.
 
 ## Bloqueos

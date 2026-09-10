@@ -42,6 +42,19 @@ Todo esto vive en la rama `fase/0-scaffolding` (pusheada a GitHub), **todavía n
 
 **No se corrió contra la API real, no hay datos cargados todavía.** Falta `OPENTRIPMAP_API_KEY` en `.env` y, sobre todo, resolver el bloqueo de destinos de arriba.
 
+## Hecho (Fase 2/3/4 y RF8, adelantadas en código mientras se esperaban las claves)
+
+El agente siguió escribiendo código base mientras faltaban `.env` y accesos, sin datos ni infraestructura real todavía detrás. Nada de esto está "cerrado" en el sentido del plan de fases, pero el código y los tests están listos:
+
+- **Fase 2 (vector store):** `src/asistente_viajes/embeddings.py` (modelo local de embeddings) y `db.py` (conexión a Postgres), usados por `cargar_vectores.py` de Fase 1.
+- **Fase 3 (retrievers y tools de RAG, RF3/RF4):** `src/asistente_viajes/recuperacion/{atractivos,comercios,faq}.py` con la consulta canónica (filtro por destino + similitud semántica en una sola query SQL). Tools `recomendar_actividades` y `recomendar_locales` en `src/asistente_viajes/tools/`, con `args_schema` y docstring para que el agente las entienda, y justificación generada por LLM **solo** a partir del texto recuperado.
+- **Fase 4 (estado y slot filling, RF1/RF2):** `src/asistente_viajes/estado.py` (`PreferenciasViaje`, merge no destructivo — nunca pisa un slot ya cargado) y la tool `completar_slots` en `src/asistente_viajes/tools/`, que pregunta como máximo 2 datos faltantes por turno.
+- **RF8 (de Fase 7, adelantado porque no depende de ninguna clave):** `tools/info_destino.py`, clima en vivo de Open-Meteo (sin API key) con el límite real de ~16 días manejado explícitamente (nunca inventa un pronóstico para fechas lejanas), e idioma/moneda desde `data/reference/paises.json`.
+
+39 tests en total, todos con mocks (LLM, Postgres, HTTP), ninguno toca la red ni una base real. Lint en verde.
+
+**Lo que falta para que esto sea real y no solo código:** correr todo contra una base Postgres real con datos cargados (bloqueado por lo de arriba) y contra el LLM real (bloqueado por el model ID sin verificar). Todavía no existe `agente.py` (el orquestador de Fase 5) ni `armar_plan` (Fase 6), esos sí no se tocaron.
+
 ## Falta para cerrar la Fase 0
 
 1. **Verificar el model ID de Gemini Flash-Lite vigente y su límite diario real** contra `https://ai.google.dev/gemini-api/docs/models` y `.../rate-limits`. Una búsqueda rápida dio resultados de terceros inconsistentes (algunos ya mencionan generaciones "Gemini 3.x"), así que quedó `gemini-2.5-flash-lite` como default sin confirmar. Actualizar `.env.example`, los 4 workflows y `estado.md` con el valor verificado.
@@ -61,7 +74,7 @@ Todo esto vive en la rama `fase/0-scaffolding` (pusheada a GitHub), **todavía n
 
 ## No arrancar todavía
 
-Fases 2 a 9 (vector store en pgvector, retrievers, slot filling, orquestador, `armar_plan`, extensiones, notebook, documentación final). El detalle de cada una, con criterios de aceptación, está en `.claude/skills/tp2-asistente-viajes/references/plan-de-fases.md`. **No se avanza de fase sin que el dueño del proyecto lo confirme**, salvo el trabajo de scaffolding/código base que no depende de una decisión de producto, que se hizo en paralelo para no perder tiempo de sesión.
+`agente.py` (orquestador, Fase 5), `armar_plan` (Fase 6), y el resto de las extensiones (RF6/RF7 alojamiento y vuelos, RF9 FAQ, RF10 gastos), más el notebook de demo y la documentación final (Fases 8 y 9). El detalle de cada una, con criterios de aceptación, está en `.claude/skills/tp2-asistente-viajes/references/plan-de-fases.md`. **No se avanza de fase sin que el dueño del proyecto lo confirme**, salvo el trabajo de código base que no depende de una decisión de producto ni de credenciales, que se adelantó para no perder tiempo de sesión (ver arriba).
 
 ## Cómo retomar
 
