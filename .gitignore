@@ -221,3 +221,4 @@ __marimo__/
 .cache/
 data/raw/*.json
 
+.DS_Store
