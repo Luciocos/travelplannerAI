@@ -1,0 +1,36 @@
+name: smoke-llm
+
+# Unico workflow que usa las claves reales y consume cuota.
+# Se dispara a mano, nunca en push ni en pull request.
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: smoke-llm
+    runs-on: ubuntu-latest
+
+    env:
+      LLM_PROVIDER: gemini
+      GEMINI_MODEL: gemini-2.5-flash-lite
+      GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
+      GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+      GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verificar rotacion de claves contra la API
+        run: python -m scripts.smoke_llm
+        # scripts/smoke_llm.py hace una llamada minima por cada clave configurada
+        # e imprime el indice de la clave usada y el resultado. Nunca imprime el valor.
