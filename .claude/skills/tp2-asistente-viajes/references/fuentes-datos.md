@@ -41,17 +41,16 @@ No necesita RAG ni embeddings. Es un dato estructurado que casi no cambia: alcan
 
 Saber explicar por qué acá **no** se usa RAG es parte de la defensa. Meter embeddings donde alcanza un diccionario es un error de criterio, no una virtud.
 
-## Amadeus for Developers, alojamiento y vuelos (RF6, RF7)
+## Amadeus for Developers, alojamiento y vuelos (RF6, RF7) — **DADO DE BAJA, ver bloqueo**
 
-Entorno de **test**, self service, sin aprobación. Una sola cuenta para los dos módulos, dos endpoints distintos de la misma API, no hace falta alta separada.
+**Esta sección ya no describe algo utilizable. Amadeus cerró el portal self-service que sustentaba esta decisión.** Confirmado el 2026-09-10 por varias fuentes (PhocusWire, anuncios de terceros): registro de usuarios nuevos pausado desde marzo/abril de 2026, portal decomisionado por completo el 2026-07-17, keys existentes desactivadas desde esa fecha. No hay forma self-service de conseguir `client_id`/`client_secret` hoy. Queda como bloqueo abierto en `estado.md`, no improvisar un reemplazo sin decisión del equipo (ver `plan-de-fases.md`, Fase 7).
 
-- Autenticación: OAuth2 `client_credentials` contra `test.api.amadeus.com`. Cachear el token, tiene vencimiento.
-- Hotel Search: hay que **resolver primero los `hotelIds` por ciudad** y recién después pedir ofertas. Es el paso que se olvida siempre.
+Lo que sigue es el diseño original, dejado como referencia histórica y como insumo si se busca un reemplazo con la misma forma:
+
+- Autenticación: OAuth2 `client_credentials` contra `test.api.amadeus.com`.
+- Hotel Search: resolver primero los `hotelIds` por ciudad y recién después pedir ofertas.
 - Flight Offers Search: búsqueda directa por origen, destino y fechas.
-
-**Verificar los paths y versiones de los endpoints contra la documentación vigente antes de codear.** Los paths de Hotel Search cambiaron de versión más de una vez, no asumirlos de memoria.
-
-Los datos del entorno de test son datos de prueba, no reales. Aclararlo en la demo y en la defensa.
+- Los datos del entorno de test eran datos de prueba, no reales.
 
 ## Booking.com, descartada
 

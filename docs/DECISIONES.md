@@ -51,3 +51,12 @@ Formato de cada entrada:
 - **Alternativas descartadas para Europa:** París (riesgo de sobrecarga de resultados en OpenTripMap, exige filtrado más agresivo), Roma (buena en histórico/patrimonio pero más floja en gastronomía/comercios curados que Barcelona).
 - **Alternativas descartadas para Caribe:** Punta Cana, República Dominicana (destino caribeño "correcto" geográficamente, pero se prefirió Cancún/Riviera Maya); San Juan, Puerto Rico (buena mezcla histórico/playas pero menor volumen de POIs que las otras dos opciones).
 - **Consecuencias:** Cancún/Riviera Maya está en el Golfo de México, no en el mar Caribe en sentido estricto; queda anotado para poder explicarlo en la defensa si se pregunta por qué "Caribe" resuelve a ese punto. Con las coordenadas ya decididas, se puede correr `python -m scripts.ingestar_destino --destino <nombre> --lat <lat> --lon <lon>` para Barcelona y Cancún en cuanto esté cargada `OPENTRIPMAP_API_KEY`.
+
+## D-05, Amadeus for Developers self-service dado de baja, RF6/RF7 sin fuente vigente
+
+- **Fecha:** 2026-09-10
+- **Fase:** 0 (afecta planificación de Fase 7)
+- **Contexto:** `fuentes-datos.md` documentaba Amadeus for Developers, entorno de test self-service, como la fuente para RF6 (alojamiento) y RF7 (vuelos), justamente por no requerir aprobación de partner (a diferencia de Booking). Al ir a buscar cómo conseguir las credenciales, se encontró que Amadeus decidió discontinuar ese portal.
+- **Decisión:** no se buscó ni se adoptó un reemplazo unilateralmente. Se marcó la sección de Amadeus en `fuentes-datos.md` como dada de baja y se dejó como bloqueo abierto en `estado.md`, a resolver por el equipo antes de llegar a Fase 7.
+- **Alternativas descartadas:** ninguna evaluada todavía a propósito, para no decidir el reemplazo sin el equipo. Opciones a evaluar cuando se retome: otra API self-service de vuelos/hoteles gratuita, o directamente cortar RF6/RF7 de las extensiones (ya son las de menor prioridad en el orden de `plan-de-fases.md` Fase 7, después de RF8).
+- **Consecuencias:** no afecta el núcleo (Fases 0-6, RF1-5/RF11/RF12), que no depende de Amadeus. Sí afecta cuánto se puede prometer de extensiones si no se encuentra reemplazo a tiempo. Evidencia del hallazgo: registro de usuarios nuevos pausado desde marzo/abril de 2026, portal decomisionado el 2026-07-17, keys existentes desactivadas desde esa fecha (confirmado por cobertura de prensa especializada, no por documentación propia de Amadeus verificada en el momento).
