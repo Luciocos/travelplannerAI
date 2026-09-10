@@ -13,7 +13,7 @@
 | Repo | https://github.com/Luciocos/travelplannerAI |
 | Integrantes | Lucio Cosentino; Joaquin Carlos Fernandez Da Silva; Aaron de Bernardo; Elias Danteo |
 | Turno y fecha de defensa | (pendiente) |
-| Destinos piloto | Europa, Miami, Caribe. **"Europa" y "Caribe" no son utilizables tal cual para la ingesta, ver bloqueos (D-04).** |
+| Destinos piloto | Barcelona (ex "Europa"), Miami, Cancún / Riviera Maya (ex "Caribe"). Resuelto por D-04 en `docs/DECISIONES.md`, coordenadas concretas todavía sin cargar en `data/reference/`. |
 | LLM | Gemini, `gemini-2.5-flash-lite` por defecto vía `GEMINI_MODEL`. **ID y límite diario reales todavía sin verificar contra `ai.google.dev`, ver bloqueos.** |
 | Claves de Gemini | 3, rotación round robin, cargadas en `.env` local por Lucio. Repository secrets de GitHub, pendientes de cargar. |
 | Límite diario real por clave | (pendiente de verificar en la doc oficial, ver D-03 en DECISIONES.md) |
@@ -65,6 +65,7 @@ Decisiones tomadas en Fase 0:
 Decisiones tomadas en Fase 1 (arranque):
 
 - `cargar_vectores.py` se implementó contra la tabla propia (`documento_rag` de `sql/001_schema.sql`), no contra `langchain_postgres.PGVector`, para tener el pipeline de ingesta terminado de punta a punta sin esperar la decisión formal de Fase 2. Los retrievers de Fase 3 (`recuperacion/*.py`) siguen la misma consulta canónica sobre esa tabla. Migrar a `PGVector` sigue abierto si conviene (ver decisiones abiertas).
+- "Europa" se resuelve a Barcelona, "Caribe" a Cancún / Riviera Maya (D-04), confirmado por el usuario.
 
 ## Decisiones abiertas
 
@@ -74,19 +75,19 @@ Decisiones tomadas en Fase 1 (arranque):
 
 ## Bloqueos
 
-- **Model ID de Gemini Flash-Lite sin verificar contra la fuente oficial.** Una búsqueda rápida el 2026-09-10 mostró resultados de terceros inconsistentes entre sí (algunos ya hablan de generaciones "Gemini 3.x Flash-Lite", límites de RPD que van de ~20 a ~1000 según la fuente y el modelo). No se pudo confirmar limpio contra `ai.google.dev/gemini-api/docs/models` y `.../rate-limits`. Se dejó `gemini-2.5-flash-lite` como default configurable, sin cerrar la fase con ese dato como verificado. Alguien del equipo tiene que entrar a esas dos páginas, confirmar el ID y el límite diario real por clave, y actualizar `.env.example`, los cuatro workflows de `.github/workflows/` y esta tabla.
+- **Model ID confirmado, límite diario sigue sin poder verificarse de forma estática.** Chequeado el 2026-09-10 contra `ai.google.dev/gemini-api/docs/models` (versión texto): `gemini-2.5-flash-lite` sigue listado como estable (junto con generaciones más nuevas, `gemini-3.1-flash-lite` y `gemini-3.5-flash-lite`, también estables). El ID actual del proyecto sigue siendo válido, no hace falta migrarlo. Lo que **no** se pudo confirmar es el límite diario: `ai.google.dev/gemini-api/docs/rate-limits` ya no publica un número fijo de RPD para el free tier, dice textualmente que el límite "depend[e] de tu tier de uso" y remite a `aistudio.google.com/rate-limit`, una página que requiere login con la cuenta que tiene la key cargada. Hay reportes de foro (no oficiales, sin confirmar) de que el free tier bajó de 250 a 20 RPD en algún modelo alrededor de diciembre 2025. **Alguien del equipo con acceso a las 3 cuentas de Google que tienen las API keys tiene que entrar a `aistudio.google.com/rate-limit` logueado con cada una y anotar el RPD real por key.** Si el número real es bajo (ej. 20/día), 3 claves dan ~60 requests/día en total, lo cual puede ser insuficiente para demo + tests manuales + grabación del video, y habría que reconsiderar (ej. más claves, o repartir cuota entre más días).
 - `.env` local: faltan `OPENTRIPMAP_API_KEY`, `AMADEUS_CLIENT_ID`, `AMADEUS_CLIENT_SECRET` y `DATABASE_URL` (Gemini ya está).
 - Repository secrets de GitHub (`GEMINI_API_KEY_1/2/3`) y protección de la rama `main` todavía no configurados, requieren acceso al repo en GitHub.
-- **"Europa" y "Caribe" como destinos piloto no son coordenadas utilizables para OpenTripMap (D-04 en DECISIONES.md).** El equipo tiene que resolverlos a ciudades puntuales (ej. una capital europea, una ciudad caribeña) antes de poder correr `scripts/ingestar_destino.py` y curar `data/curated/` de verdad. Miami no tiene este problema.
+- `scripts/ingestar_destino.py` toma `--lat`/`--lon` por CLI, no hay archivo de coordenadas que completar. Falta solo `OPENTRIPMAP_API_KEY` para poder correrlo con Barcelona (`--lat 41.3874 --lon 2.1686`) y Cancún (`--lat 21.1619 --lon -86.8515`).
 
 ## Próximo paso
 
-1. **Decidir a qué ciudades puntuales se resuelven "Europa" y "Caribe"** (bloqueo nuevo de Fase 1, ver arriba). Sin esto no se puede generar el corpus real de esos dos destinos.
-2. Verificar el model ID y el límite diario de Gemini Flash-Lite contra la doc oficial (ver bloqueo de arriba), actualizar donde corresponda.
+1. ~~Decidir a qué ciudades puntuales se resuelven "Europa" y "Caribe"~~ — resuelto 2026-09-10, Barcelona y Cancún/Riviera Maya (D-04).
+2. ~~Verificar el model ID de Gemini Flash-Lite~~ — resuelto, `gemini-2.5-flash-lite` sigue vigente. El límite diario real por key sigue pendiente, alguien con acceso a las 3 cuentas tiene que chequearlo logueado en `aistudio.google.com/rate-limit` (ver bloqueo arriba, no se puede verificar desde afuera).
 3. Completar el resto de `.env` (OpenTripMap, Amadeus, DATABASE_URL de Supabase).
 4. Cargar los repository secrets en GitHub y proteger `main` (checks `calidad`, `commits`, `secretos`).
 5. Correr `python -m scripts.inicializar_db` contra Supabase y `python -m scripts.smoke_llm` una vez a mano.
-6. Con las ciudades decididas y la API key cargada, correr `scripts/ingestar_destino.py` por destino y completar la curaduría manual en `data/curated/` para llegar al mínimo de 25 atractivos / 15 comercios por destino (criterio de aceptación de Fase 1).
+6. Con la API key de OpenTripMap cargada, correr `scripts/ingestar_destino.py` para Barcelona (`--lat 41.3874 --lon 2.1686`) y Cancún (`--lat 21.1619 --lon -86.8515`), además de Miami, y completar la curaduría manual en `data/curated/` para llegar al mínimo de 25 atractivos / 15 comercios por destino (criterio de aceptación de Fase 1).
 7. Confirmar con el usuario y mergear `fase/0-scaffolding` a `main`.
 
 ---
