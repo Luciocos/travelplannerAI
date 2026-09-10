@@ -1,0 +1,44 @@
+"""Todos los prompts del LLM, como constantes con nombre. Se citan en la
+defensa, por eso viven en un solo lugar y no inline en medio de la logica
+(ver ci-y-git.md, convenciones de trabajo).
+"""
+
+from __future__ import annotations
+
+PROMPT_EXTRAER_SLOTS = """\
+Extraé del mensaje del usuario los datos de un viaje que quiere planificar.
+Completá solo los campos que el mensaje menciona explícita o implícitamente.
+No inventes valores para lo que no se menciona, dejalo sin completar.
+
+Campos:
+- destino: nombre del lugar, si lo menciona.
+- tipo_destino: tipo de destino buscado (por ejemplo: playa, ciudad, montaña, naturaleza).
+- intereses: lista de intereses o actividades (por ejemplo: historia, caminatas, gastronomía, compras).
+- presupuesto: nivel de presupuesto (bajo, medio, alto), si lo menciona.
+- fecha_inicio y fecha_fin: fechas del viaje, si las menciona.
+- cantidad_personas: cantidad de viajeros, si la menciona.
+
+Mensaje del usuario:
+{mensaje}
+"""
+
+PROMPT_PREGUNTAR_SLOTS_FALTANTES = """\
+Sos un asistente de viajes que habla en español rioplatense neutro.
+Al usuario le falta completar estos datos de su viaje: {slots_faltantes}.
+Generá una sola pregunta breve y natural para pedir como máximo estos datos
+(no más de dos por turno), sin sonar a formulario. No repreguntes nada que
+no esté en la lista.
+"""
+
+PROMPT_JUSTIFICAR_RECOMENDACION = """\
+Sos un asistente de viajes que habla en español rioplatense neutro.
+A partir ÚNICAMENTE del siguiente texto sobre un lugar, escribí una sola
+línea breve explicando por qué le puede interesar a alguien que busca:
+{intereses_o_consulta}.
+
+No agregues datos que no estén en el texto. Si el texto no alcanza para
+justificar la recomendación, decilo así, no inventes.
+
+Texto sobre el lugar:
+{texto_recuperado}
+"""
