@@ -99,9 +99,10 @@ class RotadorClavesGemini:
         pendientes = [e.disponible_desde - ahora for e in self._estados if not e.agotada_por_hoy]
         return max(0.0, min(pendientes)) if pendientes else 0.0
 
-    def invocar(self, mensajes: object, **kwargs: object) -> object:
-        """Invoca el LLM rotando claves. Reintenta una vez tras esperar el
-        backoff mas corto si las tres claves estan agotadas."""
+    def _ejecutar_con_rotacion(self, invocar_con_cliente):
+        """Nucleo comun de reintentos: prueba cada clave disponible con el
+        callable dado (recibe el cliente de una clave), rota ante error de
+        cuota, y espera el backoff mas corto si las tres estan agotadas."""
         errores: list[Exception] = []
 
         for _intento_extra in range(2):
@@ -111,7 +112,7 @@ class RotadorClavesGemini:
                     break
                 logger.info("usando clave_%s", indice + 1)
                 try:
-                    resultado = self._cliente(indice).invoke(mensajes, **kwargs)
+                    resultado = invocar_con_cliente(self._cliente(indice))
                     self._marcar_exito(indice)
                     return resultado
                 except Exception as error:
@@ -130,6 +131,28 @@ class RotadorClavesGemini:
         raise RuntimeError(
             f"Las {len(self._claves)} claves de Gemini estan agotadas "
             f"({agotadas} por limite diario). Ultimo error: {errores[-1] if errores else 'desconocido'}"
+        )
+
+    def invocar(self, mensajes: object, **kwargs: object) -> object:
+        """Invoca el LLM rotando claves. Reintenta una vez tras esperar el
+        backoff mas corto si las tres claves estan agotadas."""
+        return self._ejecutar_con_rotacion(lambda cliente: cliente.invoke(mensajes, **kwargs))
+
+    def con_salida_estructurada(self, esquema: type) -> _SalidaEstructuradaRotada:
+        """Equivalente rotado de ChatModel.with_structured_output(esquema).
+        Devuelve un objeto con .invoke(mensajes) que aplica la misma logica
+        de rotacion y failover que invocar()."""
+        return _SalidaEstructuradaRotada(self, esquema)
+
+
+class _SalidaEstructuradaRotada:
+    def __init__(self, rotador: RotadorClavesGemini, esquema: type) -> None:
+        self._rotador = rotador
+        self._esquema = esquema
+
+    def invoke(self, mensajes: object, **kwargs: object) -> object:
+        return self._rotador._ejecutar_con_rotacion(
+            lambda cliente: cliente.with_structured_output(self._esquema).invoke(mensajes, **kwargs)
         )
 
 
