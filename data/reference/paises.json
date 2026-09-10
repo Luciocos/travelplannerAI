@@ -1,0 +1,16 @@
+{
+  "_comentario": "Pais -> idioma oficial -> moneda. Dato estructurado, no RAG (ver fuentes-datos.md, RF8). Cargado a mano una vez, no cambia seguido. Cubre Miami (EEUU) y los paises mas probables si Europa/Caribe se resuelven a ciudades concretas; completar el resto cuando se elijan los destinos definitivos.",
+  "Estados Unidos": { "idioma": "ingles", "moneda": "USD" },
+  "Espana": { "idioma": "espanol", "moneda": "EUR" },
+  "Francia": { "idioma": "frances", "moneda": "EUR" },
+  "Italia": { "idioma": "italiano", "moneda": "EUR" },
+  "Portugal": { "idioma": "portugues", "moneda": "EUR" },
+  "Alemania": { "idioma": "aleman", "moneda": "EUR" },
+  "Republica Dominicana": { "idioma": "espanol", "moneda": "DOP" },
+  "Mexico": { "idioma": "espanol", "moneda": "MXN" },
+  "Cuba": { "idioma": "espanol", "moneda": "CUP" },
+  "Jamaica": { "idioma": "ingles", "moneda": "JMD" },
+  "Puerto Rico": { "idioma": "espanol", "moneda": "USD" },
+  "Bahamas": { "idioma": "ingles", "moneda": "BSD" },
+  "Argentina": { "idioma": "espanol", "moneda": "ARS" }
+}
