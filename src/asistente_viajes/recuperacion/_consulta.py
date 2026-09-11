@@ -13,7 +13,7 @@ from asistente_viajes.embeddings import embeber_texto
 SQL_CONSULTA_CANONICA = """
 SELECT nombre, categoria, texto, direccion, rango_precio
 FROM documento_rag
-WHERE corpus = %(corpus)s AND destino = %(destino)s
+WHERE corpus = %(corpus)s AND lower(unaccent(destino)) = lower(unaccent(%(destino)s))
 ORDER BY embedding <=> %(consulta)s::vector
 LIMIT %(k)s;
 """

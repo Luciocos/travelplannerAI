@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import logging
+import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -70,12 +71,23 @@ def _decidir_accion(rotador: RotadorClavesGemini, mensaje: str, estado: Preferen
     return decision.accion
 
 
+def _normalizar_destino(texto: str) -> str:
+    """lower, sin tildes, trim. Asi 'Cancun' y 'Cancún' matchean igual
+    (el usuario puede escribir cualquiera de las dos formas)."""
+    sin_tildes = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    return sin_tildes.strip().lower()
+
+
 def _coordenadas_destino(destino: str, ruta_destinos: Path = RUTA_DESTINOS) -> dict | None:
     """Destinos piloto -> pais/lat/lon, para poder disparar info_destino
     sin pedirle coordenadas al usuario. None si el destino no esta en la
-    tabla de referencia (todavia no soportado como piloto)."""
+    tabla de referencia (todavia no soportado como piloto). Insensible a
+    tildes y mayusculas."""
     datos = json.loads(ruta_destinos.read_text(encoding="utf-8"))
-    return datos.get(destino)
+    datos_normalizados = {
+        _normalizar_destino(nombre): valor for nombre, valor in datos.items() if not nombre.startswith("_")
+    }
+    return datos_normalizados.get(_normalizar_destino(destino))
 
 
 def _disparar_info_destino_si_corresponde(sesion: SesionAgente) -> InfoDestino | None:

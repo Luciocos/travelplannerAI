@@ -106,6 +106,29 @@ def test_coordenadas_destino_desconocido_devuelve_none(tmp_path: Path) -> None:
     assert mod._coordenadas_destino("Narnia", ruta_destinos=ruta) is None
 
 
+def test_coordenadas_destino_es_insensible_a_tildes_y_mayusculas(tmp_path: Path) -> None:
+    ruta = tmp_path / "destinos.json"
+    ruta.write_text('{"Cancun": {"pais": "Mexico", "lat": 21.1, "lon": -86.8}}', encoding="utf-8")
+
+    assert mod._coordenadas_destino("cancún", ruta_destinos=ruta) == {
+        "pais": "Mexico",
+        "lat": 21.1,
+        "lon": -86.8,
+    }
+    assert mod._coordenadas_destino("CANCUN", ruta_destinos=ruta) is not None
+
+
+def test_coordenadas_destino_ignora_claves_de_metadata(tmp_path: Path) -> None:
+    ruta = tmp_path / "destinos.json"
+    ruta.write_text(
+        '{"_comentario": "nota", "Cancun": {"pais": "Mexico", "lat": 21.1, "lon": -86.8}}',
+        encoding="utf-8",
+    )
+
+    assert mod._coordenadas_destino("_comentario", ruta_destinos=ruta) is None
+    assert mod._coordenadas_destino("Cancun", ruta_destinos=ruta) is not None
+
+
 def _info_destino_falsa() -> InfoDestino:
     return InfoDestino(
         destino="Cancun",

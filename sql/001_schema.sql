@@ -4,6 +4,11 @@
 -- en la misma base que los vectores (ver arquitectura.md, decision D-01).
 
 CREATE EXTENSION IF NOT EXISTS vector;
+-- unaccent: el destino puede llegar del usuario con o sin tilde (ej. la
+-- forma correcta en espaniol vs. como puede tipearlo alguien), y el
+-- filtro por destino tiene que ser insensible a eso (ver consulta
+-- canonica en recuperacion/_consulta.py).
+CREATE EXTENSION IF NOT EXISTS unaccent;
 
 CREATE TABLE IF NOT EXISTS documento_rag (
     id            BIGSERIAL PRIMARY KEY,
