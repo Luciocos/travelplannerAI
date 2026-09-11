@@ -68,7 +68,7 @@ Orden por valor sobre esfuerzo, de mayor a menor. Si el tiempo se acorta, se cor
 1. **Clima, idioma y moneda (RF8).** Barato, visible, y permite explicar en la defensa que no todo es RAG. Hecho, D-05/D-06 adelantado.
 2. **Alojamiento y vuelos (RF6, RF7).** RapidAPI/Booking.com15 (reemplaza a Amadeus, D-06). Hecho, adelantado.
 3. **FAQ del viajero (RF9).** Tercer corpus, `corpus='faq'`, curado a mano. El menos diferencial de los RAGs, pero de esfuerzo bajo y acotado (a diferencia de RF4).
-4. **Gastos (RF10).** Tablas `gasto` y `participante`, algoritmo de minimización de transferencias. Es lógica de producto, no de IA, salvo que se le sume parseo NLP para cargar el gasto en lenguaje natural, que sí suma y es barato.
+4. ~~**Gastos (RF10).**~~ **Omitido, decisión del usuario (D-11 en `docs/DECISIONES.md`).** No se implementa.
 5. **Recomendación de comercios (RF4), retomar si hay tiempo.** Movido de núcleo a extensión (D-07). Tool y RAG ya implementados y testeados con mocks; falta corpus real, vía curaduría manual dedicada en `data/curated/` o una fuente con más volumen (ej. Yelp API). Es la de menor prioridad porque ya se probó que el esfuerzo para cerrarla es alto (8+ horas), no por falta de valor.
 
 ## Fase 8, notebook de demo (días 17 a 20)

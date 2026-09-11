@@ -1,7 +1,9 @@
 -- Esquema base del asistente de viajes.
 -- documento_rag cubre los tres corpus de RAG (atractivos, comercios, faq).
--- itinerario/itinerario_item y gasto/participante son tablas propias, viven
--- en la misma base que los vectores (ver arquitectura.md, decision D-01).
+-- itinerario/itinerario_item son tablas propias, viven en la misma base
+-- que los vectores (ver arquitectura.md, decision D-01). RF10 (gastos) se
+-- omitio del alcance del TP (D-11 en docs/DECISIONES.md), no hay tablas
+-- de gasto/participante.
 
 CREATE EXTENSION IF NOT EXISTS vector;
 -- unaccent: el destino puede llegar del usuario con o sin tilde (ej. la
@@ -75,20 +77,4 @@ CREATE TABLE IF NOT EXISTS uso_api_mensual (
     periodo    TEXT NOT NULL,   -- 'YYYY-MM'
     cantidad   INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (proveedor, periodo)
-);
-
--- Tablas de gastos (RF10, extension, Fase 7).
-CREATE TABLE IF NOT EXISTS participante (
-    id            BIGSERIAL PRIMARY KEY,
-    itinerario_id BIGINT NOT NULL REFERENCES itinerario (id) ON DELETE CASCADE,
-    nombre        TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS gasto (
-    id              BIGSERIAL PRIMARY KEY,
-    itinerario_id   BIGINT NOT NULL REFERENCES itinerario (id) ON DELETE CASCADE,
-    participante_id BIGINT NOT NULL REFERENCES participante (id) ON DELETE CASCADE,
-    concepto        TEXT NOT NULL,
-    monto           NUMERIC NOT NULL,
-    creado_en       TIMESTAMPTZ NOT NULL DEFAULT now()
 );

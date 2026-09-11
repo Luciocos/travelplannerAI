@@ -58,7 +58,7 @@ Extensiones:
 | RF7 | Vuelos por destino y fechas | `buscar_vuelos` | RapidAPI, Booking.com15 (reemplaza a Amadeus, D-06) |
 | RF8 | Clima, idioma y moneda al confirmar destino | `info_destino` | Open-Meteo mas tabla de referencia |
 | RF9 | Seguridad y costumbres locales | `responder_faq_viajero` | RAG de FAQ (corpus curado) |
-| RF10 | Gastos del viaje y división | `registrar_gasto`, `calcular_division_gastos` | Lógica propia |
+| RF10 | Gastos del viaje y división | `registrar_gasto`, `calcular_division_gastos` | **Omitido, ver D-11 en `docs/DECISIONES.md`.** No se implementa. |
 
 Transversales:
 

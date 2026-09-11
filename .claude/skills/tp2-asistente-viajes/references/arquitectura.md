@@ -52,8 +52,7 @@
 │   │   ├── info_destino.py       # clima mas idioma y moneda
 │   │   ├── buscar_alojamiento.py # RF6, sobre services/rapidapi (booking + fallback fly_scraper)
 │   │   ├── buscar_vuelos.py      # RF7, sobre services/rapidapi (fly_scraper + fallback booking)
-│   │   ├── responder_faq_viajero.py # RF9, sobre recuperacion/faq.py (corpus curado)
-│   │   └── gastos.py
+│   │   └── responder_faq_viajero.py # RF9, sobre recuperacion/faq.py (corpus curado)
 │   └── agente.py                 # orquestador, memoria, registro de tools
 ├── notebooks/
 │   └── demo_tp2.ipynb            # ENTREGABLE OFICIAL
@@ -118,7 +117,7 @@ ORDER BY embedding <=> %(consulta)s::vector
 LIMIT %(k)s;
 ```
 
-Filtro por metadata y búsqueda semántica en **una sola consulta**. Ese es el argumento concreto a favor de pgvector frente a Chroma, y hay que poder decirlo así en la defensa. Segundo argumento: las tablas estructuradas (itinerarios, gastos) viven en la misma base que los vectores, un solo motor en vez de dos.
+Filtro por metadata y búsqueda semántica en **una sola consulta**. Ese es el argumento concreto a favor de pgvector frente a Chroma, y hay que poder decirlo así en la defensa. Segundo argumento: las tablas estructuradas (itinerarios) viven en la misma base que los vectores, un solo motor en vez de dos.
 
 ### Decisión abierta, resolver en Fase 2
 
@@ -127,7 +126,7 @@ Dos caminos, los dos válidos y los dos 100% LangChain:
 - **`langchain_postgres.PGVector`**: integración oficial, metadata en jsonb, mucho menos código propio. Default recomendado para los tres corpus.
 - **Tabla propia** (la de arriba) envuelta en un `BaseRetriever` de LangChain: control total del SQL, más fácil de mostrar en la defensa.
 
-En cualquiera de los dos casos, las tablas de itinerarios y gastos son propias y viven en la misma base. Si aparece fricción con el filtrado por metadata de `PGVector`, migrar a la tabla propia y documentarlo como decisión con su motivo.
+En cualquiera de los dos casos, las tablas de itinerarios son propias y viven en la misma base. Si aparece fricción con el filtrado por metadata de `PGVector`, migrar a la tabla propia y documentarlo como decisión con su motivo.
 
 ## Modelo de estado
 
