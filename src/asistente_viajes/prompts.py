@@ -68,6 +68,12 @@ mensaje, usando el estado actual del viaje como contexto:
 - recomendar_locales: el usuario pregunta algo puntual sobre dónde comer,
   comprar, o un local en particular.
 
+Además, si el usuario pidió explícitamente una cantidad de resultados
+(por ejemplo "dame 5 opciones", "mostrame solo dos", "una sola
+actividad"), completá cantidad_resultados con ese número. Si no
+mencionó ninguna cantidad, dejalo sin completar: no inventes un número
+que el usuario no dijo, cada tool ya tiene su propio valor por defecto.
+
 Estado actual del viaje: {estado_actual}
 Datos obligatorios que todavía faltan: {slots_faltantes}
 

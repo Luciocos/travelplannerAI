@@ -13,10 +13,12 @@ from asistente_viajes.tools.info_destino import InfoClima, InfoDestino, InfoIdio
 from asistente_viajes.tools.recomendar_actividades import ActividadRecomendada
 
 
-def _rotador_con_decision(accion: str) -> MagicMock:
+def _rotador_con_decision(accion: str, cantidad_resultados: int | None = None) -> MagicMock:
     rotador = MagicMock()
     modelo_estructurado = MagicMock()
-    modelo_estructurado.invoke.return_value = mod.DecisionAccion(accion=accion)
+    modelo_estructurado.invoke.return_value = mod.DecisionAccion(
+        accion=accion, cantidad_resultados=cantidad_resultados
+    )
     rotador.con_salida_estructurada.return_value = modelo_estructurado
     return rotador
 
@@ -25,10 +27,20 @@ def test_decidir_accion_llama_al_llm_con_el_estado_y_lo_faltante() -> None:
     rotador = _rotador_con_decision("completar_slots")
     estado = PreferenciasViaje(destino="Cancun")
 
-    accion = mod._decidir_accion(rotador, "quiero ir a Cancun", estado)
+    decision = mod._decidir_accion(rotador, "quiero ir a Cancun", estado)
 
-    assert accion == "completar_slots"
+    assert decision.accion == "completar_slots"
+    assert decision.cantidad_resultados is None
     rotador.con_salida_estructurada.assert_called_once_with(mod.DecisionAccion)
+
+
+def test_decidir_accion_propaga_cantidad_resultados_pedida() -> None:
+    rotador = _rotador_con_decision("recomendar_actividades", cantidad_resultados=5)
+    estado = PreferenciasViaje(destino="Cancun", intereses=["historia"])
+
+    decision = mod._decidir_accion(rotador, "dame 5 opciones", estado)
+
+    assert decision.cantidad_resultados == 5
 
 
 def test_procesar_mensaje_completar_slots_actualiza_la_sesion(monkeypatch) -> None:
@@ -67,13 +79,26 @@ def test_procesar_mensaje_armar_plan_llama_a_la_tool_y_persiste(monkeypatch) -> 
 def test_procesar_mensaje_recomendar_actividades(monkeypatch) -> None:
     rotador = _rotador_con_decision("recomendar_actividades")
     actividad = ActividadRecomendada(nombre="El Meco", categoria="historic", justificacion="Es un sitio maya real.")
-    monkeypatch.setattr(mod, "recomendar_actividades", lambda *_, **__: [actividad])
+    llamada = MagicMock(return_value=[actividad])
+    monkeypatch.setattr(mod, "recomendar_actividades", llamada)
 
     sesion = mod.SesionAgente(estado=PreferenciasViaje(destino="Cancun", intereses=["historia"]))
     respuesta = mod.procesar_mensaje(MagicMock(), rotador, sesion, "qué puedo visitar")
 
     assert "El Meco" in respuesta
     assert "sitio maya real" in respuesta
+    assert llamada.call_args.kwargs["k"] == mod.CANTIDAD_RESULTADOS_DEFECTO
+
+
+def test_procesar_mensaje_recomendar_actividades_usa_cantidad_pedida(monkeypatch) -> None:
+    rotador = _rotador_con_decision("recomendar_actividades", cantidad_resultados=5)
+    llamada = MagicMock(return_value=[])
+    monkeypatch.setattr(mod, "recomendar_actividades", llamada)
+
+    sesion = mod.SesionAgente(estado=PreferenciasViaje(destino="Cancun", intereses=["historia"]))
+    mod.procesar_mensaje(MagicMock(), rotador, sesion, "dame 5 opciones")
+
+    assert llamada.call_args.kwargs["k"] == 5
 
 
 def test_procesar_mensaje_recomendar_locales(monkeypatch) -> None:
@@ -81,12 +106,14 @@ def test_procesar_mensaje_recomendar_locales(monkeypatch) -> None:
     from asistente_viajes.tools.recomendar_locales import LocalRecomendado
 
     local = LocalRecomendado(nombre="Mercado 28", categoria="shops", direccion=None, rango_precio="$$", justificacion="Vende artesanias tipicas.")
-    monkeypatch.setattr(mod, "recomendar_locales", lambda *_, **__: [local])
+    llamada = MagicMock(return_value=[local])
+    monkeypatch.setattr(mod, "recomendar_locales", llamada)
 
     sesion = mod.SesionAgente(estado=PreferenciasViaje(destino="Cancun"))
     respuesta = mod.procesar_mensaje(MagicMock(), rotador, sesion, "donde compro artesanias")
 
     assert "Mercado 28" in respuesta
+    assert llamada.call_args.kwargs["k"] == mod.CANTIDAD_RESULTADOS_DEFECTO
 
 
 def test_coordenadas_destino_conocido(monkeypatch) -> None:
