@@ -41,16 +41,26 @@ No necesita RAG ni embeddings. Es un dato estructurado que casi no cambia: alcan
 
 Saber explicar por qué acá **no** se usa RAG es parte de la defensa. Meter embeddings donde alcanza un diccionario es un error de criterio, no una virtud.
 
-## Amadeus for Developers, alojamiento y vuelos (RF6, RF7) — **DADO DE BAJA, ver bloqueo**
+## Amadeus for Developers — dado de baja, reemplazado por RapidAPI (D-05/D-06)
 
-**Esta sección ya no describe algo utilizable. Amadeus cerró el portal self-service que sustentaba esta decisión.** Confirmado el 2026-09-10 por varias fuentes (PhocusWire, anuncios de terceros): registro de usuarios nuevos pausado desde marzo/abril de 2026, portal decomisionado por completo el 2026-07-17, keys existentes desactivadas desde esa fecha. No hay forma self-service de conseguir `client_id`/`client_secret` hoy. Queda como bloqueo abierto en `estado.md`, no improvisar un reemplazo sin decisión del equipo (ver `plan-de-fases.md`, Fase 7).
+Amadeus cerró el portal self-service que sustentaba la decisión original: registro de usuarios nuevos pausado desde marzo/abril de 2026, portal decomisionado por completo el 2026-07-17, keys existentes desactivadas desde esa fecha (confirmado 2026-09-10 por cobertura de prensa especializada). No hay forma self-service de conseguir `client_id`/`client_secret` hoy. Reemplazado por RapidAPI, ver abajo.
 
-Lo que sigue es el diseño original, dejado como referencia histórica y como insumo si se busca un reemplazo con la misma forma:
+## RapidAPI (Booking.com15), alojamiento y vuelos (RF6, RF7)
 
-- Autenticación: OAuth2 `client_credentials` contra `test.api.amadeus.com`.
-- Hotel Search: resolver primero los `hotelIds` por ciudad y recién después pedir ofertas.
-- Flight Offers Search: búsqueda directa por origen, destino y fechas.
-- Los datos del entorno de test eran datos de prueba, no reales.
+Reemplaza a Amadeus. Una sola suscripción de cuenta (`RAPIDAPI_KEY`) sirve para todo, pero **cada API requiere suscripción explícita al plan Free desde su página en el marketplace** (Pricing → Subscribe), no alcanza con tener la key de cuenta — sin eso, todas las llamadas devuelven `403 {"message":"You are not subscribed to this API."}`.
+
+**Hallazgo central: Booking.com15 (`booking-com15.p.rapidapi.com`) sirve por sí sola para hoteles y vuelos.** Fly Scraper, evaluada en paralelo como fuente primaria de vuelos, no tiene ningún endpoint de búsqueda real funcionando bajo esta suscripción (ver más abajo) — quedó reducida a un dato complementario opcional.
+
+Patrón de dos pasos, igual en los dos dominios, verificado con llamadas reales el 2026-09-10:
+
+- **Hoteles**: `GET /api/v1/hotels/searchDestination?query=<texto>` devuelve candidatos con `dest_id` y `search_type` (**en minúscula**: `"city"`, `"district"`, `"region"`, `"airport"` — ojo, la documentación de terceros y el código de ejemplo suelen asumir mayúscula). Con esos dos valores, `GET /api/v1/hotels/searchHotels` (parámetros: `dest_id`, `search_type`, `arrival_date`, `departure_date`, `adults`, `room_qty`, `currency_code`, `languagecode`) devuelve hoteles reales con precio, puntaje y reseñas. No trae dirección (hace falta `getHotelDetails`, no implementado).
+- **Vuelos**: `GET /api/v1/flights/searchDestination?query=<texto>` (mismo nombre de endpoint que hoteles, pero bajo `/flights/`, no `/api/v1/flights/searchFlightLocation` como sugeriría el nombre "Search Flight Location" del playground) devuelve candidatos con `id` (ej. `"BUE.CITY"`, `"CUN.AIRPORT"`) y `type` (**en mayúscula**: `"CITY"`, `"AIRPORT"` — namespace de valores distinto al de hoteles). Con `fromId`/`toId`, `GET /api/v1/flights/searchFlights` (+ `departDate`, `adults`, `currency_code`, `cabinClass`, y `returnDate` si es ida y vuelta, sin verificar con llamada real) devuelve itinerarios reales con precio, aerolíneas y escalas.
+- El envelope de Booking.com15 miente sobre el éxito: `{"status": true/false, "message", "data"}`, un error de parámetros puede volver con HTTP 200 y `status: false`. Nunca confiar solo en el código HTTP.
+- Los dos dominios comparten host y key pero **no comparten namespace de id**: cachear la resolución de destino por separado (`booking_hoteles` / `booking_vuelos`).
+
+**Fly Scraper (`fly-scraper.p.rapidapi.com`) — casi todos sus endpoints anunciados no funcionan.** Se probaron `auto-complete`, `search-oneway`, `search-roundtrip`, `get-airports`, `search-everywhere`, en variantes singular/plural y con/sin prefijo `v2`: todos devuelven 404 directo del proxy de RapidAPI (`X-RapidAPI-Proxy-Response: true`, ni llegan al backend real), pese a estar listados en el playground. El único que responde con datos reales es `GET /v2/flights/price-calendar?originSkyId=<IATA>&destinationSkyId=<IATA>` (acepta código IATA directo, sin resolución previa) — un calendario de precio mínimo por día, no una búsqueda de itinerarios. Se usa solo como dato complementario ("mejor día para viajar"), nunca como fuente de `buscar_vuelos`.
+
+Implementado en `src/asistente_viajes/services/rapidapi/` (`client.py`, `booking.py`, `fly_scraper.py`, `cache.py`, `models.py`, `fixtures/`). Fixtures con respuestas reales grabadas para Barcelona/Cancún/Buenos Aires. Detalle completo del proceso de migración y verificación en `migracion-amadeus-a-rapidapi.md` (raíz del repo).
 
 ## Booking.com, descartada
 

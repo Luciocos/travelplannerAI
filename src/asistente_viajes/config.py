@@ -58,8 +58,12 @@ class Configuracion:
     claves_gemini: list[str] = field(default_factory=list)
     database_url: str = ""
     opentripmap_api_key: str | None = None
-    amadeus_client_id: str | None = None
-    amadeus_client_secret: str | None = None
+    rapidapi_key: str | None = None
+    rapidapi_host_booking: str = "booking-com15.p.rapidapi.com"
+    rapidapi_host_fly_scraper: str = "fly-scraper.p.rapidapi.com"
+    rapidapi_quota_booking: int = 0
+    rapidapi_quota_fly_scraper: int = 0
+    usar_fixtures: bool = False
 
 
 def cargar_configuracion() -> Configuracion:
@@ -70,6 +74,12 @@ def cargar_configuracion() -> Configuracion:
         claves_gemini=_claves_gemini(),
         database_url=_variable_requerida("DATABASE_URL"),
         opentripmap_api_key=os.environ.get("OPENTRIPMAP_API_KEY") or None,
-        amadeus_client_id=os.environ.get("AMADEUS_CLIENT_ID") or None,
-        amadeus_client_secret=os.environ.get("AMADEUS_CLIENT_SECRET") or None,
+        rapidapi_key=os.environ.get("RAPIDAPI_KEY") or None,
+        rapidapi_host_booking=os.environ.get("RAPIDAPI_HOST_BOOKING", "booking-com15.p.rapidapi.com"),
+        rapidapi_host_fly_scraper=os.environ.get(
+            "RAPIDAPI_HOST_FLY_SCRAPER", "fly-scraper.p.rapidapi.com"
+        ),
+        rapidapi_quota_booking=int(os.environ.get("RAPIDAPI_MONTHLY_QUOTA_BOOKING", "0")),
+        rapidapi_quota_fly_scraper=int(os.environ.get("RAPIDAPI_MONTHLY_QUOTA_FLY_SCRAPER", "0")),
+        usar_fixtures=os.environ.get("USE_FIXTURES", "false").lower() == "true",
     )

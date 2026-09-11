@@ -1,0 +1,1267 @@
+{
+  "status": true,
+  "message": "Success",
+  "timestamp": 1789086620136,
+  "data": {
+    "hotels": [
+      {
+        "hotel_id": 325001,
+        "accessibilityLabel": "H10 Casanova.\n4 de 5 estrellas.\nEste alojamiento es Preferente.\n8,9 Fabuloso 2370 comentarios.\n‎Eixample‬ • ‎A 0,8 km del centro‬\n‎A 2,7 km de la playa‬\n‎Certificación de sostenibilidad‬.\nOferta de finales de año.\n Habitación de hotel : Camas: 1 doble o 2 individuales.\nPrecio original 1364 USD. Precio actual 1089 USD..\nIncluye impuestos y cargos.\nNos quedan 3 a este precio.",
+        "property": {
+          "name": "H10 Casanova",
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "propertyClass": 4,
+          "isPreferred": true,
+          "accuratePropertyClass": 4,
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: Camas: 1 doble o 2 individuales",
+          "reviewScoreWord": "Fabuloso",
+          "isFirstPage": true,
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "00:00"
+          },
+          "currency": "EUR",
+          "checkout": {
+            "fromTime": "06:00",
+            "untilTime": "12:00"
+          },
+          "wishlistName": "Barcelona",
+          "latitude": 41.3841352871336,
+          "mainPhotoId": 471071511,
+          "reviewScore": 8.9,
+          "optOutFromGalleryChanges": 0,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/471071511.jpg?k=edea1217863bfc376fe739edc0d8fac7b4016a07980d55cf76c32030e7ed5eca&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/471071511.jpg?k=edea1217863bfc376fe739edc0d8fac7b4016a07980d55cf76c32030e7ed5eca&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/471071511.jpg?k=edea1217863bfc376fe739edc0d8fac7b4016a07980d55cf76c32030e7ed5eca&o="
+          ],
+          "priceBreakdown": {
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "strikethroughPrice": {
+              "value": 1364.24347208731,
+              "currency": "USD",
+              "amountRounded": "US$1.364"
+            },
+            "grossPrice": {
+              "amountRounded": "US$1.089",
+              "currency": "USD",
+              "value": 1088.92743234969
+            },
+            "benefitBadges": [
+              {
+                "identifier": "Late Escape Campaign",
+                "variant": "constructive",
+                "explanation": "Oferta de finales de año",
+                "text": "Oferta de finales de año"
+              }
+            ]
+          },
+          "id": 325001,
+          "checkinDate": "2026-10-15",
+          "countryCode": "es",
+          "ufi": -372490,
+          "longitude": 2.16071046888828,
+          "position": 0,
+          "reviewCount": 2370,
+          "rankingPosition": 0,
+          "blockIds": [
+            "32500159_88207349_0_2_0_498133"
+          ]
+        }
+      },
+      {
+        "hotel_id": 2822154,
+        "accessibilityLabel": "Motel One Barcelona-Ciutadella.\n3 de 5 estrellas.\n8,8 Fabuloso 10653 comentarios.\n‎Sant Martí‬ • ‎A 1,3 km del centro‬\n‎A 1,1 km de la playa‬\n‎Certificación de sostenibilidad‬.\n Habitación de hotel : 1 cama.\n999 USD.\nIncluye impuestos y cargos.\nCancelación gratis.\nSin pago por adelantado.",
+        "property": {
+          "checkout": {
+            "fromTime": "00:00",
+            "untilTime": "12:00"
+          },
+          "wishlistName": "Barcelona",
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "15:00"
+          },
+          "isFirstPage": true,
+          "currency": "EUR",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: 1 cama",
+          "reviewScoreWord": "Fabuloso",
+          "propertyClass": 3,
+          "accuratePropertyClass": 3,
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "name": "Motel One Barcelona-Ciutadella",
+          "blockIds": [
+            "282215401_426960258_2_2_0"
+          ],
+          "rankingPosition": 1,
+          "position": 1,
+          "longitude": 2.18462769999996,
+          "reviewCount": 10653,
+          "checkinDate": "2026-10-15",
+          "ufi": -372490,
+          "countryCode": "es",
+          "priceBreakdown": {
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "grossPrice": {
+              "currency": "USD",
+              "value": 999.077760063941,
+              "amountRounded": "US$999"
+            },
+            "benefitBadges": []
+          },
+          "id": 2822154,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/818940830.jpg?k=09174a98410707b9f5a9dc6e8377489b5cb14ab1dbf2be5ae341e2d704f3de95&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/818940830.jpg?k=09174a98410707b9f5a9dc6e8377489b5cb14ab1dbf2be5ae341e2d704f3de95&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/818940830.jpg?k=09174a98410707b9f5a9dc6e8377489b5cb14ab1dbf2be5ae341e2d704f3de95&o="
+          ],
+          "optOutFromGalleryChanges": 1,
+          "mainPhotoId": 818940830,
+          "reviewScore": 8.8,
+          "latitude": 41.3901309
+        }
+      },
+      {
+        "hotel_id": 16995,
+        "accessibilityLabel": "Hotel SB Diagonal Zero 4 Sup.\n4 de 5 estrellas.\n8,2 Muy bien 7268 comentarios.\n‎Sant Martí‬ • ‎A 5 km del centro‬\n‎A 0,7 km de la playa‬\n‎Certificación de sostenibilidad‬.\n Habitación de hotel : Camas: 1 doble o 2 individuales.\n935 USD.\nIncluye impuestos y cargos.\nNos quedan 2 a este precio.",
+        "property": {
+          "name": "Hotel SB Diagonal Zero 4 Sup",
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 0,
+          "accuratePropertyClass": 4,
+          "propertyClass": 4,
+          "reviewScoreWord": "Muy bien",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: Camas: 1 doble o 2 individuales",
+          "currency": "EUR",
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "15:00"
+          },
+          "isFirstPage": true,
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "untilTime": "12:00",
+            "fromTime": "04:00"
+          },
+          "latitude": 41.4119644725196,
+          "reviewScore": 8.2,
+          "mainPhotoId": 831784198,
+          "optOutFromGalleryChanges": 0,
+          "id": 16995,
+          "priceBreakdown": {
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "grossPrice": {
+              "currency": "USD",
+              "value": 934.937828339836,
+              "amountRounded": "US$935"
+            },
+            "benefitBadges": []
+          },
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/831784198.jpg?k=ae36fef09fd528c56f06a873ee4c6c1df9d072572875e8d24a64af5359e553e1&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/831784198.jpg?k=ae36fef09fd528c56f06a873ee4c6c1df9d072572875e8d24a64af5359e553e1&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/831784198.jpg?k=ae36fef09fd528c56f06a873ee4c6c1df9d072572875e8d24a64af5359e553e1&o="
+          ],
+          "ufi": -372490,
+          "countryCode": "es",
+          "checkinDate": "2026-10-15",
+          "reviewCount": 7268,
+          "position": 2,
+          "longitude": 2.21952259540558,
+          "rankingPosition": 2,
+          "blockIds": [
+            "1699526_95141877_0_2_0"
+          ]
+        }
+      },
+      {
+        "hotel_id": 90589,
+        "accessibilityLabel": "Catalonia Park Güell.\n3 de 5 estrellas.\n8,2 Muy bien 5600 comentarios.\n‎Gracia‬ • ‎A 3,7 km del centro‬\n‎Certificación de sostenibilidad‬.\n Habitación de hotel : Camas: 1 doble o 2 individuales.\n682 USD.\nIncluye impuestos y cargos.\nCancelación gratis.\nSin pago por adelantado.",
+        "property": {
+          "optOutFromGalleryChanges": 1,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/881302697.jpg?k=b4c79df2d7d4d0cc634daf9041a9b3187d6ba78931ec9b65976fe0793450a005&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/881302697.jpg?k=b4c79df2d7d4d0cc634daf9041a9b3187d6ba78931ec9b65976fe0793450a005&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/881302697.jpg?k=b4c79df2d7d4d0cc634daf9041a9b3187d6ba78931ec9b65976fe0793450a005&o="
+          ],
+          "priceBreakdown": {
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "benefitBadges": [],
+            "grossPrice": {
+              "amountRounded": "US$682",
+              "currency": "USD",
+              "value": 681.633360043625
+            }
+          },
+          "id": 90589,
+          "latitude": 41.4141480105029,
+          "reviewScore": 8.2,
+          "mainPhotoId": 881302697,
+          "rankingPosition": 3,
+          "blockIds": [
+            "9058908_194596102_0_2_0"
+          ],
+          "ufi": -372490,
+          "countryCode": "es",
+          "checkinDate": "2026-10-15",
+          "reviewCount": 5600,
+          "longitude": 2.14477278292179,
+          "position": 3,
+          "accuratePropertyClass": 3,
+          "propertyClass": 3,
+          "name": "Catalonia Park Güell",
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 0,
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "untilTime": "12:00",
+            "fromTime": "00:00"
+          },
+          "reviewScoreWord": "Muy bien",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: Camas: 1 doble o 2 individuales",
+          "currency": "EUR",
+          "isFirstPage": true,
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "15:00"
+          }
+        }
+      },
+      {
+        "hotel_id": 7553095,
+        "accessibilityLabel": "The MO House.\n8,1 Muy bien 655 comentarios.\n‎Eixample‬ • ‎A 0,8 km del centro‬\n‎A 1,6 km de la playa‬.\nPrecio solo para móvil.\n Habitación de hotel : 2 camas.\nPrecio original 1128 USD. Precio actual 1021 USD..\nIncluye impuestos y cargos.\nNos queda 1 a este precio.",
+        "property": {
+          "name": "The MO House",
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "propertyClass": 0,
+          "accuratePropertyClass": 0,
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: 2 camas",
+          "reviewScoreWord": "Muy bien",
+          "isFirstPage": true,
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "23:30"
+          },
+          "currency": "EUR",
+          "checkout": {
+            "fromTime": "00:00",
+            "untilTime": "12:00"
+          },
+          "wishlistName": "Barcelona",
+          "latitude": 41.390785,
+          "mainPhotoId": 319628934,
+          "reviewScore": 8.1,
+          "optOutFromGalleryChanges": 0,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/319628934.jpg?k=336f058cfb439bf430890783c5218ddc0359700fe7e1f75bc2f1a5e910d77e31&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/319628934.jpg?k=336f058cfb439bf430890783c5218ddc0359700fe7e1f75bc2f1a5e910d77e31&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/319628934.jpg?k=336f058cfb439bf430890783c5218ddc0359700fe7e1f75bc2f1a5e910d77e31&o="
+          ],
+          "id": 7553095,
+          "priceBreakdown": {
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos",
+            "strikethroughPrice": {
+              "amountRounded": "US$1.128",
+              "currency": "USD",
+              "value": 1128.49740007222
+            },
+            "benefitBadges": [
+              {
+                "explanation": "Precio solo para móvil",
+                "text": "Precio solo para móvil",
+                "variant": "constructive",
+                "identifier": "Mobile Rate"
+              }
+            ],
+            "grossPrice": {
+              "amountRounded": "US$1.021",
+              "value": 1021.01991234535,
+              "currency": "USD"
+            }
+          },
+          "checkinDate": "2026-10-15",
+          "ufi": -372490,
+          "countryCode": "es",
+          "longitude": 2.17807,
+          "position": 4,
+          "reviewCount": 655,
+          "blockIds": [
+            "755309509_332295956_2_0_0"
+          ],
+          "rankingPosition": 4
+        }
+      },
+      {
+        "hotel_id": 94177,
+        "accessibilityLabel": "Residència Erasmus Gracia.\n8,4 Muy bien 5911 comentarios.\n‎Gracia‬ • ‎A 2,6 km del centro‬.\nPrecio solo para móvil.\n Habitación de hotel : 2 camas.\nPrecio original 768 USD. Precio actual 691 USD..\nIncluye impuestos y cargos.\nNos queda 1 a este precio.",
+        "property": {
+          "propertyClass": 0,
+          "accuratePropertyClass": 0,
+          "name": "Residència Erasmus Gracia",
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "checkout": {
+            "fromTime": "00:00",
+            "untilTime": "11:00"
+          },
+          "wishlistName": "Barcelona",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: 2 camas",
+          "reviewScoreWord": "Muy bien",
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "14:00"
+          },
+          "isFirstPage": true,
+          "currency": "EUR",
+          "optOutFromGalleryChanges": 1,
+          "priceBreakdown": {
+            "benefitBadges": [
+              {
+                "identifier": "Mobile Rate",
+                "variant": "constructive",
+                "explanation": "Precio solo para móvil",
+                "text": "Precio solo para móvil"
+              }
+            ],
+            "grossPrice": {
+              "amountRounded": "US$691",
+              "currency": "USD",
+              "value": 690.970644044222
+            },
+            "strikethroughPrice": {
+              "value": 767.738700049135,
+              "currency": "USD",
+              "amountRounded": "US$768"
+            },
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos"
+          },
+          "id": 94177,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/28419075.jpg?k=c962b1193d1e9b21309d3540b67cba28fc32673c8a6cf8d4489f3755015c043c&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/28419075.jpg?k=c962b1193d1e9b21309d3540b67cba28fc32673c8a6cf8d4489f3755015c043c&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/28419075.jpg?k=c962b1193d1e9b21309d3540b67cba28fc32673c8a6cf8d4489f3755015c043c&o="
+          ],
+          "latitude": 41.4064927329925,
+          "mainPhotoId": 28419075,
+          "reviewScore": 8.4,
+          "rankingPosition": 5,
+          "blockIds": [
+            "9417701_339234993_0_2_0"
+          ],
+          "checkinDate": "2026-10-15",
+          "countryCode": "es",
+          "ufi": -372490,
+          "position": 5,
+          "longitude": 2.15244054794312,
+          "reviewCount": 5911
+        }
+      },
+      {
+        "hotel_id": 12529939,
+        "accessibilityLabel": "Barcelona Classic Catedral Apartments.\n4 de 5 en la categoría del alojamiento.\n8,5 Muy bien 403 comentarios.\n‎Ciutat Vella‬ • ‎A 0,7 km del centro‬\n‎A 1,5 km de la playa‬.\nPrecio solo para móvil.\n Apartamento entero – 75 m² : 4 camas • 4 dormitorios • 3 baños.\nPrecio original 1543 USD. Precio actual 1396 USD..\nIncluye impuestos y cargos.\nNos queda 1 a este precio.",
+        "property": {
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "fromTime": "05:00",
+            "untilTime": "11:00"
+          },
+          "currency": "EUR",
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "23:30"
+          },
+          "isFirstPage": true,
+          "reviewScoreWord": "Muy bien",
+          "recommendedUnitsConfigurationLabel": "<b>Apartamento entero – 75 m²</b>: 4 camas • 4 dormitorios • 3 baños",
+          "accuratePropertyClass": 0,
+          "propertyClass": 0,
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 4,
+          "name": "Barcelona Classic Catedral Apartments",
+          "rankingPosition": 6,
+          "blockIds": [
+            "1252993901_397811962_4_0_0"
+          ],
+          "reviewCount": 403,
+          "position": 6,
+          "longitude": 2.1780499,
+          "countryCode": "es",
+          "ufi": -372490,
+          "checkinDate": "2026-10-15",
+          "id": 12529939,
+          "priceBreakdown": {
+            "strikethroughPrice": {
+              "currency": "USD",
+              "value": 1543.26816009877,
+              "amountRounded": "US$1.543"
+            },
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "grossPrice": {
+              "value": 1396.23210008936,
+              "currency": "USD",
+              "amountRounded": "US$1.396"
+            },
+            "benefitBadges": [
+              {
+                "variant": "constructive",
+                "identifier": "Mobile Rate",
+                "text": "Precio solo para móvil",
+                "explanation": "Precio solo para móvil"
+              }
+            ]
+          },
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/583445213.jpg?k=5312c184afc5347a747b8d759d797b03a279531ede11978ad24c8a45ebe1b42d&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/583445213.jpg?k=5312c184afc5347a747b8d759d797b03a279531ede11978ad24c8a45ebe1b42d&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/583445213.jpg?k=5312c184afc5347a747b8d759d797b03a279531ede11978ad24c8a45ebe1b42d&o="
+          ],
+          "optOutFromGalleryChanges": 0,
+          "reviewScore": 8.5,
+          "mainPhotoId": 583445213,
+          "latitude": 41.386787
+        }
+      },
+      {
+        "hotel_id": 12358785,
+        "accessibilityLabel": "Barcelona Classic Sagrada Familia.\n4 de 5 en la categoría del alojamiento.\n8,5 Muy bien 167 comentarios.\n‎Gracia‬ • ‎A 2,2 km del centro‬.\nPrecio solo para móvil.\n Apartamento entero – 95 m² : 4 camas • 3 dormitorios • 1 sala de estar • 2 baños.\nPrecio original 1151 USD. Precio actual 1043 USD..\nIncluye impuestos y cargos.\nNos queda 1 a este precio.",
+        "property": {
+          "optOutFromGalleryChanges": 0,
+          "id": 12358785,
+          "priceBreakdown": {
+            "strikethroughPrice": {
+              "value": 1150.82316007365,
+              "currency": "USD",
+              "amountRounded": "US$1.151"
+            },
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "grossPrice": {
+              "amountRounded": "US$1.043",
+              "currency": "USD",
+              "value": 1043.03171634675
+            },
+            "benefitBadges": [
+              {
+                "identifier": "Mobile Rate",
+                "variant": "constructive",
+                "text": "Precio solo para móvil",
+                "explanation": "Precio solo para móvil"
+              }
+            ]
+          },
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/574737617.jpg?k=30890ffde061bb1c338479d861aedf0507c7e74d6418eaefec56e44f475e72ea&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/574737617.jpg?k=30890ffde061bb1c338479d861aedf0507c7e74d6418eaefec56e44f475e72ea&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/574737617.jpg?k=30890ffde061bb1c338479d861aedf0507c7e74d6418eaefec56e44f475e72ea&o="
+          ],
+          "latitude": 41.4070963,
+          "mainPhotoId": 574737617,
+          "reviewScore": 8.5,
+          "rankingPosition": 7,
+          "blockIds": [
+            "1235878501_395522626_4_0_0"
+          ],
+          "checkinDate": "2026-10-15",
+          "countryCode": "es",
+          "ufi": -372490,
+          "position": 7,
+          "longitude": 2.1666527,
+          "reviewCount": 167,
+          "propertyClass": 0,
+          "accuratePropertyClass": 0,
+          "name": "Barcelona Classic Sagrada Familia",
+          "qualityClass": 4,
+          "checkoutDate": "2026-10-18",
+          "checkout": {
+            "fromTime": "05:00",
+            "untilTime": "11:00"
+          },
+          "wishlistName": "Barcelona",
+          "recommendedUnitsConfigurationLabel": "<b>Apartamento entero – 95 m²</b>: 4 camas • 3 dormitorios • 1 sala de estar • 2 baños",
+          "reviewScoreWord": "Muy bien",
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "23:30"
+          },
+          "isFirstPage": true,
+          "currency": "EUR"
+        }
+      },
+      {
+        "hotel_id": 2338731,
+        "accessibilityLabel": "Hotel SB Glow 4 Sup.\n4 de 5 estrellas.\n8,3 Muy bien 5165 comentarios.\n‎Sant Martí‬ • ‎A 2,4 km del centro‬\n‎A 1,6 km de la playa‬\n‎Certificación de sostenibilidad‬.\n Habitación de hotel : Camas: 1 doble o 2 individuales.\n932 USD.\nIncluye impuestos y cargos.\nNos quedan 6 a este precio.",
+        "property": {
+          "mainPhotoId": 838590080,
+          "reviewScore": 8.3,
+          "latitude": 41.4021579,
+          "id": 2338731,
+          "priceBreakdown": {
+            "grossPrice": {
+              "amountRounded": "US$932",
+              "value": 931.623848339624,
+              "currency": "USD"
+            },
+            "benefitBadges": [],
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos"
+          },
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/838590080.jpg?k=8643edda303706682dd3d1c71355a16af23b6f682af6b213c830955b8f7bd9b2&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/838590080.jpg?k=8643edda303706682dd3d1c71355a16af23b6f682af6b213c830955b8f7bd9b2&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/838590080.jpg?k=8643edda303706682dd3d1c71355a16af23b6f682af6b213c830955b8f7bd9b2&o="
+          ],
+          "optOutFromGalleryChanges": 1,
+          "position": 8,
+          "longitude": 2.19097450000004,
+          "reviewCount": 5165,
+          "checkinDate": "2026-10-15",
+          "countryCode": "es",
+          "ufi": -372490,
+          "blockIds": [
+            "233873104_279534969_0_2_0"
+          ],
+          "rankingPosition": 8,
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "name": "Hotel SB Glow 4 Sup",
+          "propertyClass": 4,
+          "accuratePropertyClass": 4,
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "00:00"
+          },
+          "isFirstPage": true,
+          "currency": "EUR",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: Camas: 1 doble o 2 individuales",
+          "reviewScoreWord": "Muy bien",
+          "checkout": {
+            "untilTime": "12:00",
+            "fromTime": "01:00"
+          },
+          "wishlistName": "Barcelona"
+        }
+      },
+      {
+        "hotel_id": 91631,
+        "accessibilityLabel": "Abba Rambla Hotel.\n3 de 5 estrellas.\n8,4 Muy bien 1675 comentarios.\n‎Ciutat Vella‬ • ‎A 0,9 km del centro‬\n‎A 1,9 km de la playa‬\n‎Certificación de sostenibilidad‬.\nPrecio solo para móvil.\n Habitación de hotel : Camas: 1 doble o 2 individuales.\nPrecio original 943 USD. Precio actual 854 USD..\nIncluye impuestos y cargos.\nNos quedan 5 a este precio.",
+        "property": {
+          "name": "Abba Rambla Hotel",
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 0,
+          "accuratePropertyClass": 3,
+          "propertyClass": 3,
+          "reviewScoreWord": "Muy bien",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: Camas: 1 doble o 2 individuales",
+          "currency": "EUR",
+          "isFirstPage": true,
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "14:00"
+          },
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "untilTime": "12:00",
+            "fromTime": "00:00"
+          },
+          "latitude": 41.3791251104658,
+          "reviewScore": 8.4,
+          "mainPhotoId": 831443172,
+          "optOutFromGalleryChanges": 0,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/831443172.jpg?k=378317add92df4a4f2b125e599e613badf2a14849594b6924f9005c0cbb06e51&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/831443172.jpg?k=378317add92df4a4f2b125e599e613badf2a14849594b6924f9005c0cbb06e51&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/831443172.jpg?k=378317add92df4a4f2b125e599e613badf2a14849594b6924f9005c0cbb06e51&o="
+          ],
+          "priceBreakdown": {
+            "benefitBadges": [
+              {
+                "variant": "constructive",
+                "identifier": "Mobile Rate",
+                "explanation": "Precio solo para móvil",
+                "text": "Precio solo para móvil"
+              }
+            ],
+            "grossPrice": {
+              "value": 854.309160054676,
+              "currency": "USD",
+              "amountRounded": "US$854"
+            },
+            "strikethroughPrice": {
+              "amountRounded": "US$943",
+              "value": 943.263360060369,
+              "currency": "USD"
+            },
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": []
+          },
+          "id": 91631,
+          "ufi": -372490,
+          "countryCode": "es",
+          "checkinDate": "2026-10-15",
+          "reviewCount": 1675,
+          "longitude": 2.16837823390961,
+          "position": 9,
+          "rankingPosition": 9,
+          "blockIds": [
+            "9163102_88191474_0_2_0_683605"
+          ]
+        }
+      },
+      {
+        "hotel_id": 286088,
+        "accessibilityLabel": "Inside Barcelona Apartments Mercat.\n4 de 5 en la categoría del alojamiento.\n9,2 Fantástico 575 comentarios.\n‎Ciutat Vella‬ • ‎A 1,2 km del centro‬\n‎A 0,9 km de la playa‬.\n Apartamento entero – 65 m² : 3 camas • 2 dormitorios • 1 baño.\n1189 USD.\nIncluye impuestos y cargos.\nCancelación gratis.\nNos queda 1 a este precio.",
+        "property": {
+          "reviewScoreWord": "Fantástico",
+          "recommendedUnitsConfigurationLabel": "<b>Apartamento entero – 65 m²</b>: 3 camas • 2 dormitorios • 1 baño",
+          "currency": "EUR",
+          "isFirstPage": true,
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "15:00"
+          },
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "untilTime": "11:00",
+            "fromTime": "00:00"
+          },
+          "name": "Inside Barcelona Apartments Mercat",
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 4,
+          "accuratePropertyClass": 0,
+          "propertyClass": 0,
+          "ufi": -372490,
+          "countryCode": "es",
+          "checkinDate": "2026-10-15",
+          "reviewCount": 575,
+          "longitude": 2.18441717326641,
+          "position": 10,
+          "rankingPosition": 10,
+          "blockIds": [
+            "28608801_395149184_3_0_0"
+          ],
+          "latitude": 41.3858468497091,
+          "reviewScore": 9.2,
+          "mainPhotoId": 748436469,
+          "optOutFromGalleryChanges": 0,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/748436469.jpg?k=1b3d852e201ad8ac214686d1c81d3cbd66609880cad3459b4ff821e7d8cc25c8&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/748436469.jpg?k=1b3d852e201ad8ac214686d1c81d3cbd66609880cad3459b4ff821e7d8cc25c8&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/748436469.jpg?k=1b3d852e201ad8ac214686d1c81d3cbd66609880cad3459b4ff821e7d8cc25c8&o="
+          ],
+          "priceBreakdown": {
+            "benefitBadges": [],
+            "grossPrice": {
+              "amountRounded": "US$1.189",
+              "value": 1189.19556007611,
+              "currency": "USD"
+            },
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": []
+          },
+          "id": 286088
+        }
+      },
+      {
+        "hotel_id": 807781,
+        "accessibilityLabel": "Praktik Bakery.\n3 de 5 estrellas.\n8,6 Fabuloso 2029 comentarios.\n‎Eixample‬ • ‎A 1,2 km del centro‬.\n Habitación de hotel : Camas: 1 doble o 2 individuales.\n961 USD.\nIncluye impuestos y cargos.\nCancelación gratis.",
+        "property": {
+          "longitude": 2.16336786746979,
+          "position": 11,
+          "reviewCount": 2029,
+          "checkinDate": "2026-10-15",
+          "ufi": -372490,
+          "countryCode": "es",
+          "blockIds": [
+            "80778101_360578084_0_2_0"
+          ],
+          "rankingPosition": 11,
+          "mainPhotoId": 30797918,
+          "reviewScore": 8.6,
+          "latitude": 41.3962440517226,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/30797918.jpg?k=3ab231534eedfb37b00f7feaf74aaf141f53039e51fc987fe50cb751df4176e1&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/30797918.jpg?k=3ab231534eedfb37b00f7feaf74aaf141f53039e51fc987fe50cb751df4176e1&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/30797918.jpg?k=3ab231534eedfb37b00f7feaf74aaf141f53039e51fc987fe50cb751df4176e1&o="
+          ],
+          "id": 807781,
+          "priceBreakdown": {
+            "benefitBadges": [],
+            "grossPrice": {
+              "amountRounded": "US$961",
+              "value": 960.705360061485,
+              "currency": "USD"
+            },
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos"
+          },
+          "optOutFromGalleryChanges": 0,
+          "isFirstPage": true,
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "00:00"
+          },
+          "currency": "EUR",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: Camas: 1 doble o 2 individuales",
+          "reviewScoreWord": "Fabuloso",
+          "checkout": {
+            "fromTime": "06:00",
+            "untilTime": "12:00"
+          },
+          "wishlistName": "Barcelona",
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "name": "Praktik Bakery",
+          "propertyClass": 3,
+          "accuratePropertyClass": 3
+        }
+      },
+      {
+        "hotel_id": 310975,
+        "accessibilityLabel": "La Terrassa.\n3 de 5 en la categoría del alojamiento.\n8,5 Muy bien 4072 comentarios.\n‎Ciutat Vella‬ • ‎A 0,8 km del centro‬\n‎A 1,7 km de la playa‬.\n Habitación privada : 1 cama.\n594 USD.\nIncluye impuestos y cargos.\nNos queda 1 a este precio.",
+        "property": {
+          "qualityClass": 3,
+          "checkoutDate": "2026-10-18",
+          "name": "La Terrassa",
+          "propertyClass": 0,
+          "accuratePropertyClass": 0,
+          "checkin": {
+            "fromTime": "14:00",
+            "untilTime": "00:00"
+          },
+          "isFirstPage": true,
+          "currency": "EUR",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación privada</b>: 1 cama",
+          "reviewScoreWord": "Muy bien",
+          "checkout": {
+            "fromTime": "00:00",
+            "untilTime": "11:00"
+          },
+          "wishlistName": "Barcelona",
+          "mainPhotoId": 789375809,
+          "reviewScore": 8.5,
+          "latitude": 41.3799804601765,
+          "priceBreakdown": {
+            "grossPrice": {
+              "amountRounded": "US$594",
+              "value": 594.423360038043,
+              "currency": "USD"
+            },
+            "benefitBadges": [],
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos"
+          },
+          "id": 310975,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/789375809.jpg?k=48394383053b9f09f9dfe141c09e2507bfa4ba51d45334f085775c94e858e1e4&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/789375809.jpg?k=48394383053b9f09f9dfe141c09e2507bfa4ba51d45334f085775c94e858e1e4&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/789375809.jpg?k=48394383053b9f09f9dfe141c09e2507bfa4ba51d45334f085775c94e858e1e4&o="
+          ],
+          "optOutFromGalleryChanges": 1,
+          "position": 12,
+          "longitude": 2.1713662147522,
+          "reviewCount": 4072,
+          "checkinDate": "2026-10-15",
+          "ufi": -372490,
+          "countryCode": "es",
+          "rankingPosition": 12,
+          "blockIds": [
+            "31097506_88497695_0_0_0"
+          ]
+        }
+      },
+      {
+        "hotel_id": 901256,
+        "accessibilityLabel": "La França Hotel Boutique.\n2 de 5 estrellas.\nEste alojamiento es Preferente.\n8,6 Fabuloso 3750 comentarios.\n‎Sants-Montjuïc‬ • ‎A 2 km del centro‬\n‎A 2,7 km de la playa‬.\n Habitación de hotel : 1 cama.\n792 USD.\nIncluye impuestos y cargos.",
+        "property": {
+          "accuratePropertyClass": 2,
+          "propertyClass": 2,
+          "isPreferred": true,
+          "name": "La França Hotel Boutique",
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 0,
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "untilTime": "12:00",
+            "fromTime": "00:00"
+          },
+          "reviewScoreWord": "Fabuloso",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: 1 cama",
+          "currency": "EUR",
+          "isFirstPage": true,
+          "checkin": {
+            "untilTime": "23:30",
+            "fromTime": "14:00"
+          },
+          "optOutFromGalleryChanges": 1,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/842058749.jpg?k=f627ebb06fd52365ab43d1f6305d1db43914ddc4eaf942c915de066a2b8e679e&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/842058749.jpg?k=f627ebb06fd52365ab43d1f6305d1db43914ddc4eaf942c915de066a2b8e679e&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/842058749.jpg?k=f627ebb06fd52365ab43d1f6305d1db43914ddc4eaf942c915de066a2b8e679e&o="
+          ],
+          "priceBreakdown": {
+            "benefitBadges": [],
+            "grossPrice": {
+              "value": 792.33,
+              "currency": "USD",
+              "amountRounded": "US$792"
+            },
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos"
+          },
+          "id": 901256,
+          "latitude": 41.3721805870407,
+          "reviewScore": 8.6,
+          "mainPhotoId": 842058749,
+          "blockIds": [
+            "90125606_0_2_0_0"
+          ],
+          "rankingPosition": 13,
+          "isTPI": true,
+          "countryCode": "es",
+          "ufi": -372490,
+          "checkinDate": "2026-10-15",
+          "reviewCount": 3750,
+          "longitude": 2.15680992736975,
+          "position": 13
+        }
+      },
+      {
+        "hotel_id": 15003626,
+        "accessibilityLabel": "Outsite Barcelona - Work, Connect, Explore.\n4 de 5 en la categoría del alojamiento.\n8,9 Fabuloso 90 comentarios.\n‎Ciutat Vella‬ • ‎A 1,1 km del centro‬\n‎A 1 km de la playa‬.\n Habitación privada : 1 cama.\n1066 USD.\nIncluye impuestos y cargos.\nNos queda 1 a este precio.",
+        "property": {
+          "id": 15003626,
+          "priceBreakdown": {
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos",
+            "benefitBadges": [],
+            "grossPrice": {
+              "value": 1066.04352834823,
+              "currency": "USD",
+              "amountRounded": "US$1.066"
+            }
+          },
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/757204837.jpg?k=1df3c918b91e62655ade107e13f533077957e239e58a97638aeb1d4400d8b98c&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/757204837.jpg?k=1df3c918b91e62655ade107e13f533077957e239e58a97638aeb1d4400d8b98c&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/757204837.jpg?k=1df3c918b91e62655ade107e13f533077957e239e58a97638aeb1d4400d8b98c&o="
+          ],
+          "optOutFromGalleryChanges": 1,
+          "reviewScore": 8.9,
+          "mainPhotoId": 757204837,
+          "latitude": 41.3800236,
+          "blockIds": [
+            "1500362604_421705327_2_0_0"
+          ],
+          "rankingPosition": 14,
+          "reviewCount": 90,
+          "position": 14,
+          "longitude": 2.179831,
+          "countryCode": "es",
+          "ufi": -372490,
+          "checkinDate": "2026-10-15",
+          "accuratePropertyClass": 0,
+          "propertyClass": 0,
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 4,
+          "name": "Outsite Barcelona - Work, Connect, Explore",
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "untilTime": "11:00",
+            "fromTime": "00:00"
+          },
+          "currency": "EUR",
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "16:00"
+          },
+          "isFirstPage": true,
+          "reviewScoreWord": "Fabuloso",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación privada</b>: 1 cama"
+        }
+      },
+      {
+        "hotel_id": 303022,
+        "accessibilityLabel": "Círculo Condal.\n4 de 5 estrellas.\n9,3 Fantástico 58 comentarios.\n‎Ciutat Vella‬ • ‎A 0,9 km del centro‬\n‎A 1,4 km de la playa‬.\n Habitación de hotel : Camas: 1 doble o 2 individuales.\n1160 USD.\nIncluye impuestos y cargos.",
+        "property": {
+          "rankingPosition": 15,
+          "blockIds": [
+            "30302209_403844515_2_2_0"
+          ],
+          "countryCode": "es",
+          "ufi": -372490,
+          "checkinDate": "2026-10-15",
+          "reviewCount": 58,
+          "longitude": 2.17484772205353,
+          "position": 15,
+          "optOutFromGalleryChanges": 1,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/902863724.jpg?k=b360f7a23fb209a37ead8268120377090c21f5276b097a3d806938e22a187272&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/902863724.jpg?k=b360f7a23fb209a37ead8268120377090c21f5276b097a3d806938e22a187272&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/902863724.jpg?k=b360f7a23fb209a37ead8268120377090c21f5276b097a3d806938e22a187272&o="
+          ],
+          "id": 303022,
+          "priceBreakdown": {
+            "benefitBadges": [],
+            "grossPrice": {
+              "currency": "USD",
+              "value": 1159.54427635421,
+              "amountRounded": "US$1.160"
+            },
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos"
+          },
+          "latitude": 41.3797653411824,
+          "reviewScore": 9.3,
+          "mainPhotoId": 902863724,
+          "wishlistName": "Barcelona",
+          "checkout": {
+            "fromTime": "00:00",
+            "untilTime": "11:00"
+          },
+          "reviewScoreWord": "Fantástico",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: Camas: 1 doble o 2 individuales",
+          "currency": "EUR",
+          "isFirstPage": true,
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "15:00"
+          },
+          "accuratePropertyClass": 4,
+          "propertyClass": 4,
+          "name": "Círculo Condal",
+          "checkoutDate": "2026-10-18",
+          "qualityClass": 0
+        }
+      },
+      {
+        "hotel_id": 13799538,
+        "accessibilityLabel": "easyHotel Barcelona La Sagrera.\n1 de 5 estrellas.\n8,4 Muy bien 515 comentarios.\n‎Sant Andreu‬ • ‎A 3,4 km del centro‬\n‎A 2,7 km de la playa‬.\n Habitación de hotel : 1 cama.\n710 USD.\nIncluye impuestos y cargos.",
+        "property": {
+          "checkinDate": "2026-10-15",
+          "isTPI": true,
+          "countryCode": "es",
+          "ufi": -372490,
+          "longitude": 2.1878967,
+          "position": 16,
+          "reviewCount": 515,
+          "rankingPosition": 16,
+          "blockIds": [
+            "1379953801_0_2_0_0"
+          ],
+          "latitude": 41.4149588,
+          "mainPhotoId": 686089968,
+          "reviewScore": 8.4,
+          "optOutFromGalleryChanges": 1,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/686089968.jpg?k=cdd94cece4ed6ad585c546b9f37195dcd6a549101605dc521a3a33a5f1ccf6f3&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/686089968.jpg?k=cdd94cece4ed6ad585c546b9f37195dcd6a549101605dc521a3a33a5f1ccf6f3&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/686089968.jpg?k=cdd94cece4ed6ad585c546b9f37195dcd6a549101605dc521a3a33a5f1ccf6f3&o="
+          ],
+          "priceBreakdown": {
+            "grossPrice": {
+              "amountRounded": "US$710",
+              "value": 710.49,
+              "currency": "USD"
+            },
+            "benefitBadges": [],
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos"
+          },
+          "id": 13799538,
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: 1 cama",
+          "reviewScoreWord": "Muy bien",
+          "isFirstPage": true,
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "23:00"
+          },
+          "currency": "EUR",
+          "checkout": {
+            "fromTime": "05:00",
+            "untilTime": "11:00"
+          },
+          "wishlistName": "Barcelona",
+          "name": "easyHotel Barcelona La Sagrera",
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "propertyClass": 1,
+          "accuratePropertyClass": 1
+        }
+      },
+      {
+        "hotel_id": 287136,
+        "accessibilityLabel": "Hostal Goya.\n4 de 5 en la categoría del alojamiento.\n9,1 Fantástico 2747 comentarios.\n‎Eixample‬ • ‎A 300 m del centro‬\n‎A 2,1 km de la playa‬.\n Habitación privada : 1 cama.\n938 USD.\nIncluye impuestos y cargos.\nNos queda 1 a este precio.",
+        "property": {
+          "qualityClass": 4,
+          "checkoutDate": "2026-10-18",
+          "name": "Hostal Goya",
+          "propertyClass": 0,
+          "accuratePropertyClass": 0,
+          "checkin": {
+            "untilTime": "22:00",
+            "fromTime": "15:00"
+          },
+          "isFirstPage": true,
+          "currency": "EUR",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación privada</b>: 1 cama",
+          "reviewScoreWord": "Fantástico",
+          "checkout": {
+            "untilTime": "11:30",
+            "fromTime": "08:00"
+          },
+          "wishlistName": "Barcelona",
+          "mainPhotoId": 16220912,
+          "reviewScore": 9.1,
+          "latitude": 41.3894147241933,
+          "id": 287136,
+          "priceBreakdown": {
+            "taxExceptions": [],
+            "chargesInfo": "Incluye impuestos y cargos",
+            "grossPrice": {
+              "value": 937.902852060026,
+              "currency": "USD",
+              "amountRounded": "US$938"
+            },
+            "benefitBadges": []
+          },
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/16220912.jpg?k=90e7c61813e86eeed8c693f2a82dddf43c4c5f213ab1e6969ebd4fe31525347b&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/16220912.jpg?k=90e7c61813e86eeed8c693f2a82dddf43c4c5f213ab1e6969ebd4fe31525347b&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/16220912.jpg?k=90e7c61813e86eeed8c693f2a82dddf43c4c5f213ab1e6969ebd4fe31525347b&o="
+          ],
+          "optOutFromGalleryChanges": 0,
+          "position": 17,
+          "longitude": 2.17173367738724,
+          "reviewCount": 2747,
+          "checkinDate": "2026-10-15",
+          "ufi": -372490,
+          "countryCode": "es",
+          "rankingPosition": 17,
+          "blockIds": [
+            "28713610_91918550_2_0_0"
+          ]
+        }
+      },
+      {
+        "hotel_id": 188654,
+        "accessibilityLabel": "Praktik Rambla.\n3 de 5 estrellas.\n8,7 Fabuloso 2001 comentarios.\n‎Eixample‬ • ‎A 400 m del centro‬\n‎A 2,5 km de la playa‬.\n Habitación de hotel : 1 cama.\n1112 USD.\nIncluye impuestos y cargos.\nCancelación gratis.\nSin pago por adelantado.\nNos queda 1 a este precio.",
+        "property": {
+          "latitude": 41.3891440716552,
+          "mainPhotoId": 210275501,
+          "reviewScore": 8.7,
+          "optOutFromGalleryChanges": 0,
+          "priceBreakdown": {
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "grossPrice": {
+              "amountRounded": "US$1.112",
+              "currency": "USD",
+              "value": 1111.86936007116
+            },
+            "benefitBadges": []
+          },
+          "id": 188654,
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/210275501.jpg?k=78f45d3727544dca0e0bf1ebcc7bb618234500a2985f1c85c60375696028ddac&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/210275501.jpg?k=78f45d3727544dca0e0bf1ebcc7bb618234500a2985f1c85c60375696028ddac&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/210275501.jpg?k=78f45d3727544dca0e0bf1ebcc7bb618234500a2985f1c85c60375696028ddac&o="
+          ],
+          "checkinDate": "2026-10-15",
+          "countryCode": "es",
+          "ufi": -372490,
+          "position": 18,
+          "longitude": 2.16592669487,
+          "reviewCount": 2001,
+          "blockIds": [
+            "18865406_247450661_2_0_0"
+          ],
+          "rankingPosition": 18,
+          "name": "Praktik Rambla",
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "propertyClass": 3,
+          "accuratePropertyClass": 3,
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: 1 cama",
+          "reviewScoreWord": "Fabuloso",
+          "checkin": {
+            "untilTime": "00:00",
+            "fromTime": "15:00"
+          },
+          "isFirstPage": true,
+          "currency": "EUR",
+          "checkout": {
+            "untilTime": "12:00",
+            "fromTime": "05:30"
+          },
+          "wishlistName": "Barcelona"
+        }
+      },
+      {
+        "hotel_id": 90952,
+        "accessibilityLabel": "Moderno.\n3 de 5 estrellas.\nEste alojamiento es Preferente.\n7,6 Bien 1707 comentarios.\n‎Ciutat Vella‬ • ‎A 0,7 km del centro‬\n‎A 1,6 km de la playa‬.\n Habitación de hotel : 1 cama.\nPrecio original 968 USD. Precio actual 775 USD..\nIncluye impuestos y cargos.\nNos quedan 7 a este precio.",
+        "property": {
+          "propertyClass": 3,
+          "isPreferred": true,
+          "accuratePropertyClass": 3,
+          "qualityClass": 0,
+          "checkoutDate": "2026-10-18",
+          "name": "Moderno",
+          "checkout": {
+            "fromTime": "06:00",
+            "untilTime": "11:00"
+          },
+          "wishlistName": "Barcelona",
+          "isFirstPage": true,
+          "checkin": {
+            "fromTime": "15:00",
+            "untilTime": "00:00"
+          },
+          "currency": "EUR",
+          "recommendedUnitsConfigurationLabel": "<b>Habitación de hotel</b>: 1 cama",
+          "reviewScoreWord": "Bien",
+          "photoUrls": [
+            "https://cf.bstatic.com/xdata/images/hotel/square500/54428241.jpg?k=bc5317ca70cd6a81480c50f43ff6963b1315fb94d2d58df9f04b97cdd5c93776&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square1024/54428241.jpg?k=bc5317ca70cd6a81480c50f43ff6963b1315fb94d2d58df9f04b97cdd5c93776&o=",
+            "https://cf.bstatic.com/xdata/images/hotel/square2000/54428241.jpg?k=bc5317ca70cd6a81480c50f43ff6963b1315fb94d2d58df9f04b97cdd5c93776&o="
+          ],
+          "id": 90952,
+          "priceBreakdown": {
+            "chargesInfo": "Incluye impuestos y cargos",
+            "taxExceptions": [],
+            "strikethroughPrice": {
+              "currency": "USD",
+              "value": 968.379840061976,
+              "amountRounded": "US$968"
+            },
+            "benefitBadges": [],
+            "grossPrice": {
+              "currency": "USD",
+              "value": 774.634104049577,
+              "amountRounded": "US$775"
+            }
+          },
+          "optOutFromGalleryChanges": 0,
+          "mainPhotoId": 54428241,
+          "reviewScore": 7.6,
+          "latitude": 41.3810451032775,
+          "blockIds": [
+            "9095209_88190275_0_42_0"
+          ],
+          "rankingPosition": 19,
+          "longitude": 2.17272609472275,
+          "position": 19,
+          "reviewCount": 1707,
+          "checkinDate": "2026-10-15",
+          "countryCode": "es",
+          "ufi": -372490
+        }
+      }
+    ],
+    "meta": [
+      {
+        "title": "1139 alojamientos"
+      }
+    ],
+    "appear": [
+      {
+        "id": "cma",
+        "component": {
+          "props": {
+            "fill": true,
+            "content": {
+              "props": {
+                "items": [
+                  {
+                    "props": {
+                      "component": {
+                        "props": {
+                          "items": [
+                            {
+                              "props": {
+                                "text": [
+                                  {
+                                    "font": "body_2",
+                                    "text": "La comisión que pagan los alojamientos por las reservas y otros factores pueden influir en su puesto en el ranking. Descubre más sobre los parámetros del ranking y cómo seleccionarlos y modificarlos."
+                                  },
+                                  {
+                                    "font": "strong_2",
+                                    "text": "  ",
+                                    "color": "foreground"
+                                  },
+                                  {
+                                    "linkActions": [
+                                      {
+                                        "props": {
+                                          "url": "booking://webview?url=https%3A%2F%2Fm.booking.com%2Fgeneral.es.html%3Faid%3D332731%3Btmpl%3Ddocs%2Fterms-and-conditions"
+                                        }
+                                      }
+                                    ],
+                                    "color": "action_foreground",
+                                    "font": "body_2",
+                                    "text": "Más información"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "spacing": "spacing_half"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "props": {}
+                  },
+                  {
+                    "props": {
+                      "component": {
+                        "props": {
+                          "accessibilityLabel": "Cerrar",
+                          "tertiaryTintedColor": "foreground",
+                          "icon": "close",
+                          "variant": "tertiary_tinted"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "fitContentWidth": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "contentUrl": "https://mobile-apps.booking.com/json/mobile.saba?route_path=saba-chat-entrypoint&arrival_date=2026-10-15&categories_filter_additional_data=&departure_date=2026-10-18&dest_ids=-372490&exposure_api_version=2.59&flex_window=0&generate_map_bounding_box=1&guest_qty=2&include_bh_quality_classification=1&include_genius_badge=1&include_rtb=1&include_ski_information=1&location_source=autocomplete&mobile_saba_variant=1&outcome=search_results&reason=new_search&room_qty=1&sb_calendar_open=1&search_type=city&selected_filter_sources=&sort_by=auto&sort_by_source=sort_options&source=startup_page&travel_purpose=&units=metric&offset=0&affiliate_id=332731&attribution_affiliate_id=332731&currency_code=USD&device_id=273805cb41984326bce0560231169fbd&distance_unit=metric&languagecode=es&min_saba_version=31&network_type=wifi&notification_auth_status=3&saba_version=179&screen_density=3&temperature_unit=c&user_os=26.6&user_version=69.4-iphone&categories_filter=price%3A%3AUSD-min-max&page=search-results"
+      },
+      {
+        "id": "signin_now",
+        "component": {
+          "props": {
+            "title": "Inicia sesión y ahorra dinero",
+            "text": "Consigue acceso inmediato a nuestro programa de fidelización Genius y podrás disfrutar de descuentos en alojamientos de todo el mundo."
+          }
+        }
+      },
+      {
+        "id": "banner_qualityrating",
+        "component": {
+          "props": {
+            "text": "Este icono indica que se trata de un alojamiento tipo casa al que Booking.com ha asignado una valoración de la calidad",
+            "title": ""
+          }
+        }
+      }
+    ]
+  }
+}

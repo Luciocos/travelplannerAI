@@ -28,6 +28,32 @@ def test_carga_configuracion_completa(monkeypatch: pytest.MonkeyPatch) -> None:
     assert configuracion.claves_gemini == ["clave-1", "clave-2", "clave-3"]
 
 
+def test_carga_configuracion_rapidapi_con_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    for nombre, valor in _variables_base().items():
+        monkeypatch.setenv(nombre, valor)
+    monkeypatch.setenv("RAPIDAPI_KEY", "clave-rapidapi")
+    monkeypatch.setenv("RAPIDAPI_MONTHLY_QUOTA_BOOKING", "100")
+
+    configuracion = cargar_configuracion()
+
+    assert configuracion.rapidapi_key == "clave-rapidapi"
+    assert configuracion.rapidapi_host_booking == "booking-com15.p.rapidapi.com"
+    assert configuracion.rapidapi_host_fly_scraper == "fly-scraper.p.rapidapi.com"
+    assert configuracion.rapidapi_quota_booking == 100
+    assert configuracion.usar_fixtures is False
+
+
+def test_carga_configuracion_sin_rapidapi_no_rompe(monkeypatch: pytest.MonkeyPatch) -> None:
+    """RapidAPI es de una extension (RF6/RF7), el nucleo no depende de ella."""
+    for nombre, valor in _variables_base().items():
+        monkeypatch.setenv(nombre, valor)
+    monkeypatch.delenv("RAPIDAPI_KEY", raising=False)
+
+    configuracion = cargar_configuracion()
+
+    assert configuracion.rapidapi_key is None
+
+
 def test_falla_si_falta_una_variable_requerida(monkeypatch: pytest.MonkeyPatch) -> None:
     for nombre, valor in _variables_base().items():
         monkeypatch.setenv(nombre, valor)

@@ -1,0 +1,146 @@
+{
+  "status": true,
+  "status_code": 200,
+  "data": [
+    {
+      "day": "2026-09-11",
+      "price": 469,
+      "currency": "USD",
+      "airline": "Vueling Airlines",
+      "airlineCode": "VY"
+    },
+    {
+      "day": "2026-09-12",
+      "price": 386,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-13",
+      "price": 385,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-14",
+      "price": 430,
+      "currency": "USD",
+      "airline": "transavia",
+      "airlineCode": "HV"
+    },
+    {
+      "day": "2026-09-15",
+      "price": 470,
+      "currency": "USD",
+      "airline": "Vueling Airlines",
+      "airlineCode": "VY"
+    },
+    {
+      "day": "2026-09-16",
+      "price": 452,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-17",
+      "price": 387,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-18",
+      "price": 373,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-19",
+      "price": 460,
+      "currency": "USD",
+      "airline": "Iberia",
+      "airlineCode": "IB"
+    },
+    {
+      "day": "2026-09-20",
+      "price": 565,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-21",
+      "price": 522,
+      "currency": "USD",
+      "airline": "Vueling Airlines",
+      "airlineCode": "VY"
+    },
+    {
+      "day": "2026-09-22",
+      "price": 505,
+      "currency": "USD",
+      "airline": "Vueling Airlines",
+      "airlineCode": "VY"
+    },
+    {
+      "day": "2026-09-23",
+      "price": 435,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-24",
+      "price": 433,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-25",
+      "price": 378,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-26",
+      "price": 491,
+      "currency": "USD",
+      "airline": "Air Arabia Maroc",
+      "airlineCode": "3O"
+    },
+    {
+      "day": "2026-09-27",
+      "price": 514,
+      "currency": "USD",
+      "airline": "Air Europa",
+      "airlineCode": "UX"
+    },
+    {
+      "day": "2026-09-28",
+      "price": 526,
+      "currency": "USD",
+      "airline": "Vueling Airlines",
+      "airlineCode": "VY"
+    },
+    {
+      "day": "2026-09-29",
+      "price": 500,
+      "currency": "USD",
+      "airline": "Vueling Airlines",
+      "airlineCode": "VY"
+    },
+    {
+      "day": "2026-09-30",
+      "price": 457,
+      "currency": "USD",
+      "airline": "Vueling Airlines",
+      "airlineCode": "VY"
+    }
+  ]
+}

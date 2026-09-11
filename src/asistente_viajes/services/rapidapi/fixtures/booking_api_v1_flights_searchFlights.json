@@ -1,0 +1,3107 @@
+{
+  "status": true,
+  "message": "Success",
+  "timestamp": 1789087142647,
+  "data": {
+    "aggregation": {
+      "totalCount": 297,
+      "filteredTotalCount": 297,
+      "stops": [
+        {
+          "numberOfStops": 0,
+          "count": 2,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 545,
+            "nanos": 930000000
+          },
+          "minPriceRound": {
+            "currencyCode": "USD",
+            "units": 546,
+            "nanos": 0
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 546,
+            "nanos": 0
+          },
+          "cheapestAirline": {
+            "name": "Aerolineas Argentinas",
+            "code": "AR",
+            "logo": "https://r-xx.bstatic.com/data/airlines_logo/AR.png"
+          }
+        },
+        {
+          "numberOfStops": 1,
+          "count": 80,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 401,
+            "nanos": 550000000
+          },
+          "minPriceRound": {
+            "currencyCode": "USD",
+            "units": 402,
+            "nanos": 0
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 402,
+            "nanos": 0
+          },
+          "cheapestAirline": {
+            "name": "Copa Airlines",
+            "code": "CM",
+            "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+          }
+        },
+        {
+          "numberOfStops": 2,
+          "count": 288,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 401,
+            "nanos": 550000000
+          },
+          "minPriceRound": {
+            "currencyCode": "USD",
+            "units": 402,
+            "nanos": 0
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 402,
+            "nanos": 0
+          },
+          "cheapestAirline": {
+            "name": "Jetsmart Airlines",
+            "code": "WJ",
+            "logo": "https://r-xx.bstatic.com/data/airlines_logo/WJ.png"
+          }
+        },
+        {
+          "numberOfStops": 3,
+          "count": 297,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 401,
+            "nanos": 550000000
+          },
+          "minPriceRound": {
+            "currencyCode": "USD",
+            "units": 402,
+            "nanos": 0
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 402,
+            "nanos": 0
+          },
+          "cheapestAirline": {
+            "name": "Copa Airlines",
+            "code": "CM",
+            "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+          }
+        }
+      ],
+      "airlines": [
+        {
+          "name": "Aerolineas Argentinas",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/AR.png",
+          "iataCode": "AR",
+          "count": 22,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 545,
+            "nanos": 930000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 546,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Aeromexico",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/AM.png",
+          "iataCode": "AM",
+          "count": 20,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 510,
+            "nanos": 480000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 511,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Air Canada",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/AC.png",
+          "iataCode": "AC",
+          "count": 29,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 1334,
+            "nanos": 160000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 1335,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Air Europa",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/UX.png",
+          "iataCode": "UX",
+          "count": 1,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 5358,
+            "nanos": 670000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 5359,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "American Airlines",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/AA.png",
+          "iataCode": "AA",
+          "count": 20,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 803,
+            "nanos": 500000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 804,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Arajet",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/DM.png",
+          "iataCode": "DM",
+          "count": 6,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 449,
+            "nanos": 510000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 450,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Avianca",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/AV.png",
+          "iataCode": "AV",
+          "count": 35,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 746,
+            "nanos": 880000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 747,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Boliviana de Aviacion",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/OB.png",
+          "iataCode": "OB",
+          "count": 8,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 772,
+            "nanos": 430000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 773,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Copa Airlines",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/CM.png",
+          "iataCode": "CM",
+          "count": 80,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 401,
+            "nanos": 550000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 402,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "JetSmart",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/JA.png",
+          "iataCode": "JA",
+          "count": 7,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 449,
+            "nanos": 510000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 450,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "LATAM",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/LA.png",
+          "iataCode": "LA",
+          "count": 120,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 568,
+            "nanos": 280000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 569,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Sky Airline",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/H2.png",
+          "iataCode": "H2",
+          "count": 2,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 617,
+            "nanos": 240000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 618,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "United Airlines",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/UA.png",
+          "iataCode": "UA",
+          "count": 7,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 1228,
+            "nanos": 870000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 1229,
+            "nanos": 0
+          }
+        },
+        {
+          "name": "Volaris",
+          "logoUrl": "https://r-xx.bstatic.com/data/airlines_logo/Y4.png",
+          "iataCode": "Y4",
+          "count": 4,
+          "minPrice": {
+            "currencyCode": "USD",
+            "units": 630,
+            "nanos": 710000000
+          },
+          "minPricePerAdult": {
+            "currencyCode": "USD",
+            "units": 631,
+            "nanos": 0
+          }
+        }
+      ],
+      "departureIntervals": [
+        {
+          "start": "00:10",
+          "end": "23:25"
+        }
+      ],
+      "flightTimes": [
+        {
+          "arrival": [
+            {
+              "start": "00:00",
+              "end": "05:59",
+              "count": 6
+            },
+            {
+              "start": "06:00",
+              "end": "11:59",
+              "count": 66
+            },
+            {
+              "start": "12:00",
+              "end": "17:59",
+              "count": 170
+            },
+            {
+              "start": "18:00",
+              "end": "23:59",
+              "count": 55
+            }
+          ],
+          "departure": [
+            {
+              "start": "00:00",
+              "end": "05:59",
+              "count": 57
+            },
+            {
+              "start": "06:00",
+              "end": "11:59",
+              "count": 39
+            },
+            {
+              "start": "12:00",
+              "end": "17:59",
+              "count": 100
+            },
+            {
+              "start": "18:00",
+              "end": "23:59",
+              "count": 101
+            }
+          ]
+        }
+      ],
+      "shortLayoverConnection": {
+        "count": 23
+      },
+      "durationMin": 10,
+      "durationMax": 48,
+      "minPrice": {
+        "currencyCode": "USD",
+        "units": 401,
+        "nanos": 550000000
+      },
+      "minRoundPrice": {
+        "currencyCode": "USD",
+        "units": 402,
+        "nanos": 0
+      },
+      "minPricePerAdult": {
+        "currencyCode": "USD",
+        "units": 401,
+        "nanos": 550000000
+      },
+      "minPriceFiltered": {
+        "currencyCode": "USD",
+        "units": 401,
+        "nanos": 550000000
+      },
+      "baggage": [
+        {
+          "paramName": "includedBaggage",
+          "count": 261,
+          "enabled": true,
+          "baggageType": "CABIN"
+        },
+        {
+          "paramName": "includedBaggage",
+          "count": 115,
+          "enabled": true,
+          "baggageType": "CHECKIN"
+        }
+      ],
+      "budget": {
+        "paramName": "maxBudget",
+        "min": {
+          "currencyCode": "USD",
+          "units": 401,
+          "nanos": 550000000
+        },
+        "max": {
+          "currencyCode": "USD",
+          "units": 5358,
+          "nanos": 670000000
+        }
+      },
+      "budgetPerAdult": {
+        "paramName": "maxBudgetPerAdult",
+        "min": {
+          "currencyCode": "USD",
+          "units": 401,
+          "nanos": 550000000
+        },
+        "max": {
+          "currencyCode": "USD",
+          "units": 5358,
+          "nanos": 670000000
+        }
+      },
+      "duration": [
+        {
+          "min": 10,
+          "max": 48,
+          "durationType": "JOURNEY",
+          "enabled": true,
+          "paramName": "maxDuration"
+        },
+        {
+          "min": 1,
+          "max": 24,
+          "durationType": "LAYOVER",
+          "enabled": true,
+          "paramName": "maxLayoverDuration"
+        }
+      ],
+      "flexibleTicket": {
+        "count": 290
+      },
+      "airports": {
+        "preferSameAirport": {
+          "paramName": "preferSameAirport",
+          "enabled": false,
+          "count": 0
+        },
+        "byCity": [
+          {
+            "city": {
+              "code": "BUE",
+              "name": "Buenos Aires",
+              "translation": "Buenos Aires"
+            },
+            "airports": [
+              {
+                "name": "Ezeiza International Airport",
+                "iataCode": "EZE",
+                "translation": "Ezeiza International Airport",
+                "paramName": "airports",
+                "count": 177,
+                "minPrice": {
+                  "currencyCode": "USD",
+                  "units": 401,
+                  "nanos": 550000000
+                },
+                "minPricePerAdult": {
+                  "currencyCode": "USD",
+                  "units": 402,
+                  "nanos": 0
+                },
+                "disabled": false
+              },
+              {
+                "name": "Jorge Newbery Airfield",
+                "iataCode": "AEP",
+                "translation": "Jorge Newbery Airfield",
+                "paramName": "airports",
+                "count": 120,
+                "minPrice": {
+                  "currencyCode": "USD",
+                  "units": 449,
+                  "nanos": 510000000
+                },
+                "minPricePerAdult": {
+                  "currencyCode": "USD",
+                  "units": 450,
+                  "nanos": 0
+                },
+                "disabled": false
+              }
+            ]
+          },
+          {
+            "city": {
+              "code": "CUN",
+              "name": "Cancún",
+              "translation": "Cancún"
+            },
+            "airports": [
+              {
+                "name": "Cancún International Airport",
+                "iataCode": "CUN",
+                "translation": "Cancún International Airport",
+                "paramName": "airports",
+                "count": 297,
+                "minPrice": {
+                  "currencyCode": "USD",
+                  "units": 401,
+                  "nanos": 550000000
+                },
+                "minPricePerAdult": {
+                  "currencyCode": "USD",
+                  "units": 402,
+                  "nanos": 0
+                },
+                "disabled": true
+              }
+            ]
+          }
+        ],
+        "hasNearbyCityAirports": false
+      },
+      "filtersOrder": [
+        "stops",
+        "airlines",
+        "flightTimes",
+        "duration"
+      ],
+      "summary": {
+        "stops": [
+          {
+            "stopType": "DIRECT_FLIGHT",
+            "minPrice": {
+              "currencyCode": "USD",
+              "units": 545,
+              "nanos": 930000000
+            },
+            "count": 2
+          },
+          {
+            "stopType": "ONE_STOP_FLIGHT",
+            "minPrice": {
+              "currencyCode": "USD",
+              "units": 401,
+              "nanos": 550000000
+            },
+            "count": 78
+          },
+          {
+            "stopType": "MULTIPLE_STOPS_FLIGHT",
+            "minPrice": {
+              "currencyCode": "USD",
+              "units": 449,
+              "nanos": 510000000
+            },
+            "count": 217
+          }
+        ],
+        "baggageByStops": [
+          {
+            "stopType": "DIRECT_FLIGHT",
+            "handBaggageIncluded": 0,
+            "checkedInBaggageIncluded": 1,
+            "handAndCheckedInBaggageIncluded": 1
+          },
+          {
+            "stopType": "ONE_STOP_FLIGHT",
+            "handBaggageIncluded": 46,
+            "checkedInBaggageIncluded": 31,
+            "handAndCheckedInBaggageIncluded": 31
+          },
+          {
+            "stopType": "MULTIPLE_STOPS_FLIGHT",
+            "handBaggageIncluded": 100,
+            "checkedInBaggageIncluded": 83,
+            "handAndCheckedInBaggageIncluded": 83
+          }
+        ],
+        "layoverDuration": [
+          {
+            "duration": "SHORT",
+            "count": 33,
+            "percentage": 11.186440677966102
+          },
+          {
+            "duration": "MEDIUM",
+            "count": 44,
+            "percentage": 14.915254237288135
+          },
+          {
+            "duration": "LONG",
+            "count": 218,
+            "percentage": 73.89830508474576
+          }
+        ],
+        "layoverLocation": [
+          {
+            "location": "MEX",
+            "count": 41,
+            "percentage": 7.869481765834933
+          },
+          {
+            "location": "MDZ",
+            "count": 5,
+            "percentage": 0.9596928982725528
+          },
+          {
+            "location": "PUJ",
+            "count": 6,
+            "percentage": 1.1516314779270633
+          },
+          {
+            "location": "MIA",
+            "count": 19,
+            "percentage": 3.6468330134357005
+          },
+          {
+            "location": "COR",
+            "count": 9,
+            "percentage": 1.727447216890595
+          },
+          {
+            "location": "VVI",
+            "count": 8,
+            "percentage": 1.5355086372360844
+          },
+          {
+            "location": "CLT",
+            "count": 6,
+            "percentage": 1.1516314779270633
+          },
+          {
+            "location": "GRU",
+            "count": 55,
+            "percentage": 10.556621880998081
+          },
+          {
+            "location": "DEN",
+            "count": 1,
+            "percentage": 0.19193857965451055
+          },
+          {
+            "location": "IAD",
+            "count": 1,
+            "percentage": 0.19193857965451055
+          },
+          {
+            "location": "JFK",
+            "count": 2,
+            "percentage": 0.3838771593090211
+          },
+          {
+            "location": "MDE",
+            "count": 19,
+            "percentage": 3.6468330134357005
+          },
+          {
+            "location": "MAD",
+            "count": 1,
+            "percentage": 0.19193857965451055
+          },
+          {
+            "location": "YUL",
+            "count": 27,
+            "percentage": 5.182341650671785
+          },
+          {
+            "location": "LIM",
+            "count": 107,
+            "percentage": 20.53742802303263
+          },
+          {
+            "location": "IAH",
+            "count": 7,
+            "percentage": 1.3435700575815739
+          },
+          {
+            "location": "DFW",
+            "count": 7,
+            "percentage": 1.3435700575815739
+          },
+          {
+            "location": "PTY",
+            "count": 80,
+            "percentage": 15.355086372360844
+          },
+          {
+            "location": "ROS",
+            "count": 3,
+            "percentage": 0.5758157389635317
+          },
+          {
+            "location": "SJO",
+            "count": 4,
+            "percentage": 0.7677543186180422
+          },
+          {
+            "location": "BOG",
+            "count": 39,
+            "percentage": 7.485604606525912
+          },
+          {
+            "location": "YYZ",
+            "count": 22,
+            "percentage": 4.222648752399232
+          },
+          {
+            "location": "SCL",
+            "count": 51,
+            "percentage": 9.78886756238004
+          },
+          {
+            "location": "SAL",
+            "count": 1,
+            "percentage": 0.19193857965451055
+          }
+        ],
+        "departureTime": [
+          {
+            "departureTime": "NIGHT",
+            "count": 57,
+            "percentage": 19.19191919191919
+          },
+          {
+            "departureTime": "MORNING",
+            "count": 39,
+            "percentage": 13.131313131313131
+          },
+          {
+            "departureTime": "AFTERNOON",
+            "count": 100,
+            "percentage": 33.67003367003367
+          },
+          {
+            "departureTime": "EVENING",
+            "count": 101,
+            "percentage": 34.00673400673401
+          }
+        ]
+      }
+    },
+    "flightOffers": [
+      {
+        "token": "d6a1f_H4sIAAAAAAAA_1VS2a6iMBh-Gr1roSzCOUkzQRZHZROLijcNVlTGBQ-t4_L0A3hmkkn_fFv7_Vc9CHHln5K0O5X7g-DgxuG-EtU-FwVk1Vna1Q1squpYXvZSXtbSMHXtNER6ZBMJSaA57DP7UeTXEuawhjvsroibhJZPrdAe-76VZDROxvY4HPUUs7lMLGiNE5q4wyiadulHv6v_VybJOP7b6xcPAXjNcL_cFDDnDJvfqsYDaCzDeJQZVhexSmANfgSuMvRi5K7fYY1H2SBMJp3b4sDh9-hlGQHhSuhwnaTpc3Zcx6msk-jlqnM04wHZ-gv7_ghlkfqOqxLHMkJ05MFrz33iLYL5XQSznuo0060tcD1aULXii9mQnXfekT5nhmkVmUeCowUuN_PkhavTYxkCxmPG15OUOct5sL6vyTO2z97Xsb6kzPg6FZrGJ_fs32J4wLen_fttGMMIQs34QJ2vco7Vt2ICI_kttwITf2CPvt8IrOuKoXSGYwU40wXwzJ-ABGvFiVoKFBnIACkKMFbtZIAABN51XmJkqEg3dFNFqiH3eXEqmCiry7R4YitpM9D8ByaUASA9xd4crtWGN6KnWs3sqdzgocOcIhU1vKFma9mbttTcMK1VBQXaVm3VjmoNlhRBGbb-Fx0vG3rR_H4zB-Uffysw-LcCAAA.",
+        "segments": [
+          {
+            "departureAirport": {
+              "type": "AIRPORT",
+              "code": "EZE",
+              "name": "Ezeiza International Airport",
+              "city": "BUE",
+              "cityName": "Buenos Aires",
+              "country": "AR",
+              "countryName": "Argentina"
+            },
+            "arrivalAirport": {
+              "type": "AIRPORT",
+              "code": "CUN",
+              "name": "Cancún International Airport",
+              "city": "CUN",
+              "cityName": "Cancún",
+              "country": "MX",
+              "countryName": "Mexico",
+              "province": "Quintana Roo"
+            },
+            "departureTime": "2026-10-15T23:25:00",
+            "arrivalTime": "2026-10-16T06:30:00",
+            "legs": [
+              {
+                "departureTime": "2026-10-15T23:25:00",
+                "arrivalTime": "2026-10-16T06:30:00",
+                "departureAirport": {
+                  "type": "AIRPORT",
+                  "code": "EZE",
+                  "name": "Ezeiza International Airport",
+                  "city": "BUE",
+                  "cityName": "Buenos Aires",
+                  "country": "AR",
+                  "countryName": "Argentina"
+                },
+                "arrivalAirport": {
+                  "type": "AIRPORT",
+                  "code": "CUN",
+                  "name": "Cancún International Airport",
+                  "city": "CUN",
+                  "cityName": "Cancún",
+                  "country": "MX",
+                  "countryName": "Mexico",
+                  "province": "Quintana Roo"
+                },
+                "cabinClass": "ECONOMY",
+                "flightInfo": {
+                  "facilities": [],
+                  "flightNumber": 1370,
+                  "planeType": "330",
+                  "carrierInfo": {
+                    "operatingCarrier": "AR",
+                    "marketingCarrier": "AR",
+                    "operatingCarrierDisclosureText": "",
+                    "tier": {
+                      "addons": [],
+                      "type": "ADVANTAGE"
+                    }
+                  }
+                },
+                "carriers": [
+                  "AR",
+                  "AR"
+                ],
+                "carriersData": [
+                  {
+                    "name": "Aerolineas Argentinas",
+                    "code": "AR",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/AR.png"
+                  },
+                  {
+                    "name": "Aerolineas Argentinas",
+                    "code": "AR",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/AR.png"
+                  }
+                ],
+                "totalTime": 32700,
+                "flightStops": [],
+                "amenities": [],
+                "departureTerminal": "P",
+                "arrivalTerminal": "2",
+                "departureTimeTz": "2026-10-15T23:25:00-03:00",
+                "arrivalTimeTz": "2026-10-16T06:30:00-05:00"
+              }
+            ],
+            "totalTime": 32700,
+            "travellerCheckedLuggage": [],
+            "travellerCabinLuggage": [
+              {
+                "travellerReference": "1",
+                "luggageAllowance": {
+                  "luggageType": "HAND",
+                  "maxPiece": 0
+                },
+                "personalItem": true
+              }
+            ],
+            "isAtolProtected": false,
+            "departureTimeTz": "2026-10-15T23:25:00-03:00",
+            "arrivalTimeTz": "2026-10-16T06:30:00-05:00",
+            "highlightDestinationAirport": false,
+            "highlightOriginAirport": false,
+            "showWarningDestinationAirport": false,
+            "showWarningOriginAirport": false
+          }
+        ],
+        "priceBreakdown": {
+          "total": {
+            "currencyCode": "USD",
+            "units": 545,
+            "nanos": 930000000
+          },
+          "baseFare": {
+            "currencyCode": "USD",
+            "units": 383,
+            "nanos": 240000000
+          },
+          "fee": {
+            "currencyCode": "USD",
+            "units": 0,
+            "nanos": 0
+          },
+          "tax": {
+            "currencyCode": "USD",
+            "units": 169,
+            "nanos": 480000000
+          },
+          "totalRounded": {
+            "currencyCode": "USD",
+            "nanos": 0,
+            "units": 546
+          },
+          "discount": {
+            "currencyCode": "USD",
+            "units": 0,
+            "nanos": 0
+          },
+          "totalWithoutDiscount": {
+            "currencyCode": "USD",
+            "units": 552,
+            "nanos": 720000000
+          },
+          "totalWithoutDiscountRounded": {
+            "currencyCode": "USD",
+            "nanos": 0,
+            "units": 553
+          },
+          "bcomMargin": {
+            "currencyCode": "USD",
+            "units": -6,
+            "nanos": -790000000
+          },
+          "bcomPricingItems": [
+            {
+              "amount": {
+                "currencyCode": "USD",
+                "units": -6,
+                "nanos": -790000000
+              },
+              "itemType": "BOOKING_PAYS",
+              "name": "Booking.com pays"
+            }
+          ],
+          "carrierTaxBreakdown": [
+            {
+              "carrier": {
+                "name": "Aerolineas Argentinas",
+                "code": "AR",
+                "logo": "https://r-xx.bstatic.com/data/airlines_logo/AR.png"
+              },
+              "avgPerAdult": {
+                "currencyCode": "USD",
+                "units": 169,
+                "nanos": 480000000
+              }
+            }
+          ],
+          "showPriceStrikethrough": false
+        },
+        "travellerPrices": [
+          {
+            "travellerPriceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 545,
+                "nanos": 930000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 383,
+                "nanos": 240000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 169,
+                "nanos": 480000000
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 546
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 552,
+                "nanos": 720000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 553
+              },
+              "bcomMargin": {
+                "currencyCode": "USD",
+                "units": -6,
+                "nanos": -790000000
+              },
+              "bcomPricingItems": [
+                {
+                  "amount": {
+                    "currencyCode": "USD",
+                    "units": -6,
+                    "nanos": -790000000
+                  },
+                  "itemType": "BOOKING_PAYS",
+                  "name": "Booking.com pays"
+                }
+              ],
+              "showPriceStrikethrough": false
+            },
+            "travellerReference": "1",
+            "travellerType": "ADULT"
+          }
+        ],
+        "priceDisplayRequirements": [],
+        "pointOfSale": "us",
+        "hasGeniusAirlineFundedCampaign": false,
+        "hasGeniusSelfFundedCampaign": false,
+        "tripType": "ONEWAY",
+        "posMismatch": {
+          "detectedPointOfSale": "us",
+          "isPOSMismatch": false,
+          "offerSalesCountry": "us"
+        },
+        "includedProductsBySegment": [
+          [
+            {
+              "travellerReference": "1",
+              "travellerProducts": [
+                {
+                  "type": "personalItem"
+                }
+              ]
+            }
+          ]
+        ],
+        "includedProducts": {
+          "areAllSegmentsIdentical": true,
+          "segments": [
+            [
+              {
+                "luggageType": "PERSONAL_ITEM",
+                "maxPiece": 1,
+                "piecePerPax": 1
+              }
+            ]
+          ]
+        },
+        "extraProducts": [
+          {
+            "type": "checkedInBaggage",
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 76,
+                "nanos": 990000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 76,
+                "nanos": 990000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 76,
+                "nanos": 990000000
+              }
+            }
+          },
+          {
+            "type": "flexibleTicket",
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              }
+            }
+          }
+        ],
+        "offerExtras": {
+          "flexibleTicket": {
+            "airProductReference": "n/a",
+            "travellers": [
+              "1"
+            ],
+            "recommendation": {
+              "recommended": false,
+              "confidence": "UNKNOWN_LEVEL"
+            },
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 78
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 78
+              },
+              "showPriceStrikethrough": false
+            },
+            "supplierInfo": {
+              "name": "Gotogate, Inc.",
+              "termsUrl": "https://flights-us.gotogate.com/rf/travel-conditions",
+              "privacyPolicyUrl": "https://flights-us.gotogate.com/rf/privacy-policy"
+            }
+          }
+        },
+        "ancillaries": {
+          "checkedInBaggage": {
+            "airProductReference": "n/a",
+            "options": [
+              {
+                "luggageAllowance": {
+                  "luggageType": "CHECKED_IN",
+                  "ruleType": "PIECE_BASED",
+                  "maxPiece": 1,
+                  "maxWeightPerPiece": 50.7,
+                  "massUnit": "LB"
+                },
+                "priceBreakdown": {
+                  "total": {
+                    "currencyCode": "USD",
+                    "units": 76,
+                    "nanos": 990000000
+                  },
+                  "baseFare": {
+                    "currencyCode": "USD",
+                    "units": 76,
+                    "nanos": 990000000
+                  },
+                  "fee": {
+                    "currencyCode": "USD",
+                    "units": 0,
+                    "nanos": 0
+                  },
+                  "tax": {
+                    "currencyCode": "USD",
+                    "units": 0,
+                    "nanos": 0
+                  },
+                  "discount": {
+                    "currencyCode": "USD",
+                    "units": 0,
+                    "nanos": 0
+                  },
+                  "totalWithoutDiscount": {
+                    "currencyCode": "USD",
+                    "units": 76,
+                    "nanos": 990000000
+                  },
+                  "showPriceStrikethrough": false
+                },
+                "travellers": [
+                  "1"
+                ],
+                "preSelected": false
+              }
+            ]
+          },
+          "flexibleTicket": {
+            "airProductReference": "n/a",
+            "travellers": [
+              "1"
+            ],
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 380000000
+              },
+              "showPriceStrikethrough": false
+            },
+            "preSelected": false,
+            "recommendation": {
+              "recommended": false,
+              "confidence": "UNKNOWN_LEVEL"
+            },
+            "supplierInfo": {
+              "name": "Gotogate, Inc.",
+              "termsUrl": "https://flights-us.gotogate.com/rf/travel-conditions",
+              "privacyPolicyUrl": "https://flights-us.gotogate.com/rf/privacy-policy"
+            },
+            "shouldHighlight": false
+          }
+        },
+        "brandedFareInfo": {
+          "fareName": "BASE",
+          "cabinClass": "ECONOMY",
+          "features": [
+            {
+              "featureName": "PERSONAL_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK03",
+              "label": "1 personal item",
+              "availability": "INCLUDED",
+              "priority": 0,
+              "content": {
+                "label": "1 personal item",
+                "icon": "PERSONAL_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1
+              }
+            }
+          ],
+          "fareAttributes": [],
+          "nonIncludedFeaturesRequired": false,
+          "nonIncludedFeatures": [],
+          "featuresList": [
+            {
+              "featureName": "PERSONAL_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK03",
+              "label": "1 personal item",
+              "availability": "INCLUDED",
+              "priority": 0,
+              "content": {
+                "label": "1 personal item",
+                "icon": "PERSONAL_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1
+              }
+            }
+          ],
+          "checkinBaggageExcluded": true,
+          "cabinBaggageExcluded": true
+        },
+        "fareRules": {
+          "perSegment": [
+            {
+              "segmentIdentifiers": [
+                {
+                  "segmentIndex": 0,
+                  "legIndex": 0
+                }
+              ],
+              "availablePolicies": [
+                {
+                  "type": "CHANGE_BEFORE",
+                  "priceBreakdown": {
+                    "total": {
+                      "currencyCode": "",
+                      "units": 200,
+                      "nanos": 0
+                    },
+                    "baseFare": {
+                      "currencyCode": "",
+                      "units": 0,
+                      "nanos": 0
+                    },
+                    "fee": {
+                      "currencyCode": "",
+                      "units": 0,
+                      "nanos": 0
+                    },
+                    "tax": {
+                      "currencyCode": "",
+                      "units": 0,
+                      "nanos": 0
+                    }
+                  }
+                }
+              ],
+              "unavailablePolicies": [
+                {
+                  "type": "CHANGE_AFTER"
+                },
+                {
+                  "type": "CANCEL_BEFORE"
+                },
+                {
+                  "type": "CANCEL_AFTER"
+                }
+              ]
+            }
+          ],
+          "featuresDisplay": {
+            "features": [
+              {
+                "featureName": "CHANGEABLE_TICKET",
+                "label": "You’re allowed to change this flight for a fee"
+              }
+            ]
+          }
+        },
+        "appliedDiscounts": [],
+        "offerKeyToHighlight": "1_AR1370.EZE20261015",
+        "flightKey": "1_AR1370.EZE20261015",
+        "requestableBrandedFares": true,
+        "extraProductDisplayRequirements": {},
+        "badges": [
+          {
+            "text": "Best",
+            "variant": "BRAND_PRIMARY",
+            "type": "BEST"
+          },
+          {
+            "text": "Fastest",
+            "variant": "CONSTRUCTIVE",
+            "type": "FASTEST"
+          }
+        ],
+        "unifiedPriceBreakdown": {
+          "id": "AR1370.EZE2026-10-15T23:25:00.CUN2026-10-16T06:30:00.ECONOMY_0_1ADULT_DIRECT_ETG",
+          "price": {
+            "currencyCode": "USD",
+            "units": 545,
+            "nanos": 930000000
+          },
+          "items": [
+            {
+              "scope": "FLIGHT_ADULT",
+              "quantity": 1,
+              "id": "flight_adult",
+              "title": "Adult (1)",
+              "price": {
+                "currencyCode": "USD",
+                "units": 552,
+                "nanos": 720000000
+              },
+              "items": [
+                {
+                  "id": "flight_adult-basefare",
+                  "title": "Flight fare",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 383,
+                    "nanos": 240000000
+                  },
+                  "items": []
+                },
+                {
+                  "id": "flight_adult-tax",
+                  "title": "Taxes and airline fees",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 169,
+                    "nanos": 480000000
+                  },
+                  "items": []
+                }
+              ]
+            },
+            {
+              "id": "discount-booking_pays",
+              "title": "Booking.com pays",
+              "price": {
+                "currencyCode": "USD",
+                "units": -6,
+                "nanos": -790000000
+              },
+              "items": [],
+              "scope": "DISCOUNT",
+              "quantity": 1
+            }
+          ],
+          "addedItems": []
+        },
+        "perTravellerPriceDifferences": []
+      },
+      {
+        "token": "d6a1f_H4sIAAAAAAAA_1VSa4-iMBT9NfqN0lIFmaTZIEVl5SUDOvilQURlGMWl3dHx128H3Gw2be95tKdNbnoS4spfVPXwUR1Pgiu_OTg2ojnmogRFc1YPrSy7pqmry1HNq1adpo6dBmgc2omKVEWO4iX7UebXCuSgBQfivCVOHFgeswLb9TwrzlgUu7YbzAfaRG7GFrDcmMXONAyXnWsOu_h_4SR2o7-5YXkXCm8LMqx2Jch5QdDrk7ZEB8YmiOaZYXVW0QgyAqbvaNNZhFy_N1syd0xnm3ZqT3z7dgsfFvep8FLK78k71wLKx0mafq3qbZRC0w4fDn5FK-4ne29t3-4BFKlHHZxQ69vzfcrRa3V7hPZNBPWKe4nD_XoywLR7pCTTT90PefRz6yWXoPh5nDvru4WqQwbPsw2Mmp1eo13dzhaL7Xv0q86gMCi_QrHYijOiYb048XOefbb1WHaguxKcCDWWu14UsgsAjAwTdbrJORn1rBAEwZ7uBUk83Z4_z8jWQIj6Y5xoCl2uGd1QRS42myyUxH_LLJslfrZahlJl1IDfKluECmRQsUZMWyumy0z3WTOWKQlLFBQwFCiY4f7uiiADo7ExnmCEDTjk5UdZiKq5LMsvYvtYHynyBxVC02Xa9hHE__RAsxEuq4_rWLIBtuQ8MgigxNMTc-ZswTqTbMcm30bRw57pCB9yyUpmIE3igY1krRgCffKduRsJD4av_NLe_gDHx3SU_gIAAA..",
+        "segments": [
+          {
+            "departureAirport": {
+              "type": "AIRPORT",
+              "code": "EZE",
+              "name": "Ezeiza International Airport",
+              "city": "BUE",
+              "cityName": "Buenos Aires",
+              "country": "AR",
+              "countryName": "Argentina"
+            },
+            "arrivalAirport": {
+              "type": "AIRPORT",
+              "code": "CUN",
+              "name": "Cancún International Airport",
+              "city": "CUN",
+              "cityName": "Cancún",
+              "country": "MX",
+              "countryName": "Mexico",
+              "province": "Quintana Roo"
+            },
+            "departureTime": "2026-10-15T08:59:00",
+            "arrivalTime": "2026-10-15T22:01:00",
+            "legs": [
+              {
+                "departureTime": "2026-10-15T08:59:00",
+                "arrivalTime": "2026-10-15T14:21:00",
+                "departureAirport": {
+                  "type": "AIRPORT",
+                  "code": "EZE",
+                  "name": "Ezeiza International Airport",
+                  "city": "BUE",
+                  "cityName": "Buenos Aires",
+                  "country": "AR",
+                  "countryName": "Argentina"
+                },
+                "arrivalAirport": {
+                  "type": "AIRPORT",
+                  "code": "PTY",
+                  "name": "Tocumen International Airport",
+                  "city": "PTY",
+                  "cityName": "Panama City",
+                  "country": "PA",
+                  "countryName": "Panama",
+                  "province": "Panama"
+                },
+                "cabinClass": "ECONOMY",
+                "flightInfo": {
+                  "facilities": [],
+                  "flightNumber": 364,
+                  "planeType": "",
+                  "carrierInfo": {
+                    "operatingCarrier": "CM",
+                    "marketingCarrier": "CM",
+                    "operatingCarrierDisclosureText": "",
+                    "tier": {
+                      "addons": [],
+                      "type": "CORE"
+                    }
+                  }
+                },
+                "carriers": [
+                  "CM",
+                  "CM"
+                ],
+                "carriersData": [
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  },
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  }
+                ],
+                "totalTime": 26520,
+                "flightStops": [],
+                "amenities": [],
+                "departureTimeTz": "2026-10-15T08:59:00-03:00",
+                "arrivalTimeTz": "2026-10-15T14:21:00-05:00"
+              },
+              {
+                "departureTime": "2026-10-15T19:10:00",
+                "arrivalTime": "2026-10-15T22:01:00",
+                "departureAirport": {
+                  "type": "AIRPORT",
+                  "code": "PTY",
+                  "name": "Tocumen International Airport",
+                  "city": "PTY",
+                  "cityName": "Panama City",
+                  "country": "PA",
+                  "countryName": "Panama",
+                  "province": "Panama"
+                },
+                "arrivalAirport": {
+                  "type": "AIRPORT",
+                  "code": "CUN",
+                  "name": "Cancún International Airport",
+                  "city": "CUN",
+                  "cityName": "Cancún",
+                  "country": "MX",
+                  "countryName": "Mexico",
+                  "province": "Quintana Roo"
+                },
+                "cabinClass": "ECONOMY",
+                "flightInfo": {
+                  "facilities": [],
+                  "flightNumber": 103,
+                  "planeType": "",
+                  "carrierInfo": {
+                    "operatingCarrier": "CM",
+                    "marketingCarrier": "CM",
+                    "operatingCarrierDisclosureText": "",
+                    "tier": {
+                      "addons": [],
+                      "type": "CORE"
+                    }
+                  }
+                },
+                "carriers": [
+                  "CM",
+                  "CM"
+                ],
+                "carriersData": [
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  },
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  }
+                ],
+                "totalTime": 10260,
+                "flightStops": [],
+                "amenities": [],
+                "departureTimeTz": "2026-10-15T19:10:00-05:00",
+                "arrivalTimeTz": "2026-10-15T22:01:00-05:00"
+              }
+            ],
+            "totalTime": 54120,
+            "travellerCheckedLuggage": [],
+            "travellerCabinLuggage": [
+              {
+                "travellerReference": "1",
+                "luggageAllowance": {
+                  "luggageType": "HAND",
+                  "maxPiece": 1,
+                  "maxWeightPerPiece": 22.1,
+                  "massUnit": "LB",
+                  "sizeRestrictions": {
+                    "maxLength": 22.1,
+                    "maxWidth": 14.2,
+                    "maxHeight": 10.2,
+                    "sizeUnit": "INCH"
+                  }
+                },
+                "personalItem": true
+              }
+            ],
+            "isAtolProtected": false,
+            "departureTimeTz": "2026-10-15T08:59:00-03:00",
+            "arrivalTimeTz": "2026-10-15T22:01:00-05:00",
+            "highlightDestinationAirport": false,
+            "highlightOriginAirport": false,
+            "showWarningDestinationAirport": false,
+            "showWarningOriginAirport": false
+          }
+        ],
+        "priceBreakdown": {
+          "total": {
+            "currencyCode": "USD",
+            "units": 401,
+            "nanos": 550000000
+          },
+          "baseFare": {
+            "currencyCode": "USD",
+            "units": 246,
+            "nanos": 810000000
+          },
+          "fee": {
+            "currencyCode": "USD",
+            "units": 0,
+            "nanos": 0
+          },
+          "tax": {
+            "currencyCode": "USD",
+            "units": 153,
+            "nanos": 330000000
+          },
+          "totalRounded": {
+            "currencyCode": "USD",
+            "nanos": 0,
+            "units": 402
+          },
+          "discount": {
+            "currencyCode": "USD",
+            "units": 0,
+            "nanos": 0
+          },
+          "totalWithoutDiscount": {
+            "currencyCode": "USD",
+            "units": 401,
+            "nanos": 550000000
+          },
+          "totalWithoutDiscountRounded": {
+            "currencyCode": "USD",
+            "nanos": 0,
+            "units": 402
+          },
+          "bcomMargin": {
+            "currencyCode": "USD",
+            "units": 1,
+            "nanos": 410000000
+          },
+          "bcomPricingItems": [
+            {
+              "amount": {
+                "currencyCode": "USD",
+                "units": 1,
+                "nanos": 410000000
+              },
+              "itemType": "PLATFORM_SERVICE_FEE",
+              "name": "Platform service fee"
+            }
+          ],
+          "carrierTaxBreakdown": [
+            {
+              "carrier": {
+                "name": "Copa Airlines",
+                "code": "CM",
+                "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+              },
+              "avgPerAdult": {
+                "currencyCode": "USD",
+                "units": 153,
+                "nanos": 330000000
+              }
+            }
+          ],
+          "showPriceStrikethrough": false
+        },
+        "travellerPrices": [
+          {
+            "travellerPriceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 401,
+                "nanos": 550000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 246,
+                "nanos": 810000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 153,
+                "nanos": 330000000
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 402
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 401,
+                "nanos": 550000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 402
+              },
+              "bcomMargin": {
+                "currencyCode": "USD",
+                "units": 1,
+                "nanos": 410000000
+              },
+              "bcomPricingItems": [
+                {
+                  "amount": {
+                    "currencyCode": "USD",
+                    "units": 1,
+                    "nanos": 410000000
+                  },
+                  "itemType": "PLATFORM_SERVICE_FEE",
+                  "name": "Platform service fee"
+                }
+              ],
+              "showPriceStrikethrough": false
+            },
+            "travellerReference": "1",
+            "travellerType": "ADULT"
+          }
+        ],
+        "priceDisplayRequirements": [],
+        "pointOfSale": "us",
+        "hasGeniusAirlineFundedCampaign": false,
+        "hasGeniusSelfFundedCampaign": false,
+        "tripType": "ONEWAY",
+        "posMismatch": {
+          "detectedPointOfSale": "us",
+          "isPOSMismatch": false,
+          "offerSalesCountry": "us"
+        },
+        "includedProductsBySegment": [
+          [
+            {
+              "travellerReference": "1",
+              "travellerProducts": [
+                {
+                  "type": "cabinBaggage",
+                  "product": {
+                    "luggageType": "HAND",
+                    "maxPiece": 1,
+                    "maxWeightPerPiece": 22.1,
+                    "massUnit": "LB",
+                    "sizeRestrictions": {
+                      "maxLength": 22.1,
+                      "maxWidth": 14.2,
+                      "maxHeight": 10.2,
+                      "sizeUnit": "INCH"
+                    }
+                  }
+                },
+                {
+                  "type": "personalItem"
+                }
+              ]
+            }
+          ]
+        ],
+        "includedProducts": {
+          "areAllSegmentsIdentical": true,
+          "segments": [
+            [
+              {
+                "luggageType": "PERSONAL_ITEM",
+                "maxPiece": 1,
+                "piecePerPax": 1
+              },
+              {
+                "luggageType": "HAND",
+                "maxPiece": 1,
+                "maxWeightPerPiece": 22.1,
+                "massUnit": "LB",
+                "sizeRestrictions": {
+                  "maxLength": 22.1,
+                  "maxWidth": 14.2,
+                  "maxHeight": 10.2,
+                  "sizeUnit": "INCH"
+                },
+                "piecePerPax": 1
+              }
+            ]
+          ]
+        },
+        "extraProducts": [
+          {
+            "type": "flexibleTicket",
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              }
+            }
+          }
+        ],
+        "offerExtras": {
+          "flexibleTicket": {
+            "airProductReference": "n/a",
+            "travellers": [
+              "1"
+            ],
+            "recommendation": {
+              "recommended": false,
+              "confidence": "UNKNOWN_LEVEL"
+            },
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 57
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 57
+              },
+              "showPriceStrikethrough": false
+            },
+            "supplierInfo": {
+              "name": "Gotogate, Inc.",
+              "termsUrl": "https://flights-us.gotogate.com/rf/travel-conditions",
+              "privacyPolicyUrl": "https://flights-us.gotogate.com/rf/privacy-policy"
+            }
+          }
+        },
+        "ancillaries": {
+          "flexibleTicket": {
+            "airProductReference": "n/a",
+            "travellers": [
+              "1"
+            ],
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 56,
+                "nanos": 20000000
+              },
+              "showPriceStrikethrough": false
+            },
+            "preSelected": false,
+            "recommendation": {
+              "recommended": false,
+              "confidence": "UNKNOWN_LEVEL"
+            },
+            "supplierInfo": {
+              "name": "Gotogate, Inc.",
+              "termsUrl": "https://flights-us.gotogate.com/rf/travel-conditions",
+              "privacyPolicyUrl": "https://flights-us.gotogate.com/rf/privacy-policy"
+            },
+            "shouldHighlight": false
+          }
+        },
+        "brandedFareInfo": {
+          "fareName": "Economy Basic",
+          "cabinClass": "ECONOMY",
+          "features": [
+            {
+              "featureName": "PERSONAL_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK03",
+              "label": "1 personal item",
+              "availability": "INCLUDED",
+              "priority": 0,
+              "content": {
+                "label": "1 personal item",
+                "icon": "PERSONAL_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1
+              }
+            },
+            {
+              "featureName": "CABIN_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK02",
+              "label": "1 carry-on bag (22.1 lbs)\t",
+              "availability": "INCLUDED",
+              "priority": 2,
+              "content": {
+                "label": "1 carry-on bag (22.1 lbs)",
+                "icon": "CABIN_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1,
+                "weight": 22.1,
+                "massUnit": "LB"
+              }
+            }
+          ],
+          "fareAttributes": [],
+          "nonIncludedFeaturesRequired": false,
+          "nonIncludedFeatures": [],
+          "featuresList": [
+            {
+              "featureName": "PERSONAL_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK03",
+              "label": "1 personal item",
+              "availability": "INCLUDED",
+              "priority": 0,
+              "content": {
+                "label": "1 personal item",
+                "icon": "PERSONAL_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1
+              }
+            },
+            {
+              "featureName": "CABIN_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK02",
+              "label": "1 carry-on bag (22.1 lbs)\t",
+              "availability": "INCLUDED",
+              "priority": 2,
+              "content": {
+                "label": "1 carry-on bag (22.1 lbs)",
+                "icon": "CABIN_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1,
+                "weight": 22.1,
+                "massUnit": "LB"
+              }
+            }
+          ],
+          "checkinBaggageExcluded": true,
+          "cabinBaggageExcluded": false
+        },
+        "appliedDiscounts": [],
+        "offerKeyToHighlight": "1_CM364_CM103.EZE20261015",
+        "flightKey": "1_CM364_CM103.EZE20261015",
+        "extraProductDisplayRequirements": {},
+        "badges": [
+          {
+            "text": "Cheapest",
+            "variant": "CONSTRUCTIVE",
+            "type": "CHEAPEST"
+          }
+        ],
+        "unifiedPriceBreakdown": {
+          "id": "CM364.EZE2026-10-15T08:59:00.PTY2026-10-15T14:21:00.ECONOMY,CM103.PTY2026-10-15T19:10:00.CUN2026-10-15T22:01:00.ECONOMY_0_1ADULT_DIRECT_ETG",
+          "price": {
+            "currencyCode": "USD",
+            "units": 401,
+            "nanos": 550000000
+          },
+          "items": [
+            {
+              "scope": "FLIGHT_ADULT",
+              "quantity": 1,
+              "id": "flight_adult",
+              "title": "Adult (1)",
+              "price": {
+                "currencyCode": "USD",
+                "units": 401,
+                "nanos": 550000000
+              },
+              "items": [
+                {
+                  "id": "flight_adult-basefare",
+                  "title": "Flight fare",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 246,
+                    "nanos": 810000000
+                  },
+                  "items": []
+                },
+                {
+                  "id": "flight_adult-tax",
+                  "title": "Taxes and airline fees",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 153,
+                    "nanos": 330000000
+                  },
+                  "items": []
+                },
+                {
+                  "id": "flight_adult-platform_service_fee",
+                  "title": "Platform service fee",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 1,
+                    "nanos": 410000000
+                  },
+                  "items": []
+                }
+              ]
+            }
+          ],
+          "addedItems": []
+        },
+        "perTravellerPriceDifferences": []
+      },
+      {
+        "token": "d6a1f_H4sIAAAAAAAA_1VSW4-iMBT-NfrWQinXSZoNAjo4XARhHPalQUTEGcWxnfHy67cDbjabnp7v0n4nadId5yf2JEnbj7bZcQa-GGw63jUlr2HVHaTtWbR11723x0Yq27M0yT0nj5AWO5mEJCBW9VT8qstTC0t4hlvivWVeGtkBtSPHDwI7Legi9R0_mo0UUxymNrT9lKbeJI5fetca9_H_wlnqL_7mxvWVA3auyLhd17BkFUHLBz0THRqraDErDLu3qo4TFVqhp0ymC-QXg3kmM1dfLl97tSGhc7nEd5uFLg9yl12zPVMil2lZnt-S99-LXLac-O7hJUpYmG2CV-dyjWSeB66HM9c2Itlk4b1hQT5NAke-9mNrIie1nha-XprB6X761icpnzNbv7lodkzWzyDSD-578YEPn9ncrsr97TjX4kuCmKq5zJiYkYZ3qvWFrMafy8kIu6KG0XBHytp_iEq8H0LVsFCvu5IRdWAVJ0ge6IaTLNCd2eMOJ5qmYKsXjCjAfXml7soFYtOp-Qyy8G2-kmkWFsiOf1SxjH-UZcRApjKwVIo1YPnU8h-9oAWIaQxQRFEEMMXD7JYgAyPN0EyMsCGPWf1RV7ztji_1jTghVkwg_k7FFV2knRAh_E-PFAfh8qBeGsFG2BbVUBnKAncPLKnuwNlSsDU1f4xqgA019Y1ZClZTXAnYUlX0liI4BPfUXwm4U8Usv_XPPx_Z8Bv3AgAA",
+        "segments": [
+          {
+            "departureAirport": {
+              "type": "AIRPORT",
+              "code": "EZE",
+              "name": "Ezeiza International Airport",
+              "city": "BUE",
+              "cityName": "Buenos Aires",
+              "country": "AR",
+              "countryName": "Argentina"
+            },
+            "arrivalAirport": {
+              "type": "AIRPORT",
+              "code": "CUN",
+              "name": "Cancún International Airport",
+              "city": "CUN",
+              "cityName": "Cancún",
+              "country": "MX",
+              "countryName": "Mexico",
+              "province": "Quintana Roo"
+            },
+            "departureTime": "2026-10-15T03:48:00",
+            "arrivalTime": "2026-10-15T12:55:00",
+            "legs": [
+              {
+                "departureTime": "2026-10-15T03:48:00",
+                "arrivalTime": "2026-10-15T09:10:00",
+                "departureAirport": {
+                  "type": "AIRPORT",
+                  "code": "EZE",
+                  "name": "Ezeiza International Airport",
+                  "city": "BUE",
+                  "cityName": "Buenos Aires",
+                  "country": "AR",
+                  "countryName": "Argentina"
+                },
+                "arrivalAirport": {
+                  "type": "AIRPORT",
+                  "code": "PTY",
+                  "name": "Tocumen International Airport",
+                  "city": "PTY",
+                  "cityName": "Panama City",
+                  "country": "PA",
+                  "countryName": "Panama",
+                  "province": "Panama"
+                },
+                "cabinClass": "ECONOMY",
+                "flightInfo": {
+                  "facilities": [],
+                  "flightNumber": 328,
+                  "planeType": "",
+                  "carrierInfo": {
+                    "operatingCarrier": "CM",
+                    "marketingCarrier": "CM",
+                    "operatingCarrierDisclosureText": "",
+                    "tier": {
+                      "addons": [],
+                      "type": "CORE"
+                    }
+                  }
+                },
+                "carriers": [
+                  "CM",
+                  "CM"
+                ],
+                "carriersData": [
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  },
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  }
+                ],
+                "totalTime": 26520,
+                "flightStops": [],
+                "amenities": [],
+                "departureTimeTz": "2026-10-15T03:48:00-03:00",
+                "arrivalTimeTz": "2026-10-15T09:10:00-05:00"
+              },
+              {
+                "departureTime": "2026-10-15T10:04:00",
+                "arrivalTime": "2026-10-15T12:55:00",
+                "departureAirport": {
+                  "type": "AIRPORT",
+                  "code": "PTY",
+                  "name": "Tocumen International Airport",
+                  "city": "PTY",
+                  "cityName": "Panama City",
+                  "country": "PA",
+                  "countryName": "Panama",
+                  "province": "Panama"
+                },
+                "arrivalAirport": {
+                  "type": "AIRPORT",
+                  "code": "CUN",
+                  "name": "Cancún International Airport",
+                  "city": "CUN",
+                  "cityName": "Cancún",
+                  "country": "MX",
+                  "countryName": "Mexico",
+                  "province": "Quintana Roo"
+                },
+                "cabinClass": "ECONOMY",
+                "flightInfo": {
+                  "facilities": [],
+                  "flightNumber": 113,
+                  "planeType": "",
+                  "carrierInfo": {
+                    "operatingCarrier": "CM",
+                    "marketingCarrier": "CM",
+                    "operatingCarrierDisclosureText": "",
+                    "tier": {
+                      "addons": [],
+                      "type": "CORE"
+                    }
+                  }
+                },
+                "carriers": [
+                  "CM",
+                  "CM"
+                ],
+                "carriersData": [
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  },
+                  {
+                    "name": "Copa Airlines",
+                    "code": "CM",
+                    "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+                  }
+                ],
+                "totalTime": 10260,
+                "flightStops": [],
+                "amenities": [],
+                "departureTimeTz": "2026-10-15T10:04:00-05:00",
+                "arrivalTimeTz": "2026-10-15T12:55:00-05:00"
+              }
+            ],
+            "totalTime": 40020,
+            "travellerCheckedLuggage": [],
+            "travellerCabinLuggage": [
+              {
+                "travellerReference": "1",
+                "luggageAllowance": {
+                  "luggageType": "HAND",
+                  "maxPiece": 1,
+                  "maxWeightPerPiece": 22.1,
+                  "massUnit": "LB",
+                  "sizeRestrictions": {
+                    "maxLength": 22.1,
+                    "maxWidth": 14.2,
+                    "maxHeight": 10.2,
+                    "sizeUnit": "INCH"
+                  }
+                },
+                "personalItem": true
+              }
+            ],
+            "isAtolProtected": false,
+            "departureTimeTz": "2026-10-15T03:48:00-03:00",
+            "arrivalTimeTz": "2026-10-15T12:55:00-05:00",
+            "highlightDestinationAirport": false,
+            "highlightOriginAirport": false,
+            "showWarningDestinationAirport": false,
+            "showWarningOriginAirport": false
+          }
+        ],
+        "priceBreakdown": {
+          "total": {
+            "currencyCode": "USD",
+            "units": 554,
+            "nanos": 880000000
+          },
+          "baseFare": {
+            "currencyCode": "USD",
+            "units": 389,
+            "nanos": 60000000
+          },
+          "fee": {
+            "currencyCode": "USD",
+            "units": 0,
+            "nanos": 0
+          },
+          "tax": {
+            "currencyCode": "USD",
+            "units": 163,
+            "nanos": 330000000
+          },
+          "totalRounded": {
+            "currencyCode": "USD",
+            "nanos": 0,
+            "units": 555
+          },
+          "discount": {
+            "currencyCode": "USD",
+            "units": 0,
+            "nanos": 0
+          },
+          "totalWithoutDiscount": {
+            "currencyCode": "USD",
+            "units": 554,
+            "nanos": 880000000
+          },
+          "totalWithoutDiscountRounded": {
+            "currencyCode": "USD",
+            "nanos": 0,
+            "units": 555
+          },
+          "bcomMargin": {
+            "currencyCode": "USD",
+            "units": 2,
+            "nanos": 490000000
+          },
+          "bcomPricingItems": [
+            {
+              "amount": {
+                "currencyCode": "USD",
+                "units": 2,
+                "nanos": 490000000
+              },
+              "itemType": "PLATFORM_SERVICE_FEE",
+              "name": "Platform service fee"
+            }
+          ],
+          "carrierTaxBreakdown": [
+            {
+              "carrier": {
+                "name": "Copa Airlines",
+                "code": "CM",
+                "logo": "https://r-xx.bstatic.com/data/airlines_logo/CM.png"
+              },
+              "avgPerAdult": {
+                "currencyCode": "USD",
+                "units": 163,
+                "nanos": 330000000
+              }
+            }
+          ],
+          "showPriceStrikethrough": false
+        },
+        "travellerPrices": [
+          {
+            "travellerPriceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 554,
+                "nanos": 880000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 389,
+                "nanos": 60000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 163,
+                "nanos": 330000000
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 555
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 554,
+                "nanos": 880000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 555
+              },
+              "bcomMargin": {
+                "currencyCode": "USD",
+                "units": 2,
+                "nanos": 490000000
+              },
+              "bcomPricingItems": [
+                {
+                  "amount": {
+                    "currencyCode": "USD",
+                    "units": 2,
+                    "nanos": 490000000
+                  },
+                  "itemType": "PLATFORM_SERVICE_FEE",
+                  "name": "Platform service fee"
+                }
+              ],
+              "showPriceStrikethrough": false
+            },
+            "travellerReference": "1",
+            "travellerType": "ADULT"
+          }
+        ],
+        "priceDisplayRequirements": [],
+        "pointOfSale": "us",
+        "hasGeniusAirlineFundedCampaign": false,
+        "hasGeniusSelfFundedCampaign": false,
+        "tripType": "ONEWAY",
+        "posMismatch": {
+          "detectedPointOfSale": "us",
+          "isPOSMismatch": false,
+          "offerSalesCountry": "us"
+        },
+        "includedProductsBySegment": [
+          [
+            {
+              "travellerReference": "1",
+              "travellerProducts": [
+                {
+                  "type": "cabinBaggage",
+                  "product": {
+                    "luggageType": "HAND",
+                    "maxPiece": 1,
+                    "maxWeightPerPiece": 22.1,
+                    "massUnit": "LB",
+                    "sizeRestrictions": {
+                      "maxLength": 22.1,
+                      "maxWidth": 14.2,
+                      "maxHeight": 10.2,
+                      "sizeUnit": "INCH"
+                    }
+                  }
+                },
+                {
+                  "type": "personalItem"
+                }
+              ]
+            }
+          ]
+        ],
+        "includedProducts": {
+          "areAllSegmentsIdentical": true,
+          "segments": [
+            [
+              {
+                "luggageType": "PERSONAL_ITEM",
+                "maxPiece": 1,
+                "piecePerPax": 1
+              },
+              {
+                "luggageType": "HAND",
+                "maxPiece": 1,
+                "maxWeightPerPiece": 22.1,
+                "massUnit": "LB",
+                "sizeRestrictions": {
+                  "maxLength": 22.1,
+                  "maxWidth": 14.2,
+                  "maxHeight": 10.2,
+                  "sizeUnit": "INCH"
+                },
+                "piecePerPax": 1
+              }
+            ]
+          ]
+        },
+        "extraProducts": [
+          {
+            "type": "flexibleTicket",
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              }
+            }
+          }
+        ],
+        "offerExtras": {
+          "flexibleTicket": {
+            "airProductReference": "n/a",
+            "travellers": [
+              "1"
+            ],
+            "recommendation": {
+              "recommended": false,
+              "confidence": "UNKNOWN_LEVEL"
+            },
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 78
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 78
+              },
+              "showPriceStrikethrough": false
+            },
+            "supplierInfo": {
+              "name": "Gotogate, Inc.",
+              "termsUrl": "https://flights-us.gotogate.com/rf/travel-conditions",
+              "privacyPolicyUrl": "https://flights-us.gotogate.com/rf/privacy-policy"
+            }
+          }
+        },
+        "ancillaries": {
+          "flexibleTicket": {
+            "airProductReference": "n/a",
+            "travellers": [
+              "1"
+            ],
+            "priceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 77,
+                "nanos": 330000000
+              },
+              "showPriceStrikethrough": false
+            },
+            "preSelected": false,
+            "recommendation": {
+              "recommended": false,
+              "confidence": "UNKNOWN_LEVEL"
+            },
+            "supplierInfo": {
+              "name": "Gotogate, Inc.",
+              "termsUrl": "https://flights-us.gotogate.com/rf/travel-conditions",
+              "privacyPolicyUrl": "https://flights-us.gotogate.com/rf/privacy-policy"
+            },
+            "shouldHighlight": false
+          }
+        },
+        "brandedFareInfo": {
+          "fareName": "Economy Basic",
+          "cabinClass": "ECONOMY",
+          "features": [
+            {
+              "featureName": "PERSONAL_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK03",
+              "label": "1 personal item",
+              "availability": "INCLUDED",
+              "priority": 0,
+              "content": {
+                "label": "1 personal item",
+                "icon": "PERSONAL_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1
+              }
+            },
+            {
+              "featureName": "CABIN_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK02",
+              "label": "1 carry-on bag (22.1 lbs)\t",
+              "availability": "INCLUDED",
+              "priority": 2,
+              "content": {
+                "label": "1 carry-on bag (22.1 lbs)",
+                "icon": "CABIN_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1,
+                "weight": 22.1,
+                "massUnit": "LB"
+              }
+            }
+          ],
+          "fareAttributes": [],
+          "nonIncludedFeaturesRequired": false,
+          "nonIncludedFeatures": [],
+          "featuresList": [
+            {
+              "featureName": "PERSONAL_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK03",
+              "label": "1 personal item",
+              "availability": "INCLUDED",
+              "priority": 0,
+              "content": {
+                "label": "1 personal item",
+                "icon": "PERSONAL_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1
+              }
+            },
+            {
+              "featureName": "CABIN_BAGGAGE",
+              "category": "BAGGAGE",
+              "code": "BK02",
+              "label": "1 carry-on bag (22.1 lbs)\t",
+              "availability": "INCLUDED",
+              "priority": 2,
+              "content": {
+                "label": "1 carry-on bag (22.1 lbs)",
+                "icon": "CABIN_LUGGAGE_ICON"
+              },
+              "sectionCategory": {
+                "groupingKey": "BAGGAGE",
+                "heading": "Baggage",
+                "priority": 1
+              },
+              "baggageInfo": {
+                "amount": 1,
+                "weight": 22.1,
+                "massUnit": "LB"
+              }
+            }
+          ],
+          "checkinBaggageExcluded": true,
+          "cabinBaggageExcluded": false
+        },
+        "appliedDiscounts": [],
+        "offerKeyToHighlight": "1_CM328_CM113.EZE20261015",
+        "flightKey": "1_CM328_CM113.EZE20261015",
+        "extraProductDisplayRequirements": {},
+        "unifiedPriceBreakdown": {
+          "id": "CM328.EZE2026-10-15T03:48:00.PTY2026-10-15T09:10:00.ECONOMY,CM113.PTY2026-10-15T10:04:00.CUN2026-10-15T12:55:00.ECONOMY_0_1ADULT_DIRECT_ETG",
+          "price": {
+            "currencyCode": "USD",
+            "units": 554,
+            "nanos": 880000000
+          },
+          "items": [
+            {
+              "scope": "FLIGHT_ADULT",
+              "quantity": 1,
+              "id": "flight_adult",
+              "title": "Adult (1)",
+              "price": {
+                "currencyCode": "USD",
+                "units": 554,
+                "nanos": 880000000
+              },
+              "items": [
+                {
+                  "id": "flight_adult-basefare",
+                  "title": "Flight fare",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 389,
+                    "nanos": 60000000
+                  },
+                  "items": []
+                },
+                {
+                  "id": "flight_adult-tax",
+                  "title": "Taxes and airline fees",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 163,
+                    "nanos": 330000000
+                  },
+                  "items": []
+                },
+                {
+                  "id": "flight_adult-platform_service_fee",
+                  "title": "Platform service fee",
+                  "price": {
+                    "currencyCode": "USD",
+                    "units": 2,
+                    "nanos": 490000000
+                  },
+                  "items": []
+                }
+              ]
+            }
+          ],
+          "addedItems": []
+        },
+        "perTravellerPriceDifferences": []
+      }
+    ],
+    "selectedOffers": [],
+    "flightDeals": [
+      {
+        "key": "BEST",
+        "offerToken": "d6a1f_H4sIAAAAAAAA_1VS2a6iMBh-Gr1roSzCOUkzQRZHZROLijcNVlTGBQ-t4_L0A3hmkkn_fFv7_Vc9CHHln5K0O5X7g-DgxuG-EtU-FwVk1Vna1Q1squpYXvZSXtbSMHXtNER6ZBMJSaA57DP7UeTXEuawhjvsroibhJZPrdAe-76VZDROxvY4HPUUs7lMLGiNE5q4wyiadulHv6v_VybJOP7b6xcPAXjNcL_cFDDnDJvfqsYDaCzDeJQZVhexSmANfgSuMvRi5K7fYY1H2SBMJp3b4sDh9-hlGQHhSuhwnaTpc3Zcx6msk-jlqnM04wHZ-gv7_ghlkfqOqxLHMkJ05MFrz33iLYL5XQSznuo0060tcD1aULXii9mQnXfekT5nhmkVmUeCowUuN_PkhavTYxkCxmPG15OUOct5sL6vyTO2z97Xsb6kzPg6FZrGJ_fs32J4wLen_fttGMMIQs34QJ2vco7Vt2ICI_kttwITf2CPvt8IrOuKoXSGYwU40wXwzJ-ABGvFiVoKFBnIACkKMFbtZIAABN51XmJkqEg3dFNFqiH3eXEqmCiry7R4YitpM9D8ByaUASA9xd4crtWGN6KnWs3sqdzgocOcIhU1vKFma9mbttTcMK1VBQXaVm3VjmoNlhRBGbb-Fx0vG3rR_H4zB-Uffysw-LcCAAA.",
+        "price": {
+          "currencyCode": "USD",
+          "units": 545,
+          "nanos": 930000000
+        },
+        "priceRounded": {
+          "currencyCode": "USD",
+          "units": 546,
+          "nanos": 0
+        },
+        "travellerPrices": [
+          {
+            "travellerPriceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 545,
+                "nanos": 930000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 383,
+                "nanos": 240000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 169,
+                "nanos": 480000000
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 546
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 552,
+                "nanos": 720000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 553
+              },
+              "bcomMargin": {
+                "currencyCode": "USD",
+                "units": -6,
+                "nanos": -790000000
+              },
+              "bcomPricingItems": [
+                {
+                  "amount": {
+                    "currencyCode": "USD",
+                    "units": -6,
+                    "nanos": -790000000
+                  },
+                  "itemType": "BOOKING_PAYS",
+                  "name": "Booking.com pays"
+                }
+              ]
+            },
+            "travellerReference": "1",
+            "travellerType": "ADULT"
+          }
+        ]
+      },
+      {
+        "key": "CHEAPEST",
+        "offerToken": "d6a1f_H4sIAAAAAAAA_1VSa4-iMBT9NfqN0lIFmaTZIEVl5SUDOvilQURlGMWl3dHx128H3Gw2be95tKdNbnoS4spfVPXwUR1Pgiu_OTg2ojnmogRFc1YPrSy7pqmry1HNq1adpo6dBmgc2omKVEWO4iX7UebXCuSgBQfivCVOHFgeswLb9TwrzlgUu7YbzAfaRG7GFrDcmMXONAyXnWsOu_h_4SR2o7-5YXkXCm8LMqx2Jch5QdDrk7ZEB8YmiOaZYXVW0QgyAqbvaNNZhFy_N1syd0xnm3ZqT3z7dgsfFvep8FLK78k71wLKx0mafq3qbZRC0w4fDn5FK-4ne29t3-4BFKlHHZxQ69vzfcrRa3V7hPZNBPWKe4nD_XoywLR7pCTTT90PefRz6yWXoPh5nDvru4WqQwbPsw2Mmp1eo13dzhaL7Xv0q86gMCi_QrHYijOiYb048XOefbb1WHaguxKcCDWWu14UsgsAjAwTdbrJORn1rBAEwZ7uBUk83Z4_z8jWQIj6Y5xoCl2uGd1QRS42myyUxH_LLJslfrZahlJl1IDfKluECmRQsUZMWyumy0z3WTOWKQlLFBQwFCiY4f7uiiADo7ExnmCEDTjk5UdZiKq5LMsvYvtYHynyBxVC02Xa9hHE__RAsxEuq4_rWLIBtuQ8MgigxNMTc-ZswTqTbMcm30bRw57pCB9yyUpmIE3igY1krRgCffKduRsJD4av_NLe_gDHx3SU_gIAAA..",
+        "price": {
+          "currencyCode": "USD",
+          "units": 401,
+          "nanos": 550000000
+        },
+        "priceRounded": {
+          "currencyCode": "USD",
+          "units": 402,
+          "nanos": 0
+        },
+        "travellerPrices": [
+          {
+            "travellerPriceBreakdown": {
+              "total": {
+                "currencyCode": "USD",
+                "units": 401,
+                "nanos": 550000000
+              },
+              "baseFare": {
+                "currencyCode": "USD",
+                "units": 246,
+                "nanos": 810000000
+              },
+              "fee": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "tax": {
+                "currencyCode": "USD",
+                "units": 153,
+                "nanos": 330000000
+              },
+              "totalRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 402
+              },
+              "discount": {
+                "currencyCode": "USD",
+                "units": 0,
+                "nanos": 0
+              },
+              "totalWithoutDiscount": {
+                "currencyCode": "USD",
+                "units": 401,
+                "nanos": 550000000
+              },
+              "totalWithoutDiscountRounded": {
+                "currencyCode": "USD",
+                "nanos": 0,
+                "units": 402
+              },
+              "bcomMargin": {
+                "currencyCode": "USD",
+                "units": 1,
+                "nanos": 410000000
+              },
+              "bcomPricingItems": [
+                {
+                  "amount": {
+                    "currencyCode": "USD",
+                    "units": 1,
+                    "nanos": 410000000
+                  },
+                  "itemType": "PLATFORM_SERVICE_FEE",
+                  "name": "Platform service fee"
+                }
+              ]
+            },
+            "travellerReference": "1",
+            "travellerType": "ADULT"
+          }
+        ]
+      }
+    ],
+    "atolProtectedStatus": "NONE",
+    "searchId": "D5CB2139CEF590BCBFF34F2244C79C2C",
+    "banners": [],
+    "displayOptions": {
+      "brandedFaresShownByDefault": false,
+      "directFlightsOnlyFilterIgnored": false,
+      "hideFlexiblePricesBanner": false
+    },
+    "sortingOptions": [],
+    "isOffersCabinClassExtended": false,
+    "cabinClassExtension": {},
+    "searchCriteria": {
+      "cabinClass": "ECONOMY"
+    },
+    "personalisationAttributes": {
+      "isUserFlexible": false
+    },
+    "source": "cache",
+    "baggagePolicies": [
+      {
+        "code": "AR",
+        "name": "Aerolineas Argentinas",
+        "url": "https://www.aerolineas.com.ar/en-ar/baggage/franchise"
+      },
+      {
+        "code": "AM",
+        "name": "Aeromexico",
+        "url": "https://aeromexico.com/en-nl/travel-information/baggage"
+      },
+      {
+        "code": "AC",
+        "name": "Air Canada",
+        "url": "https://www.aircanada.com/uk/en/aco/home/plan/baggage/checked.html"
+      },
+      {
+        "code": "UX",
+        "name": "Air Europa",
+        "url": "https://www.aireuropa.com/ot/en/aea/travel-information/baggage.html"
+      },
+      {
+        "code": "AA",
+        "name": "American Airlines",
+        "url": "https://aa.com/i18n/travel-info/baggage/checked-baggage-policy.jsp"
+      },
+      {
+        "code": "DM",
+        "name": "Arajet",
+        "url": "https://www.arajet.com/en/baggage"
+      },
+      {
+        "code": "AV",
+        "name": "Avianca",
+        "url": "https://www.avianca.com/otr/en/travel-information/plan/baggage"
+      },
+      {
+        "code": "OB",
+        "name": "Boliviana de Aviacion",
+        "url": "https://www.boa.bo/BoAWebSite/Home/About?primary=politica_equipaje"
+      },
+      {
+        "code": "CM",
+        "name": "Copa Airlines",
+        "url": "https://www.copaair.com/en/web/mx/baggage-policy"
+      },
+      {
+        "code": "JA",
+        "name": "JetSmart",
+        "url": "https://jetsmart.com/us/en/opcionales"
+      },
+      {
+        "code": "LA",
+        "name": "LATAM",
+        "url": "https://www.latamairlines.com/es/en/experience/prepare-your-trip/baggage"
+      },
+      {
+        "code": "H2",
+        "name": "Sky Airline",
+        "url": "https://www.skyairline.com/english/price-list"
+      },
+      {
+        "code": "UA",
+        "name": "United Airlines",
+        "url": "https://www.united.com/web/en-US/content/travel/baggage/default.aspx"
+      },
+      {
+        "code": "Y4",
+        "name": "Volaris",
+        "url": "https://cms.volaris.com/en/travel-info/baggage-policy/"
+      }
+    ],
+    "personalisationSegments": [
+      "BUSINESS_TRAVELLER",
+      "LONG_HAUL_TRIP",
+      "SOLO_TRAVELLER",
+      "BOOKER_INTERNATIONAL",
+      "EARLY_BIRD",
+      "BOOKER_US"
+    ],
+    "priceAlertStatus": {
+      "isEligible": false,
+      "isSearchEligible": true
+    }
+  }
+}

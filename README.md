@@ -34,7 +34,7 @@ cp .env.example .env                  # completar las variables, ver abajo
 | `GEMINI_MODEL` | ID del modelo Flash-Lite vigente (verificar en `ai.google.dev`) |
 | `GEMINI_API_KEY_1` / `_2` / `_3` | Claves de Gemini, rotación round robin |
 | `OPENTRIPMAP_API_KEY` | Clave de OpenTripMap (ingesta de POIs) |
-| `AMADEUS_CLIENT_ID` / `AMADEUS_CLIENT_SECRET` | Extensiones de alojamiento y vuelos (entorno test) |
+| `RAPIDAPI_KEY` / `RAPIDAPI_HOST_BOOKING` / `RAPIDAPI_HOST_FLY_SCRAPER` | Extensiones de alojamiento y vuelos, Booking.com15 (reemplaza a Amadeus, dado de baja en 2026, ver D-06 en DECISIONES.md) |
 | `DATABASE_URL` | Connection string de Postgres (Supabase, o local vía `docker-compose`) |
 
 **Nunca** se versionan valores reales, solo nombres. `.env` está en `.gitignore`.

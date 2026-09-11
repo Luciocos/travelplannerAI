@@ -11,7 +11,7 @@ Fuente de verdad del proyecto. Todo el contexto estable vive acá, el contexto q
 
 1. **Al empezar cualquier sesión de trabajo sobre este proyecto**, leer `references/estado.md`. Dice en qué fase está el proyecto, qué está cerrado, qué está abierto y qué decisiones ya se tomaron. Sin eso vas a reproponer cosas ya resueltas.
 2. **Antes de codear una fase**, leer `references/plan-de-fases.md` (la fase que toca) y `references/arquitectura.md`.
-3. **Antes de integrar cualquier API externa**, leer `references/fuentes-datos.md`. Tiene los dos pasos de OpenTripMap, los límites de Open-Meteo y las trampas de Amadeus.
+3. **Antes de integrar cualquier API externa**, leer `references/fuentes-datos.md`. Tiene los dos pasos de OpenTripMap, los límites de Open-Meteo y las trampas de RapidAPI/Booking.com15 (reemplaza a Amadeus, dado de baja en 2026, ver D-05/D-06 en DECISIONES.md).
 4. **Antes de discutir entregables, evaluación o fechas**, leer `references/consigna-catedra.md`. Es el texto de lo que pide el profesor, y lo que se evalúa.
 5. **Al cerrar cada fase**, actualizar `references/estado.md` (fase, decisiones nuevas en una línea, bloqueos) y `docs/DECISIONES.md` del repo (decisión, alternativa descartada, motivo). Ese log es el insumo directo de la defensa oral y del video, no es burocracia.
 
@@ -54,8 +54,8 @@ Extensiones:
 
 | RF | Qué pide | Tool | Fuente |
 |----|----------|------|--------|
-| RF6 | Alojamiento por destino y fechas | `buscar_alojamiento` | Amadeus Hotel Search (test) |
-| RF7 | Vuelos por destino y fechas | `buscar_vuelos` | Amadeus Flight Offers Search (test) |
+| RF6 | Alojamiento por destino y fechas | `buscar_alojamiento` | RapidAPI, Booking.com15 (reemplaza a Amadeus, D-06) |
+| RF7 | Vuelos por destino y fechas | `buscar_vuelos` | RapidAPI, Booking.com15 (reemplaza a Amadeus, D-06) |
 | RF8 | Clima, idioma y moneda al confirmar destino | `info_destino` | Open-Meteo mas tabla de referencia |
 | RF9 | Seguridad y costumbres locales | `responder_faq_viajero` | RAG de FAQ (corpus curado) |
 | RF10 | Gastos del viaje y división | `registrar_gasto`, `calcular_division_gastos` | Lógica propia |
@@ -96,7 +96,7 @@ Patrón común a los tres, y esto es lo que hay que poder explicar: **primero se
 - `references/estado.md`, **archivo vivo**: fase actual, decisiones tomadas, bloqueos abiertos, próximo paso. Leer al empezar, actualizar al cerrar cada fase.
 - `references/consigna-catedra.md`: texto de lo que pide el profesor, criterios de evaluación, entregables, fechas, requisitos del video.
 - `references/arquitectura.md`: estructura del repo, esquema SQL, patrón de consulta, contratos de las tools, modelo de estado, dependencias.
-- `references/fuentes-datos.md`: OpenTripMap en dos pasos, Open-Meteo, Amadeus, por qué Booking queda afuera, embeddings.
+- `references/fuentes-datos.md`: OpenTripMap en dos pasos, Open-Meteo, RapidAPI/Booking.com15 (reemplaza a Amadeus), por qué Booking directo queda afuera, embeddings.
 - `references/llm-y-claves.md`: elección del modelo, rotador de 3 claves de Gemini, manejo de 429, higiene de secretos, ahorro de cuota.
 - `references/ci-y-git.md`: convención de commits, prohibición de coautoría, hook local, ramas, los cuatro workflows de CI.
 - `references/plan-de-fases.md`: las 10 fases con criterios de aceptación y calendario.

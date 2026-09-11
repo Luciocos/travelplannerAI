@@ -58,7 +58,7 @@ El agente siguió escribiendo código base mientras faltaban `.env` y accesos, s
 ## Falta para cerrar la Fase 0
 
 1. **Verificar el model ID de Gemini Flash-Lite vigente y su límite diario real** contra `https://ai.google.dev/gemini-api/docs/models` y `.../rate-limits`. Una búsqueda rápida dio resultados de terceros inconsistentes (algunos ya mencionan generaciones "Gemini 3.x"), así que quedó `gemini-2.5-flash-lite` como default sin confirmar. Actualizar `.env.example`, los 4 workflows y `estado.md` con el valor verificado.
-2. Completar en `.env` (ya cargado: las 3 claves de Gemini): `OPENTRIPMAP_API_KEY`, `AMADEUS_CLIENT_ID`, `AMADEUS_CLIENT_SECRET`, `DATABASE_URL`.
+2. Completar en `.env` (ya cargado: las 3 claves de Gemini, y `RAPIDAPI_KEY`): `OPENTRIPMAP_API_KEY`, `DATABASE_URL`. Amadeus se dio de baja, RF6/RF7 corren sobre RapidAPI (Booking.com15), ver D-06 en DECISIONES.md.
 3. Cargar `GEMINI_API_KEY_1/2/3` como **repository secrets** en GitHub (Settings → Secrets and variables → Actions).
 4. Proteger la rama `main` en GitHub: requerir PR, y los checks `calidad`, `commits`, `secretos` en verde antes de mergear.
 5. Correr `python -m scripts.inicializar_db` contra la base elegida (Supabase) y `python -m scripts.smoke_llm` una vez a mano, para confirmar que la rotación de claves funciona de punta a punta.

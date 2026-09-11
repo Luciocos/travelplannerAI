@@ -47,6 +47,31 @@ CREATE TABLE IF NOT EXISTS itinerario_item (
     costo_estimado NUMERIC
 );
 
+-- Cache de resolucion de destinos para RapidAPI (RF6/RF7, Fase 7, D-06).
+-- Booking.com15 y Fly Scraper no aceptan un nombre de ciudad como parametro
+-- de busqueda directo, hay que resolverlo antes a un id propio de cada API.
+-- Esa resolucion no cambia nunca para un mismo destino, asi que se cachea
+-- para no quemar la cuota Free en cada corrida.
+CREATE TABLE IF NOT EXISTS destino_externo (
+    id               SERIAL PRIMARY KEY,
+    proveedor        TEXT NOT NULL,        -- 'booking' | 'fly_scraper'
+    texto_consultado TEXT NOT NULL,        -- normalizado: lower, sin tildes, trim
+    id_externo       TEXT NOT NULL,
+    tipo             TEXT,
+    payload          JSONB NOT NULL,       -- respuesta cruda, para re-parsear sin volver a llamar
+    creado_en        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (proveedor, texto_consultado)
+);
+
+-- Contador de llamadas por proveedor RapidAPI y mes, para el guard de cuota
+-- del plan Free (ver migracion-amadeus-a-rapidapi.md, seccion 5).
+CREATE TABLE IF NOT EXISTS uso_api_mensual (
+    proveedor  TEXT NOT NULL,
+    periodo    TEXT NOT NULL,   -- 'YYYY-MM'
+    cantidad   INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (proveedor, periodo)
+);
+
 -- Tablas de gastos (RF10, extension, Fase 7).
 CREATE TABLE IF NOT EXISTS participante (
     id            BIGSERIAL PRIMARY KEY,

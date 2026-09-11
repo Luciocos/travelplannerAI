@@ -36,14 +36,22 @@
 │   │   ├── atractivos.py
 │   │   ├── comercios.py
 │   │   └── faq.py
+│   ├── services/
+│   │   └── rapidapi/          # RF6/RF7, reemplaza a Amadeus (D-06)
+│   │       ├── client.py      # headers, retry, timeout, contador de cuota
+│   │       ├── models.py      # DestinoResuelto, Alojamiento, OpcionVuelo
+│   │       ├── booking.py     # adaptador Booking.com15 (hoteles)
+│   │       ├── fly_scraper.py # adaptador Fly Scraper (vuelos)
+│   │       ├── cache.py       # cache de resolucion de destinos en Postgres
+│   │       └── fixtures/      # respuestas reales grabadas, una por endpoint
 │   ├── tools/
 │   │   ├── completar_slots.py
 │   │   ├── recomendar_actividades.py
 │   │   ├── recomendar_locales.py
 │   │   ├── armar_plan.py
 │   │   ├── info_destino.py       # clima mas idioma y moneda
-│   │   ├── alojamiento.py
-│   │   ├── vuelos.py
+│   │   ├── buscar_alojamiento.py # RF6, sobre services/rapidapi (booking + fallback fly_scraper)
+│   │   ├── buscar_vuelos.py      # RF7, sobre services/rapidapi (fly_scraper + fallback booking)
 │   │   └── gastos.py
 │   └── agente.py                 # orquestador, memoria, registro de tools
 ├── notebooks/
@@ -63,7 +71,7 @@ Cualquier dependencia fuera de esta lista se justifica antes de agregarla.
 
 ## Variables de entorno
 
-`LLM_PROVIDER`, `GEMINI_MODEL`, `GEMINI_API_KEY_1`, `GEMINI_API_KEY_2`, `GEMINI_API_KEY_3`, `OPENTRIPMAP_API_KEY`, `AMADEUS_CLIENT_ID`, `AMADEUS_CLIENT_SECRET`, `DATABASE_URL`.
+`LLM_PROVIDER`, `GEMINI_MODEL`, `GEMINI_API_KEY_1`, `GEMINI_API_KEY_2`, `GEMINI_API_KEY_3`, `OPENTRIPMAP_API_KEY`, `RAPIDAPI_KEY`, `RAPIDAPI_HOST_BOOKING`, `RAPIDAPI_HOST_FLY_SCRAPER`, `RAPIDAPI_MONTHLY_QUOTA_BOOKING`, `RAPIDAPI_MONTHLY_QUOTA_FLY_SCRAPER`, `USE_FIXTURES`, `DATABASE_URL`. Amadeus se dio de baja (D-05/D-06 en `docs/DECISIONES.md`), RF6/RF7 corren sobre RapidAPI (Booking.com15 + Fly Scraper).
 
 `config.py` falla rápido y con mensaje claro si falta una variable requerida, y levanta todas las variables que matcheen `GEMINI_API_KEY_\d+` en una lista, sin cantidad hardcodeada. Ver `llm-y-claves.md`.
 
