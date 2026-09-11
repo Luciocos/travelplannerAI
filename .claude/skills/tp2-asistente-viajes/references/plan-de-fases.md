@@ -29,7 +29,7 @@ Calendario de referencia, contra la entrega del 30 de septiembre de 2026. Los d�
 
 Implementar el flujo de dos pasos de OpenTripMap descripto en `fuentes-datos.md`, la separación en dos corpus por `kind`, el filtro por longitud mínima de descripción, la curaduría manual en `data/curated/` y el fallback cuando la API no responde.
 
-**Aceptación:** al menos 25 documentos de atractivos y 15 de comercios por destino piloto, todos con texto real, ninguno inventado.
+**Aceptación (núcleo):** al menos 25 documentos de atractivos por destino piloto, todos con texto real, ninguno inventado. **El mínimo de 15 comercios por destino queda para cuando se retome RF4 como extensión (D-07)**: OpenTripMap no da volumen confiable de datos comerciales sin curaduría manual de horas (confirmado con los tres destinos piloto, ver `estado.md` y P-02 en `DIFICULTADES.md`), así que se prioriza un solo RAG (atractivos) robusto y testeado sobre dos RAGs parciales.
 
 ## Fase 2, vector store en pgvector (días 4 a 5)
 
@@ -39,9 +39,9 @@ Esquema, índices, embebido, carga. Resolver la decisión abierta entre `langcha
 
 ## Fase 3, retrievers y tools de RAG (días 5 a 7)
 
-`recomendar_actividades` y `recomendar_locales` como `@tool`, con `args_schema` y docstring precisa. Justificaciones generadas sólo sobre el contexto recuperado.
+`recomendar_actividades` como `@tool`, con `args_schema` y docstring precisa. Justificaciones generadas sólo sobre el contexto recuperado. `recomendar_locales` ya está escrito y testeado con mocks (RF4 movido a extensión, D-07), no bloquea esta fase.
 
-**Aceptación:** RF3 y RF4 verificables por test, llamando las tools directo, todavía sin agente.
+**Aceptación (núcleo):** RF3 verificable por test, llamando la tool directo, todavía sin agente.
 
 ## Fase 4, estado y slot filling (días 7 a 9)
 
@@ -66,9 +66,10 @@ Itinerario día a día con 2 o 3 actividades por día, costo estimado calculado 
 Orden por valor sobre esfuerzo, de mayor a menor. Si el tiempo se acorta, se cortan de abajo hacia arriba:
 
 1. **Clima, idioma y moneda (RF8).** Barato, visible, y permite explicar en la defensa que no todo es RAG.
-2. **Alojamiento y vuelos (RF6, RF7).** Amadeus test.
-3. **FAQ del viajero (RF9).** Tercer corpus, `corpus='faq'`, curado a mano. El menos diferencial de los tres RAGs.
-4. **Gastos (RF10).** Tablas `gasto` y `participante`, algoritmo de minimización de transferencias. Es lógica de producto, no de IA, salvo que se le sume parseo NLP para cargar el gasto en lenguaje natural, que sí suma y es barato.
+2. **Alojamiento y vuelos (RF6, RF7).** RapidAPI/Booking.com15 (reemplaza a Amadeus, D-06).
+3. **Recomendación de comercios (RF4).** Movido de núcleo a extensión (D-07). Tool y RAG ya implementados y testeados con mocks; falta corpus real, vía curaduría manual en `data/curated/` o una fuente con más volumen (ej. Yelp API), si el tiempo lo permite.
+4. **FAQ del viajero (RF9).** Tercer corpus, `corpus='faq'`, curado a mano. El menos diferencial de los RAGs.
+5. **Gastos (RF10).** Tablas `gasto` y `participante`, algoritmo de minimización de transferencias. Es lógica de producto, no de IA, salvo que se le sume parseo NLP para cargar el gasto en lenguaje natural, que sí suma y es barato.
 
 ## Fase 8, notebook de demo (días 17 a 20)
 

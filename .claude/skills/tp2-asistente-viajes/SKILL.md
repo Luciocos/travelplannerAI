@@ -32,7 +32,7 @@ El entregable oficial es un **notebook interactivo reproducible** más una defen
 3. **Ninguna API que requiera aprobación de partner.** Booking.com Demand API está descartada por eso. Todo lo externo tiene que ser self service, gratuito y sin tarjeta.
 4. **Cero secretos en el repo.** Credenciales por `.env`, con `.env.example` versionado y `.env` en `.gitignore`.
 5. **Nada de datos inventados.** Si un punto de interés no tiene descripción en la fuente, se descarta o se completa a mano y se marca con `fuente='curado'`. Ningún registro fabricado por el LLM entra a los corpus. Las justificaciones que el LLM genera salen sólo del contexto recuperado.
-6. **Núcleo antes que extensiones.** Fases 0 a 6 (RF1 a RF5, RF11, RF12) se terminan y se verifican antes de tocar una extensión. Si falta tiempo, se cortan extensiones, nunca núcleo.
+6. **Núcleo antes que extensiones.** Fases 0 a 6 (RF1, RF2, RF3, RF5, RF11, RF12) se terminan y se verifican antes de tocar una extensión. Si falta tiempo, se cortan extensiones, nunca núcleo. **RF4 (recomendación de comercios) se movió a extensión, ver D-07 en `docs/DECISIONES.md`**: OpenTripMap no da volumen confiable de datos comerciales sin curaduría manual de horas: se priorizó un RAG de atractivos robusto y testeado sobre dos RAGs parciales.
 7. **Español.** Código, nombres de funciones y variables en español (los nombres de las tools están fijados por la propuesta y no se cambian). Documentación en español. Respuestas del sistema al usuario final en español rioplatense neutro.
 8. **Ningún commit lleva coautoría.** Prohibido el trailer `Co-Authored-By`, la línea `Generated with Claude Code` y cualquier mención a la herramienta generadora, en el asunto o en el cuerpo. El autor es el usuario. Detalle y mecanismos de control en `references/ci-y-git.md`.
 9. **Commitear cada unidad de trabajo terminada**, con formato `tipo(alcance): descripción`. No acumular una fase entera en un commit.
@@ -47,13 +47,13 @@ Núcleo:
 | RF1 | Interpretar preferencias en lenguaje natural | `completar_slots` | `tools/completar_slots.py` |
 | RF2 | Preguntar incrementalmente sólo lo que falta | `completar_slots` | `tools/completar_slots.py` |
 | RF3 | Recomendar actividades por intereses | `recomendar_actividades` | `tools/recomendar_actividades.py` |
-| RF4 | Recomendación local puntual (comer, comprar) | `recomendar_locales` | `tools/recomendar_locales.py` |
 | RF5 | Itinerario con costo estimado | `armar_plan` | `tools/armar_plan.py` |
 
 Extensiones:
 
 | RF | Qué pide | Tool | Fuente |
 |----|----------|------|--------|
+| RF4 | Recomendación local puntual (comer, comprar) | `recomendar_locales` | RAG de comercios (corpus parcial, ver D-07). Ya implementado y testeado, sin datos reales suficientes todavía. |
 | RF6 | Alojamiento por destino y fechas | `buscar_alojamiento` | RapidAPI, Booking.com15 (reemplaza a Amadeus, D-06) |
 | RF7 | Vuelos por destino y fechas | `buscar_vuelos` | RapidAPI, Booking.com15 (reemplaza a Amadeus, D-06) |
 | RF8 | Clima, idioma y moneda al confirmar destino | `info_destino` | Open-Meteo mas tabla de referencia |
@@ -65,10 +65,15 @@ Transversales:
 - **RF11**: mantener el estado de la conversación durante la sesión (`estado.py` mas memoria del agente).
 - **RF12**: el orquestador decide solo qué tool usar, sin que el usuario indique un modo. Única excepción, el módulo de información del destino se dispara automáticamente al confirmarse el destino.
 
-## Los tres RAGs
+## Los RAGs
 
-1. **Atractivos turísticos**, por destino: museos, sitios históricos, caminatas, parques, con descripción y tags de interés (histórico, naturaleza, gastronómico, familiar). Alimenta `recomendar_actividades` y `armar_plan`.
-2. **Comercios y gastronomía local**, por destino: locales, ferias, restaurantes, con descripción, categoría y rango de precio. Alimenta `recomendar_locales`.
+Núcleo:
+
+1. **Atractivos turísticos**, por destino: museos, sitios históricos, caminatas, parques, con descripción y tags de interés (histórico, naturaleza, gastronómico, familiar). Alimenta `recomendar_actividades` y `armar_plan`. Es el RAG que se prioriza con volumen y calidad real de datos (ver D-07).
+
+Extensión:
+
+2. **Comercios y gastronomía local**, por destino: locales, ferias, restaurantes, con descripción, categoría y rango de precio. Alimenta `recomendar_locales` (RF4, movido a extensión por D-07: OpenTripMap no da volumen confiable de datos comerciales sin curaduría manual de horas). Ya implementado y testeado con mocks; falta corpus real.
 3. **FAQ del viajero**, texto curado por destino sobre seguridad, estafas comunes y costumbres. Es el menos diferencial de los tres, se puede dejar afuera sin que se note en la defensa.
 
 Patrón común a los tres, y esto es lo que hay que poder explicar: **primero se filtra por destino (metadata), recién ahí se busca semánticamente por interés**. Con pgvector las dos cosas pasan en una sola consulta SQL, que es exactamente el argumento a favor de pgvector sobre Chroma.
