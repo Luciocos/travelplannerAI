@@ -22,7 +22,7 @@ from asistente_viajes.prompts import PROMPT_EXTRAER_SLOTS, PROMPT_PREGUNTAR_SLOT
 
 NOMBRES_LEGIBLES_SLOTS = {
     "destino": "el destino",
-    "tipo_destino": "el tipo de destino",
+    "tipo_destino": "el tipo de destino que busca (por ejemplo playa, ciudad, montaña o naturaleza, no el nombre del lugar)",
     "intereses": "los intereses",
     "presupuesto": "el presupuesto",
     "fecha_inicio": "la fecha de inicio",

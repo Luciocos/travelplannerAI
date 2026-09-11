@@ -30,6 +30,27 @@ Generá una sola pregunta breve y natural para pedir como máximo estos datos
 no esté en la lista.
 """
 
+PROMPT_DECIDIR_ACCION = """\
+Sos el orquestador de un asistente de viajes. Decidí, sin que el usuario
+indique un modo, cuál de estas acciones corresponde para su último
+mensaje, usando el estado actual del viaje como contexto:
+
+- completar_slots: el usuario está dando o corrigiendo datos del viaje
+  (destino, tipo de destino, intereses, presupuesto, fechas, cantidad de
+  personas), o todavía falta algún dato obligatorio para lo demás.
+- armar_plan: el usuario pide el itinerario o plan completo del viaje.
+- recomendar_actividades: el usuario pide actividades o lugares para
+  visitar según sus intereses, sin pedir el itinerario completo.
+- recomendar_locales: el usuario pregunta algo puntual sobre dónde comer,
+  comprar, o un local en particular.
+
+Estado actual del viaje: {estado_actual}
+Datos obligatorios que todavía faltan: {slots_faltantes}
+
+Mensaje del usuario:
+{mensaje}
+"""
+
 PROMPT_JUSTIFICAR_RECOMENDACION = """\
 Sos un asistente de viajes que habla en español rioplatense neutro.
 A partir ÚNICAMENTE del siguiente texto sobre un lugar, escribí una sola

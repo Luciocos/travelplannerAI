@@ -1,0 +1,6 @@
+{
+  "_comentario": "Destino piloto (nombre tal como lo usa PreferenciasViaje.destino) -> pais (clave de paises.json) y coordenadas, para poder disparar info_destino (RF8/RF12) automaticamente sin pedirle lat/lon al usuario. Mismas coordenadas usadas para ingestar cada destino, ver estado.md.",
+  "Barcelona": { "pais": "Espana", "lat": 41.3874, "lon": 2.1686 },
+  "Miami": { "pais": "Estados Unidos", "lat": 25.7617, "lon": -80.1918 },
+  "Cancun": { "pais": "Mexico", "lat": 21.1619, "lon": -86.8515 }
+}
