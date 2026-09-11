@@ -26,13 +26,13 @@
 - **Fase 0** (scaffolding): estructura del repo, hook de commits, workflows de CI, `config.py`, rotador de claves con failover (`llm.py`), esquema SQL. **`docker-compose up -d` levantado y funcionando**, esquema aplicado con `inicializar_db` contra esa base local, `smoke_llm.py` corrido a mano: **5/5 claves responden `200 OK`** con `gemini-3.5-flash-lite` (ver D-03).
 - **Fase 1** (ingesta): cliente de OpenTripMap en dos pasos, normalización, CLI `scripts/ingestar_destino.py` (con `--rate`/`--limite` nuevos, ver abajo). **Corrida real completa para los tres destinos piloto:**
 
-  | Destino | Atractivos (min. 25, núcleo) | Comercios (extensión, D-07) |
+  | Destino | Atractivos (min. 20, núcleo, D-07) | Comercios (extensión, D-07) |
   |---|---|---|
   | Barcelona | 41 ✅ | 2 |
   | Miami | 75 ✅ | 2 |
   | Cancún | 7 ❌ (con `--rate 1 --radio 50000 --limite 500`) | 0 |
 
-  **RF4 (comercios) se movió de núcleo a extensión (D-07): el mínimo de 15 comercios ya no es criterio de cierre de Fase 1.** OpenTripMap casi no tiene locales/gastronomía con extracto de Wikipedia en ningún destino, no es solucionable ajustando parámetros — se prioriza un solo RAG núcleo (atractivos). **Lo que sigue siendo un bloqueo real de núcleo es Cancún en atractivos: 7 de 25**, incluso relajando `rate` y ampliando radio a 50km (probado y descartado seguir ajustando, decisión del usuario). Falta curaduría manual en `data/curated/` de atractivos de Cancún para cerrar Fase 1; comercios en los tres destinos queda para cuando se retome RF4 como extensión.
+  **RF4 (comercios) se movió de núcleo a extensión (D-07): el mínimo de 15 comercios ya no es criterio de cierre de Fase 1.** OpenTripMap casi no tiene locales/gastronomía con extracto de Wikipedia en ningún destino, no es solucionable ajustando parámetros — se prioriza un solo RAG núcleo (atractivos). El mínimo de atractivos también se bajó de 25 a 20 (D-07, mismo motivo de fondo). **Lo que sigue siendo un bloqueo real de núcleo es Cancún en atractivos: 7 de 20**, incluso relajando `rate` y ampliando radio a 50km (probado y descartado seguir ajustando, decisión del usuario). Faltan ~13 atractivos curados a mano en `data/curated/` para Cancún; comercios en los tres destinos queda para cuando se retome RF4 como extensión.
 - **Fase 2** (vector store): `embeddings.py` + `db.py` + `ingesta/cargar_vectores.py` contra la tabla propia. Escrito, todavía no se corrió la carga real de vectores (viene después de completar la curaduría de atractivos de Cancún).
 - **Fase 3** (retrievers y tools de RAG, RF3 núcleo / RF4 extensión): `recuperacion/*.py` + `recomendar_actividades`/`recomendar_locales`. Verificado por test con retriever y LLM mockeados, sin agente, sin corpus real todavía (depende de Fase 2).
 - **Fase 4** (estado y slot filling, RF1/RF2): `estado.py` + `completar_slots`. Test con LLM mockeado.
@@ -89,7 +89,7 @@ Decisiones tomadas en Fase 1 (arranque):
 - **Límite diario real por clave de Gemini sigue sin poder verificarse de forma estática.** El ID de modelo ya no es bloqueo (D-03). `ai.google.dev/gemini-api/docs/rate-limits` no publica un número fijo de RPD para el free tier, remite a `aistudio.google.com/rate-limit`, que requiere login con la cuenta de cada key. Hay reportes de foro (no oficiales) de recortes recientes al free tier. **Alguien con acceso a esas cuentas de Google tiene que entrar logueado y anotar el RPD real por key.**
 - **Decisión pendiente con el equipo: seguir en Postgres local o migrar ya a Supabase.** Por ahora se está desarrollando y validando contra el Postgres local de `docker-compose` (ver Configuración del proyecto). Funciona igual de bien para seguir avanzando, pero antes de la entrega hay que decidir si el equipo se pasa a Supabase (para tener una base compartida) o se sigue en local hasta más adelante.
 - Repository secrets de GitHub (`GEMINI_API_KEY_1/2/3`) y protección de la rama `main` todavía no configurados, requieren acceso al repo en GitHub.
-- **Cancún por debajo del mínimo de atractivos (núcleo).** 7 de 25, incluso con `--rate 1 --radio 50000 --limite 500` (probado y no se sigue ajustando, decisión del usuario). **Hace falta curaduría manual en `data/curated/`, marcado `fuente='curado'`, para cerrar Fase 1.** Comercios en los tres destinos (2/2/0 contra un mínimo de 15) ya no bloquea Fase 1, RF4 se movió a extensión (D-07).
+- **Cancún por debajo del mínimo de atractivos (núcleo).** 7 de 20 (mínimo bajado de 25 a 20, D-07), incluso con `--rate 1 --radio 50000 --limite 500` (probado y no se sigue ajustando, decisión del usuario). **Hace falta curaduría manual de ~13 atractivos en `data/curated/`, marcado `fuente='curado'`, para cerrar Fase 1.** Comercios en los tres destinos (2/2/0 contra un mínimo de 15) ya no bloquea Fase 1, RF4 se movió a extensión (D-07).
 
 ## Próximo paso
 

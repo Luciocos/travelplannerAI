@@ -29,7 +29,7 @@ Calendario de referencia, contra la entrega del 30 de septiembre de 2026. Los d�
 
 Implementar el flujo de dos pasos de OpenTripMap descripto en `fuentes-datos.md`, la separación en dos corpus por `kind`, el filtro por longitud mínima de descripción, la curaduría manual en `data/curated/` y el fallback cuando la API no responde.
 
-**Aceptación (núcleo):** al menos 25 documentos de atractivos por destino piloto, todos con texto real, ninguno inventado. **El mínimo de 15 comercios por destino queda para cuando se retome RF4 como extensión (D-07)**: OpenTripMap no da volumen confiable de datos comerciales sin curaduría manual de horas (confirmado con los tres destinos piloto, ver `estado.md` y P-02 en `DIFICULTADES.md`), así que se prioriza un solo RAG (atractivos) robusto y testeado sobre dos RAGs parciales.
+**Aceptación (núcleo):** al menos **20** documentos de atractivos por destino piloto (bajado de 25 a 20, D-07: Cancún tiene poca densidad de contenido editorial incluso ampliando radio y relajando el filtro de significancia), todos con texto real, ninguno inventado. **El mínimo de 15 comercios por destino queda para cuando se retome RF4 como extensión (D-07)**: OpenTripMap no da volumen confiable de datos comerciales sin curaduría manual de horas (confirmado con los tres destinos piloto, ver `estado.md` y P-02 en `DIFICULTADES.md`), así que se prioriza un solo RAG (atractivos) robusto y testeado sobre dos RAGs parciales.
 
 ## Fase 2, vector store en pgvector (días 4 a 5)
 
