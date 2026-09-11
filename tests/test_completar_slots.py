@@ -6,7 +6,11 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 
 from asistente_viajes.estado import PreferenciasViaje
-from asistente_viajes.tools.completar_slots import completar_slots, crear_tool_completar_slots
+from asistente_viajes.tools.completar_slots import (
+    _destino_fue_inferido,
+    completar_slots,
+    crear_tool_completar_slots,
+)
 
 
 def _rotador_falso(slots_extraidos: PreferenciasViaje, pregunta: str = "¿Cuántas personas viajan?"):
@@ -76,6 +80,59 @@ def test_completar_slots_pregunta_maximo_dos_por_turno() -> None:
     assert "el tipo de destino" in prompt_enviado
     assert "los intereses" not in prompt_enviado
     assert "la cantidad de personas" not in prompt_enviado
+
+
+def test_destino_fue_inferido_si_no_esta_literal_en_el_mensaje() -> None:
+    assert _destino_fue_inferido("quiero un lugar caribeño", "Cancun") is True
+
+
+def test_destino_no_fue_inferido_si_esta_literal_insensible_a_tildes() -> None:
+    assert _destino_fue_inferido("quiero ir a Cancún", "Cancun") is False
+    assert _destino_fue_inferido("quiero ir a CANCUN de vacaciones", "Cancun") is False
+
+
+def test_completar_slots_confirma_destino_inferido_con_todo_lo_demas_completo() -> None:
+    from datetime import date
+
+    extraidos = PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        intereses=["descanso"],
+        presupuesto="medio",
+        fecha_inicio=date(2026, 11, 1),
+        fecha_fin=date(2026, 11, 3),
+        cantidad_personas=2,
+    )
+    rotador = _rotador_falso(extraidos, pregunta="¿Te referís a Cancún?")
+
+    estado, pregunta = completar_slots(rotador, "quiero un lugar caribeño", PreferenciasViaje())
+
+    assert estado.destino == "Cancun"
+    assert pregunta == "¿Te referís a Cancún?"
+    rotador.invocar.assert_called_once()
+    prompt_enviado = rotador.invocar.call_args.args[0]
+    assert "Cancun" in prompt_enviado
+
+
+def test_completar_slots_no_confirma_si_destino_esta_literal_en_el_mensaje() -> None:
+    from datetime import date
+
+    extraidos = PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        intereses=["descanso"],
+        presupuesto="medio",
+        fecha_inicio=date(2026, 11, 1),
+        fecha_fin=date(2026, 11, 3),
+        cantidad_personas=2,
+    )
+    rotador = _rotador_falso(extraidos)
+
+    estado, pregunta = completar_slots(rotador, "quiero ir a Cancun", PreferenciasViaje())
+
+    assert estado.completo()
+    assert pregunta is None
+    rotador.invocar.assert_not_called()
 
 
 def test_tool_completar_slots_tiene_docstring_y_args_schema() -> None:

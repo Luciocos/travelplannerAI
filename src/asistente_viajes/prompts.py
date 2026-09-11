@@ -11,7 +11,15 @@ Completá solo los campos que el mensaje menciona explícita o implícitamente.
 No inventes valores para lo que no se menciona, dejalo sin completar.
 
 Campos:
-- destino: nombre del lugar, si lo menciona.
+- destino: nombre del lugar, si lo menciona. Este sistema solo tiene datos
+  reales de estos destinos piloto, con sus características:
+  {destinos_piloto}
+  Si el usuario describe una región o característica (por ejemplo "un
+  lugar caribeño", "algo en Europa", "una ciudad de playa en Estados
+  Unidos") en vez de nombrar la ciudad, y esa descripción coincide
+  claramente con uno solo de estos destinos, completá destino con el
+  nombre de esa ciudad igual. Si no coincide claramente con ninguno, o
+  coincide con más de uno, dejá destino sin completar.
 - tipo_destino: tipo de destino buscado (por ejemplo: playa, ciudad, montaña, naturaleza).
 - intereses: lista de intereses o actividades (por ejemplo: historia, caminatas, gastronomía, compras).
 - presupuesto: nivel de presupuesto (bajo, medio, alto), si lo menciona.
@@ -25,9 +33,25 @@ Mensaje del usuario:
 PROMPT_PREGUNTAR_SLOTS_FALTANTES = """\
 Sos un asistente de viajes que habla en español rioplatense neutro.
 Al usuario le falta completar estos datos de su viaje: {slots_faltantes}.
+{nota_destino_inferido}
 Generá una sola pregunta breve y natural para pedir como máximo estos datos
 (no más de dos por turno), sin sonar a formulario. No repreguntes nada que
 no esté en la lista.
+"""
+
+NOTA_CONFIRMAR_DESTINO_INFERIDO = """\
+Además: el usuario no nombró la ciudad, pero describió algo que coincide
+con {destino}. Antes de seguir, incluí en la misma pregunta una
+confirmación breve tipo "¿te referís a {destino}?", para no asumirlo sin
+chequear.
+"""
+
+PROMPT_CONFIRMAR_DESTINO_INFERIDO = """\
+Sos un asistente de viajes que habla en español rioplatense neutro. El
+usuario no nombró una ciudad, pero describió algo que coincide con
+{destino}. Ya tenés todos los demás datos del viaje. Generá una sola
+pregunta breve confirmando si el destino es {destino}, sin agregar nada
+más.
 """
 
 PROMPT_DECIDIR_ACCION = """\

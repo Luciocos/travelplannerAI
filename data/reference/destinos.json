@@ -1,6 +1,21 @@
 {
-  "_comentario": "Destino piloto (nombre tal como lo usa PreferenciasViaje.destino) -> pais (clave de paises.json) y coordenadas, para poder disparar info_destino (RF8/RF12) automaticamente sin pedirle lat/lon al usuario. Mismas coordenadas usadas para ingestar cada destino, ver estado.md.",
-  "Barcelona": { "pais": "Espana", "lat": 41.3874, "lon": 2.1686 },
-  "Miami": { "pais": "Estados Unidos", "lat": 25.7617, "lon": -80.1918 },
-  "Cancun": { "pais": "Mexico", "lat": 21.1619, "lon": -86.8515 }
+  "_comentario": "Destino piloto (nombre tal como lo usa PreferenciasViaje.destino) -> pais (clave de paises.json), coordenadas y caracteristicas. Coordenadas: mismas usadas para ingestar cada destino, ver estado.md. Caracteristicas: se usan en el prompt de extraccion de slots para interpretar descripciones regionales (ej. 'un lugar caribeno') cuando el usuario no nombra la ciudad, ver D-09 en DECISIONES.md.",
+  "Barcelona": {
+    "pais": "Espana",
+    "lat": 41.3874,
+    "lon": 2.1686,
+    "caracteristicas": ["europeo", "ciudad", "historia", "arquitectura", "cultura", "mediterraneo"]
+  },
+  "Miami": {
+    "pais": "Estados Unidos",
+    "lat": 25.7617,
+    "lon": -80.1918,
+    "caracteristicas": ["playa", "ciudad", "estados unidos", "norteamericano"]
+  },
+  "Cancun": {
+    "pais": "Mexico",
+    "lat": 21.1619,
+    "lon": -86.8515,
+    "caracteristicas": ["playa", "caribeno", "caribe", "ruinas mayas", "naturaleza", "mexico"]
+  }
 }
