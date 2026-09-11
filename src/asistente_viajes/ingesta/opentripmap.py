@@ -42,8 +42,17 @@ def buscar_por_radio(
     radio_metros: int,
     kinds: list[str] | None = None,
     limite: int = 200,
+    rate: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Paso 1: lista liviana de POIs alrededor de un punto. Sin texto."""
+    """Paso 1: lista liviana de POIs alrededor de un punto. Sin texto.
+
+    `rate` filtra por significancia segun OpenTripMap ('1', '2', '3', 'h',
+    de menor a mayor). Sin esto, el radius search devuelve los primeros
+    `limite` resultados sin priorizar por relevancia, y en zonas con mucho
+    comercio chico (ej. Cancun) eso llena el limite de comercios sin texto
+    de Wikipedia antes de llegar a los atractivos genuinos. Util para el
+    corpus de atractivos; para comercios no ayuda porque casi nunca tienen
+    rate alto (ver estado.md, hallazgo de la ingesta real de Cancun)."""
     parametros: dict[str, Any] = {
         "radius": radio_metros,
         "lat": lat,
@@ -54,6 +63,8 @@ def buscar_por_radio(
     }
     if kinds:
         parametros["kinds"] = ",".join(kinds)
+    if rate:
+        parametros["rate"] = rate
 
     try:
         respuesta = httpx.get(f"{URL_BASE}/radius", params=parametros, timeout=TIMEOUT_SEGUNDOS)
@@ -85,6 +96,8 @@ def ingerir_destino(
     api_key: str,
     directorio_raw: Path,
     kinds: list[str] | None = None,
+    limite: int = 200,
+    rate: str | None = None,
 ) -> list[dict[str, Any]]:
     """Corre los dos pasos para un destino y persiste las respuestas crudas
     en directorio_raw. Si la API falla en cualquier paso, intenta recuperar
@@ -95,7 +108,7 @@ def ingerir_destino(
     ruta_detalles = _ruta_cruda(directorio_raw, destino, "detalles")
 
     try:
-        lista = buscar_por_radio(api_key, lat, lon, radio_metros, kinds=kinds)
+        lista = buscar_por_radio(api_key, lat, lon, radio_metros, kinds=kinds, limite=limite, rate=rate)
         ruta_lista.write_text(json.dumps(lista, ensure_ascii=False, indent=2), encoding="utf-8")
     except ErrorOpenTripMap as error:
         logger.warning(

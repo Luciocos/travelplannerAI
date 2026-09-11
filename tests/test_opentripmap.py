@@ -25,6 +25,35 @@ def test_buscar_por_radio_devuelve_la_lista(monkeypatch: pytest.MonkeyPatch) -> 
     assert resultado == lista_esperada
 
 
+def test_buscar_por_radio_pasa_rate_y_limite_si_se_dan(monkeypatch: pytest.MonkeyPatch) -> None:
+    parametros_capturados = {}
+
+    def get_falso(url, params, timeout):
+        parametros_capturados.update(params)
+        return httpx.Response(200, json=[], request=httpx.Request("GET", url))
+
+    monkeypatch.setattr(httpx, "get", get_falso)
+
+    opentripmap.buscar_por_radio("clave", lat=1.0, lon=2.0, radio_metros=5000, limite=500, rate="1")
+
+    assert parametros_capturados["rate"] == "1"
+    assert parametros_capturados["limit"] == 500
+
+
+def test_buscar_por_radio_sin_rate_no_lo_manda(monkeypatch: pytest.MonkeyPatch) -> None:
+    parametros_capturados = {}
+
+    def get_falso(url, params, timeout):
+        parametros_capturados.update(params)
+        return httpx.Response(200, json=[], request=httpx.Request("GET", url))
+
+    monkeypatch.setattr(httpx, "get", get_falso)
+
+    opentripmap.buscar_por_radio("clave", lat=1.0, lon=2.0, radio_metros=5000)
+
+    assert "rate" not in parametros_capturados
+
+
 def test_buscar_por_radio_propaga_error_como_error_opentripmap(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -44,6 +44,16 @@ def main() -> int:
     parser.add_argument("--lat", type=float, required=True)
     parser.add_argument("--lon", type=float, required=True)
     parser.add_argument("--radio", type=int, default=8000, help="radio en metros")
+    parser.add_argument("--limite", type=int, default=200, help="maximo de POIs por busqueda")
+    parser.add_argument(
+        "--rate",
+        default=None,
+        help=(
+            "filtro de significancia de OpenTripMap ('1','2','3','h'). Util para atractivos "
+            "en zonas con mucho comercio chico sin texto de Wikipedia (ver estado.md, "
+            "hallazgo de Cancun); no ayuda para comercios."
+        ),
+    )
     argumentos = parser.parse_args()
 
     api_key = os.environ.get("OPENTRIPMAP_API_KEY")
@@ -60,6 +70,8 @@ def main() -> int:
             api_key=api_key,
             directorio_raw=DIRECTORIO_RAW,
             kinds=KINDS_A_TRAER,
+            limite=argumentos.limite,
+            rate=argumentos.rate,
         )
     except ErrorOpenTripMap as error:
         logger.error("no se pudo ingerir %s y no hay cache previa: %s", argumentos.destino, error)
