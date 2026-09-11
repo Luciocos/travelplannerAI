@@ -33,14 +33,14 @@ Formato de cada entrada:
 - **Alternativas descartadas:** solo Docker local, descartado porque cada integrante tendría datos distintos y el trabajo en equipo se complica. Neon, no elegido por preferencia del equipo por Supabase.
 - **Consecuencias:** todos apuntan a la misma base durante el desarrollo. Hay que evitar correr la ingesta completa en paralelo sin coordinarse, para no pisarse datos. La connection string va solo en `.env`, nunca en el repo.
 
-## D-03, Modelo Gemini Flash-Lite, ID exacto pendiente de verificación final
+## D-03, Modelo Gemini: `gemini-3.5-flash-lite`, confirmado contra la API real
 
 - **Fecha:** 2026-09-10
 - **Fase:** 0
-- **Contexto:** el plan pide verificar contra la documentación oficial de Google cuál es el Flash-Lite vigente y su límite diario antes de cerrar la Fase 0.
-- **Decisión:** se deja `gemini-2.5-flash-lite` como valor por defecto en `.env.example` y en los workflows, configurable por variable de entorno (`GEMINI_MODEL`), sin hardcodear el ID en el código.
-- **Alternativas descartadas:** hardcodear un ID sin verificar. Una búsqueda rápida mostró fuentes de terceros con datos inconsistentes entre sí (algunas ya mencionan generaciones "Gemini 3.x Flash-Lite" con límites distintos, 1000 RPD vs otras cifras) y ninguna confirmación limpia contra `ai.google.dev`. No se quiso asumir el dato.
-- **Consecuencias:** **queda como bloqueo abierto, ver `estado.md` de la skill.** Antes de usar cuota real (correr `smoke_llm.py` o cargar los tres `GEMINI_API_KEY_n`), alguien del equipo tiene que entrar a `https://ai.google.dev/gemini-api/docs/models` y `https://ai.google.dev/gemini-api/docs/rate-limits`, confirmar el ID vigente y el límite diario real, y actualizar `GEMINI_MODEL` en `.env.example`, los cuatro workflows y `estado.md`.
+- **Contexto:** el plan pide verificar contra la documentación oficial de Google cuál es el Flash-Lite vigente y su límite diario antes de cerrar la Fase 0. Una revisión de la documentación (`ai.google.dev`) no alcanzó a confirmar el dato limpio (ver primera versión de esta decisión). Al correr `smoke_llm.py` por primera vez contra las 5 claves reales, `gemini-2.5-flash-lite` devolvió `404 NOT_FOUND`: `"This model models/gemini-2.5-flash-lite is no longer available to new users. Please update your code to use models/gemini-3.5-flash-lite"`.
+- **Decisión:** `GEMINI_MODEL=gemini-3.5-flash-lite`, confirmado con `smoke_llm.py` real (5/5 claves responden `200 OK`). Actualizado en `.env`, `.env.example` y los cuatro workflows de `.github/workflows/` y `assets/workflows/`.
+- **Alternativas descartadas:** `gemini-2.5-flash-lite`, que seguía figurando como estable en la documentación pública pero ya no está disponible para las cuentas nuevas de este equipo. La documentación de terceros y la propia doc de Google resultaron menos confiables que el error real de la API para esta decisión.
+- **Consecuencias:** el límite diario real por clave del tier gratuito sigue sin confirmar (ver bloqueo en `estado.md`, la página de rate limits de Google ya no publica un número fijo). El ID de modelo ya no es bloqueo.
 
 ## D-04, Destinos piloto "Europa" y "Caribe" resueltos a ciudades puntuales
 

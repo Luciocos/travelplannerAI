@@ -4,7 +4,7 @@
 
 Proveedor: **Google Gemini**, vía `langchain-google-genai`.
 
-Modelo por defecto: **`gemini-2.5-flash-lite`**. Es un modelo deliberadamente chico. Razones, en orden:
+Modelo por defecto: **`gemini-3.5-flash-lite`**. Es un modelo deliberadamente chico. Razones, en orden:
 
 1. Es el que más cuota da en el tier gratuito (el límite diario de Flash Lite es varias veces el de Flash, y varias veces más el de los modelos Pro).
 2. Las tareas del sistema son extracción estructurada de slots, clasificación de intención y redacción de justificaciones cortas sobre texto ya recuperado. Ninguna necesita razonamiento profundo. El trabajo pesado lo hace la recuperación, no el modelo.
@@ -24,7 +24,7 @@ Hay **3 claves de Gemini** disponibles. Cada clave tiene su propia cuota, así q
 GEMINI_API_KEY_1=...
 GEMINI_API_KEY_2=...
 GEMINI_API_KEY_3=...
-GEMINI_MODEL=gemini-2.5-flash-lite
+GEMINI_MODEL=gemini-3.5-flash-lite
 LLM_PROVIDER=gemini
 ```
 
