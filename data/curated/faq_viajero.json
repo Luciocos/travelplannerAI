@@ -1,0 +1,74 @@
+[
+  {
+    "corpus": "faq",
+    "destino": "Barcelona",
+    "nombre": "Hurtos y carteristas",
+    "categoria": "seguridad",
+    "texto": "Barcelona figura entre las ciudades de Europa con mas hurtos a turistas, detras de Paris y Roma. Las zonas de mas riesgo son la Sagrada Familia, el Park Guell, Las Ramblas y el metro en horas pico. La gran mayoria de los delitos contra visitantes son hurtos oportunistas de carteristas, no delitos violentos, que son muy poco frecuentes. Los carteristas suelen trabajar en grupo: uno distrae (pidiendo indicaciones, ofreciendo un folleto, o generando un choque casual) mientras otro sustrae el bolso o la mochila. Recomendaciones practicas: llevar la mochila adelante del cuerpo en el metro y en sitios concurridos, no llevar todo el dinero ni todas las tarjetas juntas en la misma billetera, y mantenerse atento a las pertenencias en terrazas, restaurantes y colas de atracciones.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Barcelona",
+    "nombre": "Estafas turisticas comunes",
+    "categoria": "estafas",
+    "texto": "Ademas de los hurtos, en Barcelona son comunes varias modalidades de estafa dirigidas a turistas: precios inflados en locales cercanos a las atracciones principales, tours callejeros no oficiales que se presentan como gratuitos y despues presionan por una propina alta, y trucos con el cambio de moneda al pagar en efectivo. Tambien existe el 'trilerismo', un juego de apuestas callejero armado (con carteles y cubiletes) que siempre esta preparado para que el jugador pierda. Conviene contratar excursiones y guias por canales oficiales o con reputacion verificable, revisar los precios antes de consumir en zonas muy turisticas, y no acercarse a juegos de apuestas callejeros.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Barcelona",
+    "nombre": "Horarios de comida y propinas",
+    "categoria": "costumbres",
+    "texto": "En Barcelona el almuerzo se concentra entre las 14 y las 16 horas, y la cena recien arranca despues de las 21 horas; muchos restaurantes locales ni siquiera abren la cocina antes de esa hora. La propina no es obligatoria en Espana: si el servicio estuvo bien alcanza con redondear la cuenta o dejar algunas monedas, no se espera un porcentaje fijo como en otros paises. Una costumbre tipica es la 'pica-pica' o picada, pedir varios platos chicos para compartir entre el grupo, lo que ademas suele abaratar la cuenta final. Al sentarse en una terraza o vereda conviene tener en cuenta que muchos locales cobran un recargo extra por esas mesas frente a las de adentro.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Miami",
+    "nombre": "Zonas seguras y estafa de conductores falsos",
+    "categoria": "seguridad",
+    "texto": "Dentro de Miami, South Beach (con fuerte presencia policial), Coconut Grove y Coral Gables son consideradas zonas mas seguras para moverse, incluso de noche, aunque siempre conviene evitar callejuelas solitarias. Una estafa reportada con frecuencia ocurre en las zonas de pickup de Uber o Lyft del aeropuerto: conductores sin licencia esperan ahi haciendose pasar por el viaje solicitado, con un auto que coincide a simple vista con la descripcion de la app, y una vez que el pasajero sube inventan una excusa para desviarse y robarle. La recomendacion es siempre verificar la patente y el nombre del conductor contra los datos que muestra la aplicacion antes de subir, nunca solo el modelo o color del auto.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Miami",
+    "nombre": "Estafas turisticas comunes",
+    "categoria": "estafas",
+    "texto": "En zonas turisticas de Miami tambien se reportan vendedores informales sin autorizacion, guias turisticos improvisados sin credencial, y taxistas sin licencia que cobran de mas. Otra modalidad reportada son avisos de alquiler temporal de casas o departamentos que en realidad no existen o no pertenecen a quien los publica, sobre todo en plataformas de anuncios clasificados fuera de los sitios de alquiler establecidos. Se recomienda contratar tours solo con agencias reconocidas o plataformas con reseñas verificables, y reservar alojamiento unicamente a traves de plataformas reconocidas, evitando pagos por transferencia directa a un anuncio sin verificar.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Miami",
+    "nombre": "Propinas",
+    "categoria": "costumbres",
+    "texto": "En Miami, como en el resto de Estados Unidos, dejar propina en restaurantes es una practica practicamente obligatoria: los meseros suelen cobrar un salario base muy bajo y dependen de la propina como parte principal de su ingreso. Lo habitual es entre 15% y 20% del total de la cuenta. Muchos restaurantes de zonas muy turisticas, como South Beach o el centro, agregan automaticamente un cargo de servicio de 18% a 20% a la cuenta, asi que conviene revisarla antes de dejar una propina adicional para no pagar de mas. La costumbre de dar propina tambien se extiende a bares, hoteles (botones, servicio de limpieza) y taxis o remises.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Cancun",
+    "nombre": "Taxis y tarifas",
+    "categoria": "estafas",
+    "texto": "En Cancun la mayoria de los taxis no usan taximetro, y es comun que los conductores ofrezcan tarifas arbitrarias a los turistas, muchas veces el doble o el triple de la tarifa local real; los que operan sin licencia pueden llegar a cobrar entre 300% y 500% mas de lo regulado. La recomendacion es siempre acordar el precio antes de subir al auto, evitar tomar taxis al voleo en la calle y preferir aplicaciones de viajes compartidos como Uber o DiDi donde esten disponibles, o los taxis de las paradas designadas de hoteles y zonas turisticas.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Cancun",
+    "nombre": "Timeshare y ofertas en la calle",
+    "categoria": "estafas",
+    "texto": "Una practica muy reportada en Cancun es la de representantes no solicitados que ofrecen transporte gratis o vouchers de descuento a cambio de asistir a una presentacion de tiempo compartido (timeshare), que frecuentemente dura entre 4 y 6 horas con tecnicas de venta de alta presion. Tambien conviene evitar contratar tours con desconocidos que abordan en la calle o que se ofrecen por redes sociales sin reputacion verificable, y no cambiar dolares u otra moneda con personas en la via publica, sino en casas de cambio establecidas. Al salir de la aduana del aeropuerto, se recomienda no detenerse con los 'jaladores' que ofrecen traslados o paquetes y caminar directo hacia la salida oficial.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Cancun",
+    "nombre": "Propinas y trato cortes",
+    "categoria": "costumbres",
+    "texto": "En Mexico la propina es una costumbre importante, y buena parte del personal de servicios turisticos depende de ella porque el salario base suele ser bajo. En zonas turisticas como Cancun el estandar ronda entre 10% y 20% de la cuenta, con 15% como promedio habitual, y algo mas si el servicio fue especialmente bueno. Para servicios puntuales: a los botones del hotel se les suele dar entre 2 y 3 dolares por maleta, y al servicio de camastros o hamacas en la playa entre 30 y 50 pesos mexicanos por ronda. A los taxistas no es costumbre dejarles propina aparte, aunque redondear la tarifa hacia arriba es comun. En el trato cotidiano, dirigirse a alguien como 'señor', 'señora' o 'señorita' se considera un gesto de respeto que suele mejorar la atencion.",
+    "fuente": "curado"
+  }
+]
