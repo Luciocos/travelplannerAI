@@ -17,7 +17,7 @@ from asistente_viajes.estado import (
     PreferenciasViaje,
     fusionar_preferencias,
 )
-from asistente_viajes.llm import RotadorClavesGemini
+from asistente_viajes.llm import RotadorClavesGemini, contenido_texto
 from asistente_viajes.prompts import PROMPT_EXTRAER_SLOTS, PROMPT_PREGUNTAR_SLOTS_FALTANTES
 
 NOMBRES_LEGIBLES_SLOTS = {
@@ -46,7 +46,7 @@ def _generar_pregunta(rotador: RotadorClavesGemini, slots_a_preguntar: list[str]
     nombres = ", ".join(NOMBRES_LEGIBLES_SLOTS[slot] for slot in slots_a_preguntar)
     prompt = PROMPT_PREGUNTAR_SLOTS_FALTANTES.format(slots_faltantes=nombres)
     respuesta = rotador.invocar(prompt)
-    return getattr(respuesta, "content", str(respuesta)).strip()
+    return contenido_texto(respuesta)
 
 
 def completar_slots(

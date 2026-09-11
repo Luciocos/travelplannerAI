@@ -10,7 +10,7 @@ import psycopg
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 
-from asistente_viajes.llm import RotadorClavesGemini
+from asistente_viajes.llm import RotadorClavesGemini, contenido_texto
 from asistente_viajes.prompts import PROMPT_JUSTIFICAR_RECOMENDACION
 from asistente_viajes.recuperacion.comercios import buscar_comercios
 
@@ -36,7 +36,7 @@ def _justificar(rotador: RotadorClavesGemini, texto: str, consulta: str) -> str:
         intereses_o_consulta=consulta, texto_recuperado=texto
     )
     respuesta = rotador.invocar(prompt)
-    return getattr(respuesta, "content", str(respuesta)).strip()
+    return contenido_texto(respuesta)
 
 
 def recomendar_locales(

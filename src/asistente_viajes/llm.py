@@ -156,6 +156,21 @@ class _SalidaEstructuradaRotada:
         )
 
 
+def contenido_texto(respuesta: object) -> str:
+    """Extrae el texto de una respuesta del ChatModel. `content` puede ser
+    un string plano (Gemini 2.x) o una lista de bloques
+    `{'type': 'text', 'text': ...}` (confirmado con gemini-3.5-flash-lite
+    contra la API real, 2026-09-10). Nunca asumir un formato fijo."""
+    contenido = getattr(respuesta, "content", respuesta)
+    if isinstance(contenido, list):
+        return "".join(
+            bloque.get("text", "")
+            for bloque in contenido
+            if isinstance(bloque, dict) and bloque.get("type") == "text"
+        ).strip()
+    return str(contenido).strip()
+
+
 def crear_rotador(configuracion: Configuracion | None = None) -> RotadorClavesGemini:
     """Factory principal. Usa la configuracion cargada de .env si no se pasa una."""
     configuracion = configuracion or cargar_configuracion()

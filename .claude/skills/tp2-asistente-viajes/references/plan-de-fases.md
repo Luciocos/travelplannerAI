@@ -47,7 +47,7 @@ Esquema, índices, embebido, carga. Resolver la decisión abierta entre `langcha
 
 `PreferenciasViaje`, extracción estructurada, merge no destructivo, generación de la pregunta por lo que falta, máximo 2 slots por turno.
 
-**Aceptación:** el ejemplo de la consigna funciona. Entrada "quiero un viaje para caminar y ver cosas históricas, presupuesto medio" produce intereses `[caminatas, historia]`, presupuesto `medio`, y la pregunta por cantidad de personas y fechas. Segundo turno: no repregunta nada de lo ya cargado.
+**Aceptación:** el ejemplo de la consigna funciona. Entrada "quiero un viaje para caminar y ver cosas históricas, presupuesto medio" produce intereses (variantes de `[caminar/caminatas, historia]`, la extracción exacta del LLM puede variar en la forma de la palabra) y presupuesto `medio`. **Corregido 2026-09-10 tras verificar con el LLM real**: como esa entrada no menciona destino, la pregunta del primer turno es por destino y tipo de destino (los dos primeros slots faltantes según el orden de `SLOTS_OBLIGATORIOS`), no por cantidad de personas y fechas — eso solo pasaría si destino y tipo_destino ya estuvieran cargados de un turno anterior. Segundo turno: no repregunta nada de lo ya cargado.
 
 ## Fase 5, orquestador (días 9 a 11)
 
