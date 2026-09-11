@@ -92,6 +92,18 @@ def test_completar_slots_pregunta_maximo_dos_por_turno() -> None:
     assert "el destino" in prompt_enviado
     assert "el tipo de destino" in prompt_enviado
     assert "los intereses" not in prompt_enviado
+
+
+def test_pregunta_ofrece_opciones_concretas_no_abiertas() -> None:
+    """El usuario pidio preguntas dirigidas (con opciones para elegir),
+    no abiertas tipo 'que te gustaria hacer'."""
+    rotador = _rotador_falso(PreferenciasViaje())
+
+    completar_slots(rotador, "hola", PreferenciasViaje())
+
+    prompt_enviado = rotador.invocar.call_args.args[0]
+    assert "playa, ciudad, montaña o naturaleza" in prompt_enviado
+    assert "DIRIGIDA" in prompt_enviado
     assert "la cantidad de personas" not in prompt_enviado
 
 

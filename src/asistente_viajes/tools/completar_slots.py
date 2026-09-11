@@ -36,12 +36,12 @@ from asistente_viajes.texto import normalizar
 
 NOMBRES_LEGIBLES_SLOTS = {
     "destino": "el destino",
-    "tipo_destino": "el tipo de destino que busca (por ejemplo playa, ciudad, montaña o naturaleza, no el nombre del lugar)",
-    "intereses": "los intereses",
-    "presupuesto": "el presupuesto",
-    "fecha_inicio": "la fecha de inicio",
-    "fecha_fin": "la fecha de fin",
-    "cantidad_personas": "la cantidad de personas",
+    "tipo_destino": "el tipo de destino que busca, no el nombre del lugar (ofrecele para elegir entre playa, ciudad, montaña o naturaleza)",
+    "intereses": "los intereses o actividades que busca (ofrecele para elegir entre historia, naturaleza, gastronomía, compras, descanso o vida nocturna, puede elegir más de uno)",
+    "presupuesto": "el nivel de presupuesto (ofrecele para elegir entre bajo, medio o alto)",
+    "fecha_inicio": "la fecha de inicio del viaje",
+    "fecha_fin": "la fecha de fin del viaje",
+    "cantidad_personas": "la cantidad de personas que viajan",
 }
 
 

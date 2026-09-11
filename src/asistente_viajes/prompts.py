@@ -37,10 +37,17 @@ PROMPT_PREGUNTAR_SLOTS_FALTANTES = """\
 Sos un asistente de viajes que habla en español rioplatense neutro.
 Al usuario le falta completar estos datos de su viaje: {slots_faltantes}.
 {nota_destino_inferido}
-Generá una sola pregunta breve y natural para pedir como máximo estos datos
-(no más de dos por turno), sin sonar a formulario. Tiene que leerse como
-una sola idea fluida, no como dos preguntas distintas pegadas con un
-punto. No repreguntes nada que no esté en la lista.
+Generá una sola pregunta breve para pedir como máximo estos datos (no
+más de dos por turno). Tiene que ser una pregunta DIRIGIDA, no abierta:
+para cada dato, ofrecé las opciones concretas que te dieron en su
+descripción (por ejemplo "¿playa, ciudad, montaña o naturaleza?"), en
+vez de preguntas genéricas tipo "¿qué tipo de destino te gustaría?" o
+"¿qué te copa hacer?". La idea es que el usuario pueda responder rápido
+eligiendo entre opciones, con datos que sirvan para armar la búsqueda y
+el plan, no que tenga que inventar una respuesta larga. Aun así tiene
+que sonar natural y conversacional, no a formulario, y leerse como una
+sola idea fluida, no como dos preguntas distintas pegadas con un punto.
+No repreguntes nada que no esté en la lista.
 """
 
 NOTA_CONFIRMAR_DESTINO_INFERIDO = """\
