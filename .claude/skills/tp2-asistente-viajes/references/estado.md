@@ -24,14 +24,22 @@
 **Código de las Fases 0 a 4 y de RF6/RF7/RF8 (Fase 7) escrito, con tests en verde y ya validado con infraestructura y APIs reales (local, no Supabase todavía).** Sigue sin mergear a `main` ni confirmarse como cerrado en el sentido de `plan-de-fases.md`, pero a diferencia del corte anterior, buena parte de esto ya corrió de verdad: Postgres local, OpenTripMap, Gemini y Booking.com15 reales, no solo mocks.
 
 - **Fase 0** (scaffolding): estructura del repo, hook de commits, workflows de CI, `config.py`, rotador de claves con failover (`llm.py`), esquema SQL. **`docker-compose up -d` levantado y funcionando**, esquema aplicado con `inicializar_db` contra esa base local, `smoke_llm.py` corrido a mano: **5/5 claves responden `200 OK`** con `gemini-3.5-flash-lite` (ver D-03).
-- **Fase 1** (ingesta): cliente de OpenTripMap en dos pasos, normalización, CLI `scripts/ingestar_destino.py`. **Corrido contra la API real**: Barcelona (`--lat 41.3874 --lon 2.1686`) dio 41 atractivos / 2 comercios; Cancún en curso. El mínimo de 15 comercios no se alcanza con la API sola (esperado, ver `fuentes-datos.md`), falta curaduría manual en `data/curated/` para cerrar el criterio de aceptación de la fase.
+- **Fase 1** (ingesta): cliente de OpenTripMap en dos pasos, normalización, CLI `scripts/ingestar_destino.py` (con `--rate`/`--limite` nuevos, ver abajo). **Corrida real completa para los tres destinos piloto:**
+
+  | Destino | Atractivos (min. 25) | Comercios (min. 15) |
+  |---|---|---|
+  | Barcelona | 41 ✅ | 2 |
+  | Miami | 75 ✅ | 2 |
+  | Cancún | 7 (con `--rate 1 --radio 50000 --limite 500`) | 0 |
+
+  **Comercios queda sistemáticamente por debajo del mínimo en los tres destinos** (no es un caso aislado de Cancún): OpenTripMap casi no tiene locales/gastronomía con extracto de Wikipedia, es lo que anticipaba `fuentes-datos.md`. Cancún además queda corto en atractivos (7 de 25) por baja densidad de contenido editorial en esa zona, incluso relajando el filtro de significancia (`rate`) y ampliando radio a 50km — probado y descartado seguir ajustando parámetros (decisión explícita del usuario: aceptar que hay pocos lugares registrados y resolver por curaduría manual antes de invertir más tiempo en tuning). **Falta curaduría manual en `data/curated/` para los tres destinos, con foco fuerte en comercios y en atractivos de Cancún, para cerrar el criterio de aceptación de la fase.**
 - **Fase 2** (vector store): `embeddings.py` + `db.py` + `ingesta/cargar_vectores.py` contra la tabla propia. Escrito, todavía no se corrió la carga real de vectores (viene después de completar la curaduría de Fase 1).
 - **Fase 3** (retrievers y tools de RAG, RF3/RF4): `recuperacion/*.py` + `recomendar_actividades`/`recomendar_locales`. Verificado por test con retriever y LLM mockeados, sin agente, sin corpus real todavía (depende de Fase 2).
 - **Fase 4** (estado y slot filling, RF1/RF2): `estado.py` + `completar_slots`. Test con LLM mockeado.
 - **RF8** (clima + idioma/moneda): `tools/info_destino.py`, clima en vivo de Open-Meteo, idioma/moneda desde `paises.json`.
 - **RF6/RF7** (alojamiento y vuelos): Amadeus dado de baja, migrado a RapidAPI/Booking.com15 (D-05/D-06). `services/rapidapi/` + tools `buscar_alojamiento`/`buscar_vuelos`. **Verificado de punta a punta contra la base local y la API real**: destinos piloto precargados en `destino_externo` (Barcelona/Cancún para hoteles, Buenos Aires/Cancún para vuelos), `buscar_alojamiento("Barcelona", ...)` corrido de verdad devolvió 20 hoteles reales usando el cache (sin re-resolver destino). Fly Scraper reducido a `price-calendar` como dato complementario.
 
-67 tests unitarios (`pytest`) mockeados y en verde, más las verificaciones manuales reales de arriba. Lint (`ruff`) en verde. Venv local (`.venv`) armado porque esta máquina no tenía dependencias instaladas.
+69 tests unitarios (`pytest`) mockeados y en verde, más las verificaciones manuales reales de arriba. Lint (`ruff`) en verde. Venv local (`.venv`) armado porque esta máquina no tenía dependencias instaladas.
 
 Todo en la rama `fase/0-scaffolding`, pusheada a origin, todavía no mergeada a `main`.
 
@@ -80,15 +88,15 @@ Decisiones tomadas en Fase 1 (arranque):
 - **Límite diario real por clave de Gemini sigue sin poder verificarse de forma estática.** El ID de modelo ya no es bloqueo (D-03). `ai.google.dev/gemini-api/docs/rate-limits` no publica un número fijo de RPD para el free tier, remite a `aistudio.google.com/rate-limit`, que requiere login con la cuenta de cada key. Hay reportes de foro (no oficiales) de recortes recientes al free tier. **Alguien con acceso a esas cuentas de Google tiene que entrar logueado y anotar el RPD real por key.**
 - **Decisión pendiente con el equipo: seguir en Postgres local o migrar ya a Supabase.** Por ahora se está desarrollando y validando contra el Postgres local de `docker-compose` (ver Configuración del proyecto). Funciona igual de bien para seguir avanzando, pero antes de la entrega hay que decidir si el equipo se pasa a Supabase (para tener una base compartida) o se sigue en local hasta más adelante.
 - Repository secrets de GitHub (`GEMINI_API_KEY_1/2/3`) y protección de la rama `main` todavía no configurados, requieren acceso al repo en GitHub.
-- **Corpus de comercios por debajo del mínimo con solo la API.** Barcelona: 41 atractivos (bien) / 2 comercios (el mínimo es 15). Esperado (ver `fuentes-datos.md`, POIs de `foods`/`shops` casi nunca tienen extracto de Wikipedia). Hace falta curaduría manual en `data/curated/` para los tres destinos antes de cerrar Fase 1.
+- **Corpus por debajo del mínimo con solo la API, los tres destinos.** Comercios: 2/2/0 (Barcelona/Miami/Cancún) contra el mínimo de 15 — esperado, casi ningún local tiene extracto de Wikipedia. Atractivos: Cancún da solo 7 de 25 incluso con `--rate 1 --radio 50000 --limite 500` (probado y no se sigue ajustando, decisión del usuario). **Hace falta curaduría manual en `data/curated/` para los tres destinos, marcado `fuente='curado'`, antes de cerrar Fase 1** — es el bloqueo real que sigue, no algo que un parámetro de API vaya a resolver.
 
 ## Próximo paso
 
 1. ~~Decidir a qué ciudades puntuales se resuelven "Europa" y "Caribe"~~ — resuelto, Barcelona y Cancún/Riviera Maya (D-04).
 2. ~~Verificar el model ID de Gemini~~ — resuelto contra la API real, `gemini-3.5-flash-lite` (D-03). El límite diario real por key sigue pendiente (ver bloqueo arriba).
 3. ~~Levantar Postgres y aplicar el esquema~~ — resuelto en local con `docker-compose` + `inicializar_db`. Pendiente decidir Supabase con el equipo (ver bloqueo arriba).
-4. ~~Ingestar Barcelona y Cancún contra OpenTripMap real~~ — Barcelona hecho (41/2). Cancún en curso al momento de escribir esto. Falta Miami.
-5. **Completar la curaduría manual en `data/curated/`** para llegar a 15+ comercios por destino (bloqueo de arriba) — es lo que falta para cerrar el criterio de aceptación de Fase 1.
+4. ~~Ingestar Barcelona, Miami y Cancún contra OpenTripMap real~~ — hecho, ver tabla arriba (Fase 1). Aceptados los números reales tal como salieron, sin seguir ajustando parámetros de búsqueda (decisión del usuario).
+5. **Completar la curaduría manual en `data/curated/`** para los tres destinos (bloqueo de arriba) — es lo que falta para cerrar el criterio de aceptación de Fase 1. Foco: comercios en los tres, atractivos en Cancún.
 6. Cargar los vectores reales (Fase 2, `cargar_vectores.py`) una vez cerrada la curaduría, y correr Fase 3 (RAG) y Fase 4 (slot filling) contra datos reales en vez de mocks.
 7. Cargar los repository secrets en GitHub y proteger `main` (checks `calidad`, `commits`, `secretos`).
 8. Confirmar con el usuario y mergear `fase/0-scaffolding` a `main`.
