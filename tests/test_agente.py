@@ -4,7 +4,6 @@ tools) y la conexion, no toca la red ni Postgres real."""
 from __future__ import annotations
 
 from datetime import date
-from pathlib import Path
 from unittest.mock import MagicMock
 
 from asistente_viajes import agente as mod
@@ -90,43 +89,16 @@ def test_procesar_mensaje_recomendar_locales(monkeypatch) -> None:
     assert "Mercado 28" in respuesta
 
 
-def test_coordenadas_destino_conocido(tmp_path: Path) -> None:
-    ruta = tmp_path / "destinos.json"
-    ruta.write_text('{"Cancun": {"pais": "Mexico", "lat": 21.1, "lon": -86.8}}', encoding="utf-8")
+def test_coordenadas_destino_conocido(monkeypatch) -> None:
+    monkeypatch.setattr(mod, "buscar_destino_piloto", lambda destino: ("Cancun", {"pais": "Mexico", "lat": 21.1, "lon": -86.8}))
 
-    coordenadas = mod._coordenadas_destino("Cancun", ruta_destinos=ruta)
-
-    assert coordenadas == {"pais": "Mexico", "lat": 21.1, "lon": -86.8}
+    assert mod._coordenadas_destino("Cancun") == {"pais": "Mexico", "lat": 21.1, "lon": -86.8}
 
 
-def test_coordenadas_destino_desconocido_devuelve_none(tmp_path: Path) -> None:
-    ruta = tmp_path / "destinos.json"
-    ruta.write_text("{}", encoding="utf-8")
+def test_coordenadas_destino_desconocido_devuelve_none(monkeypatch) -> None:
+    monkeypatch.setattr(mod, "buscar_destino_piloto", lambda destino: None)
 
-    assert mod._coordenadas_destino("Narnia", ruta_destinos=ruta) is None
-
-
-def test_coordenadas_destino_es_insensible_a_tildes_y_mayusculas(tmp_path: Path) -> None:
-    ruta = tmp_path / "destinos.json"
-    ruta.write_text('{"Cancun": {"pais": "Mexico", "lat": 21.1, "lon": -86.8}}', encoding="utf-8")
-
-    assert mod._coordenadas_destino("cancún", ruta_destinos=ruta) == {
-        "pais": "Mexico",
-        "lat": 21.1,
-        "lon": -86.8,
-    }
-    assert mod._coordenadas_destino("CANCUN", ruta_destinos=ruta) is not None
-
-
-def test_coordenadas_destino_ignora_claves_de_metadata(tmp_path: Path) -> None:
-    ruta = tmp_path / "destinos.json"
-    ruta.write_text(
-        '{"_comentario": "nota", "Cancun": {"pais": "Mexico", "lat": 21.1, "lon": -86.8}}',
-        encoding="utf-8",
-    )
-
-    assert mod._coordenadas_destino("_comentario", ruta_destinos=ruta) is None
-    assert mod._coordenadas_destino("Cancun", ruta_destinos=ruta) is not None
+    assert mod._coordenadas_destino("Narnia") is None
 
 
 def _info_destino_falsa() -> InfoDestino:

@@ -13,12 +13,11 @@ con `guardar_destino_cacheado`.
 
 from __future__ import annotations
 
-import unicodedata
-
 import psycopg
 from psycopg.types.json import Jsonb
 
 from asistente_viajes.services.rapidapi.models import DestinoResuelto
+from asistente_viajes.texto import normalizar as normalizar_texto
 
 SQL_BUSCAR = """
 SELECT id_externo, tipo, payload
@@ -32,12 +31,6 @@ VALUES (%(proveedor)s, %(texto_consultado)s, %(id_externo)s, %(tipo)s, %(payload
 ON CONFLICT (proveedor, texto_consultado)
 DO UPDATE SET id_externo = EXCLUDED.id_externo, tipo = EXCLUDED.tipo, payload = EXCLUDED.payload;
 """
-
-
-def normalizar_texto(texto: str) -> str:
-    """lower, sin tildes, trim. Asi 'Cancun' y 'Cancún' cachean al mismo registro."""
-    sin_tildes = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
-    return sin_tildes.strip().lower()
 
 
 def buscar_destino_cacheado(
