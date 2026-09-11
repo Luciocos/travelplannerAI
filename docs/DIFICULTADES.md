@@ -55,6 +55,24 @@ Formato de cada entrada:
 
 ---
 
+## P-05, matching de destino sensible a tildes rompía la recuperación
+
+- **Fecha:** 2026-09-11
+- **Fase:** 5 (Fase 3/RAG en general)
+- **Síntoma:** al probar el orquestador a mano (`scripts/chat.py`), un destino escrito con tilde por el usuario ("Cancún") no encontraba nada si el dato ingerido estaba sin tilde ("Cancun", como lo carga `scripts/ingestar_destino.py`), o viceversa según cómo el LLM extrajera el nombre.
+- **Causa:** la consulta canónica (`recuperacion/_consulta.py`) filtraba por `destino = %(destino)s`, comparación de igualdad exacta de string, sensible a tildes y mayúsculas. El lookup de coordenadas por destino en `agente.py` (`data/reference/destinos.json`) tenía el mismo problema, como dict exacto.
+- **Solución:** extensión `unaccent` de Postgres (agregada al esquema) más `lower()` en la consulta canónica; y una normalización equivalente en Python (`unicodedata`, sin librerías nuevas) para el lookup de `destinos.json`. Verificado contra la base real: "Cancún" y "Cancun" devuelven exactamente los mismos resultados.
+- **Aprendizaje:** cualquier comparación de texto libre generado por un LLM (nombres de destino, ciudades) tiene que asumir variación de tildes/mayúsculas por defecto, no como caso raro. Vale revisar si hay otro punto de comparación de texto libre en el sistema con el mismo riesgo.
+
+## P-06, latencia real de Gemini se degrada con uso acumulado (sin resolver)
+
+- **Fecha:** 2026-09-11
+- **Fase:** 5, pero afecta a cualquier tool que use el LLM
+- **Síntoma:** al probar la conversación completa a mano, cada turno tardaba mucho más de lo esperado. Una sola invocación aislada (`rotador.invocar`, sin tools ni contexto extra) tardó **42 segundos**, contra 1-3 segundos en las primeras pruebas de la sesión con el mismo modelo y las mismas claves.
+- **Causa (probable, no confirmada):** cuota por minuto (RPM) de Gemini rozándose por el volumen de llamadas reales hechas en la sesión (decenas, entre verificar cada fase y la conversación de prueba). No hay error duro en los logs (`RotadorClavesGemini` no registró ningún backoff ni clave agotada), así que no es el mecanismo de reintento del propio rotador el que agrega la demora: la lentitud viene de la respuesta de la API en sí.
+- **Solución:** ninguna aplicada todavía. No se puede confirmar la causa exacta sin entrar logueado a `aistudio.google.com/rate-limit` (mismo bloqueo abierto de `estado.md` sobre el límite diario/por minuto real). Mitigación de código pendiente de evaluar: reducir la cantidad de llamadas al LLM por turno (por ejemplo, `recomendar_actividades`/`recomendar_locales` hacen una llamada de justificación por resultado, podrían batchearse en una sola).
+- **Aprendizaje:** un modelo "Flash Lite" gratuito no garantiza latencia baja sostenida bajo uso intensivo de desarrollo/testing; hay que probar el sistema en vivo con volumen real antes de la demo, no asumir que el tiempo de respuesta de las primeras pruebas se mantiene. Para el video/demo, conviene espaciar las pruebas o tener un colchón de tiempo por si la cuota está ajustada ese día.
+
 ## Candidatos previsibles, confirmar si pasan de verdad
 
 No inventar entradas. Estos son los puntos donde es probable que algo falle, listados para que se registren bien si ocurren:
@@ -63,5 +81,4 @@ No inventar entradas. Estos son los puntos donde es probable que algo falle, lis
 - Extractos de Wikipedia en inglés mezclados con consultas en español, y el efecto en la recuperación.
 - El agente eligiendo la tool equivocada por un docstring ambiguo.
 - Slot filling que repregunta algo ya respondido, o que pisa un slot cargado con None.
-- Rate limit del LLM gratuito en medio de una demo.
 - Open-Meteo sin pronóstico para fechas a más de 16 días.
