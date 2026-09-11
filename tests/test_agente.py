@@ -116,6 +116,23 @@ def test_procesar_mensaje_recomendar_locales(monkeypatch) -> None:
     assert llamada.call_args.kwargs["k"] == mod.CANTIDAD_RESULTADOS_DEFECTO
 
 
+def test_procesar_mensaje_responder_faq_viajero(monkeypatch) -> None:
+    rotador = _rotador_con_decision("responder_faq_viajero")
+    from asistente_viajes.tools.responder_faq_viajero import RespuestaFaq
+
+    respuesta_faq = RespuestaFaq(
+        tema="Taxis y tarifas", categoria="estafas", respuesta="Acordá el precio antes de subir."
+    )
+    llamada = MagicMock(return_value=[respuesta_faq])
+    monkeypatch.setattr(mod, "responder_faq_viajero", llamada)
+
+    sesion = mod.SesionAgente(estado=PreferenciasViaje(destino="Cancun"))
+    respuesta = mod.procesar_mensaje(MagicMock(), rotador, sesion, "es seguro tomar un taxi")
+
+    assert "Acordá el precio antes de subir" in respuesta
+    assert llamada.call_args.kwargs["k"] == mod.CANTIDAD_RESULTADOS_DEFECTO
+
+
 def test_coordenadas_destino_conocido(monkeypatch) -> None:
     monkeypatch.setattr(mod, "buscar_destino_piloto", lambda destino: ("Cancun", {"pais": "Mexico", "lat": 21.1, "lon": -86.8}))
 

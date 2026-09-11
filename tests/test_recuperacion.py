@@ -10,6 +10,7 @@ import pytest
 from asistente_viajes.recuperacion import _consulta
 from asistente_viajes.recuperacion.atractivos import buscar_atractivos
 from asistente_viajes.recuperacion.comercios import buscar_comercios
+from asistente_viajes.recuperacion.faq import buscar_faq
 
 
 @pytest.fixture(autouse=True)
@@ -58,3 +59,13 @@ def test_buscar_comercios_usa_la_consulta_puntual() -> None:
     cursor_usado = conexion.cursor.return_value.__enter__.return_value
     parametros_enviados = cursor_usado.execute.call_args.args[1]
     assert parametros_enviados["corpus"] == "comercios"
+
+
+def test_buscar_faq_usa_la_consulta_puntual() -> None:
+    conexion = _conexion_falsa([])
+
+    buscar_faq(conexion, destino="Cancun", consulta="es seguro tomar un taxi")
+
+    cursor_usado = conexion.cursor.return_value.__enter__.return_value
+    parametros_enviados = cursor_usado.execute.call_args.args[1]
+    assert parametros_enviados["corpus"] == "faq"

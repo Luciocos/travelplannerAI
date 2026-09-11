@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 from asistente_viajes.recuperacion._consulta import ResultadoRecuperado
 from asistente_viajes.tools import recomendar_actividades as mod_actividades
 from asistente_viajes.tools import recomendar_locales as mod_locales
+from asistente_viajes.tools import responder_faq_viajero as mod_faq
 
 
 def _rotador_falso(respuesta_texto: str = "Justificación de prueba.") -> MagicMock:
@@ -79,3 +80,35 @@ def test_tool_recomendar_locales_tiene_docstring_y_args_schema() -> None:
     assert tool_creada.name == "recomendar_locales"
     assert tool_creada.description
     assert tool_creada.args_schema is mod_locales.ArgsRecomendarLocales
+
+
+def test_responder_faq_viajero_responde_solo_con_el_texto_recuperado(monkeypatch) -> None:
+    resultado = ResultadoRecuperado(
+        nombre="Taxis y tarifas",
+        categoria="estafas",
+        texto="Texto real del corpus de FAQ.",
+    )
+    monkeypatch.setattr(mod_faq, "buscar_faq", lambda *_, **__: [resultado])
+
+    rotador = _rotador_falso("En Cancun conviene acordar el precio antes de subir.")
+    respuestas = mod_faq.responder_faq_viajero(
+        conexion=MagicMock(), rotador=rotador, destino="Cancun", consulta="es seguro tomar un taxi"
+    )
+
+    assert len(respuestas) == 1
+    assert respuestas[0].tema == "Taxis y tarifas"
+    assert respuestas[0].respuesta == "En Cancun conviene acordar el precio antes de subir."
+
+    prompt_enviado = rotador.invocar.call_args.args[0]
+    assert "Texto real del corpus de FAQ." in prompt_enviado
+    assert "no agregues datos" in prompt_enviado.lower()
+
+
+def test_tool_responder_faq_viajero_tiene_docstring_y_args_schema() -> None:
+    tool_creada = mod_faq.crear_tool_responder_faq_viajero(
+        conexion=MagicMock(), rotador=_rotador_falso()
+    )
+
+    assert tool_creada.name == "responder_faq_viajero"
+    assert tool_creada.description
+    assert tool_creada.args_schema is mod_faq.ArgsResponderFaqViajero

@@ -32,6 +32,7 @@
 - **Fase 5** (RF11/RF12, orquestador, nuevo — `agente.py`): `SesionAgente` mantiene el estado entre turnos (RF11); en cada turno un LLM con salida estructurada decide sola qué tool corresponde (RF12), excepto `info_destino` que se dispara aparte, una sola vez, al confirmarse destino y fechas. **Verificado con una conversación real de 6 turnos** (LLM + corpus + Postgres reales): el estado se acumuló sin perder nada, la tool elegida en cada turno fue la correcta (`completar_slots` x4, `armar_plan`, `recomendar_locales`), `info_destino` se disparó exactamente una vez. El turno de comercios devolvió "no encontré locales" — correcto y esperado, es la limitación real y documentada de RF4 (D-07), no un bug. **Redefinido 2026-09-11 (D-10):** el orquestador ahora también elige `cantidad_resultados` (no solo la tool), sin pedirle nunca al LLM los parámetros que ya son estado validado (destino, intereses, fechas). **Re-verificado con LLM y Postgres reales**, conversación de 3 turnos: "dame 5 actividades" y "dame solo 1 opción de dónde comer" produjeron `cantidad_resultados=5` y `=1` correctamente, estado intacto en las 3 vueltas.
 - **RF8** (clima + idioma/moneda, extensión adelantada): `tools/info_destino.py`, verificado dentro de la conversación de 6 turnos de arriba.
 - **RF6/RF7** (alojamiento y vuelos, extensión adelantada): Amadeus dado de baja, migrado a RapidAPI/Booking.com15 (D-05/D-06). Verificado de punta a punta contra la base local y la API real.
+- **RF9** (FAQ del viajero, extensión, 2026-09-11): `tools/responder_faq_viajero.py`, mismo patrón que `recomendar_locales` sobre el corpus `faq` (ya existía el retriever, `recuperacion/faq.py`). Corpus curado nuevo, `data/curated/faq_viajero.json`, 3 temas por destino piloto (seguridad/hurtos, estafas comunes, costumbres/propinas) verificados por búsqueda web, cargados a Postgres (9 documentos, 3 por destino). Enganchado al orquestador (`agente.py`), quinta acción de `DecisionAccion`. **Verificado con LLM y Postgres reales**: retrieval correcto por destino y consulta, y respuesta correctamente acotada al texto recuperado (un caso de prueba en Barcelona mostró el sistema negándose a inventar un dato de propina que no estaba en el tema recuperado).
 
 101 tests unitarios (`pytest`) mockeados y en verde, más todas las verificaciones manuales reales de arriba. Lint (`ruff`) en verde. Venv local (`.venv`) armado porque esta máquina no tenía dependencias instaladas.
 
@@ -106,7 +107,7 @@ Decisiones tomadas en Fase 5:
 7. ~~Correr Fase 3, Fase 4, Fase 6 (armar_plan) y Fase 5 (orquestador) contra el corpus y el LLM reales~~ — resuelto, ver "Fase actual". Núcleo completo verificado de punta a punta con una conversación real de 6 turnos.
 8. Cargar los repository secrets en GitHub y proteger `main` (checks `calidad`, `commits`, `secretos`).
 9. Confirmar el cierre de núcleo con el usuario/equipo y mergear `fase/0-scaffolding` a `main`.
-10. Con el núcleo cerrado, pasar a extensiones (Fase 7): RF9 (FAQ) primero, RF10 (gastos) después, y retomar RF4 (comercios) solo si queda tiempo (D-07).
+10. Con el núcleo cerrado, pasar a extensiones (Fase 7): ~~RF9 (FAQ)~~ — hecho, ver "Fase actual" arriba. Sigue RF10 (gastos), y retomar RF4 (comercios) solo si queda tiempo (D-07).
 
 ---
 

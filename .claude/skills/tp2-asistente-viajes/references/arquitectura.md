@@ -52,6 +52,7 @@
 │   │   ├── info_destino.py       # clima mas idioma y moneda
 │   │   ├── buscar_alojamiento.py # RF6, sobre services/rapidapi (booking + fallback fly_scraper)
 │   │   ├── buscar_vuelos.py      # RF7, sobre services/rapidapi (fly_scraper + fallback booking)
+│   │   ├── responder_faq_viajero.py # RF9, sobre recuperacion/faq.py (corpus curado)
 │   │   └── gastos.py
 │   └── agente.py                 # orquestador, memoria, registro de tools
 ├── notebooks/
@@ -149,6 +150,7 @@ Todas son `@tool` de LangChain, con `args_schema` de pydantic y docstring precis
 - `recomendar_locales(destino: str, consulta: str, k: int = 5)`. Mismo patrón sobre el corpus de comercios, devuelve dirección y rango de precio.
 - `armar_plan(estado: PreferenciasViaje)`. Itinerario día a día, 2 o 3 actividades por día, costo estimado y resumen de presupuesto. Persiste en `itinerario` e `itinerario_item`.
 - `info_destino(destino: str, fecha_inicio, fecha_fin)`. Clima en vivo mas idioma y moneda. Se dispara automáticamente al confirmarse el destino, no espera pregunta del usuario.
+- `responder_faq_viajero(destino: str, consulta: str, k: int = 3)` (RF9, extensión). Mismo patrón que `recomendar_locales` pero sobre el corpus curado de FAQ (seguridad, estafas comunes, costumbres), devuelve tema y respuesta generada por el LLM sólo sobre el texto recuperado.
 
 Sobre el costo estimado: sale de los rangos de precio del corpus mas una tabla de costos base por categoría. **No es un número inventado por el LLM.** El método de estimación se documenta, porque en la defensa lo van a preguntar.
 

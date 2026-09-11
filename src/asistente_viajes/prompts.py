@@ -67,6 +67,10 @@ mensaje, usando el estado actual del viaje como contexto:
   visitar según sus intereses, sin pedir el itinerario completo.
 - recomendar_locales: el usuario pregunta algo puntual sobre dónde comer,
   comprar, o un local en particular.
+- responder_faq_viajero: el usuario pregunta algo puntual sobre seguridad,
+  estafas comunes a evitar, o costumbres locales (por ejemplo cuánto dejar
+  de propina, horarios habituales, cómo tratar a la gente), no sobre
+  actividades para hacer ni sobre dónde comer o comprar.
 
 Además, si el usuario pidió explícitamente una cantidad de resultados
 (por ejemplo "dame 5 opciones", "mostrame solo dos", "una sola
@@ -79,6 +83,21 @@ Datos obligatorios que todavía faltan: {slots_faltantes}
 
 Mensaje del usuario:
 {mensaje}
+"""
+
+PROMPT_RESPONDER_FAQ_VIAJERO = """\
+Sos un asistente de viajes que habla en español rioplatense neutro.
+Un viajero preguntó lo siguiente sobre su destino:
+{consulta}
+
+Respondé usando ÚNICAMENTE la información del siguiente texto de referencia
+sobre seguridad, estafas comunes o costumbres del lugar.
+
+No agregues datos que no estén en el texto. Si el texto no alcanza para
+responder la pregunta, decilo así, no inventes.
+
+Texto de referencia:
+{texto_recuperado}
 """
 
 PROMPT_JUSTIFICAR_RECOMENDACION = """\

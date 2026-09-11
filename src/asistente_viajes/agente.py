@@ -44,10 +44,17 @@ from asistente_viajes.tools.recomendar_actividades import (
     recomendar_actividades,
 )
 from asistente_viajes.tools.recomendar_locales import LocalRecomendado, recomendar_locales
+from asistente_viajes.tools.responder_faq_viajero import RespuestaFaq, responder_faq_viajero
 
 logger = logging.getLogger(__name__)
 
-Accion = Literal["completar_slots", "armar_plan", "recomendar_actividades", "recomendar_locales"]
+Accion = Literal[
+    "completar_slots",
+    "armar_plan",
+    "recomendar_actividades",
+    "recomendar_locales",
+    "responder_faq_viajero",
+]
 
 CANTIDAD_RESULTADOS_DEFECTO = 3
 
@@ -147,6 +154,13 @@ def _resumen_locales(locales: list[LocalRecomendado]) -> str:
     return "\n".join(lineas)
 
 
+def _resumen_faq(respuestas: list[RespuestaFaq]) -> str:
+    if not respuestas:
+        return "No tengo información sobre seguridad, estafas o costumbres para esa consulta en este destino."
+    lineas = [f"- {r.tema}: {r.respuesta}" for r in respuestas]
+    return "\n".join(lineas)
+
+
 def procesar_mensaje(
     conexion: psycopg.Connection,
     rotador: RotadorClavesGemini,
@@ -173,9 +187,12 @@ def procesar_mensaje(
             conexion, rotador, sesion.estado.destino, sesion.estado.intereses or [], k=k
         )
         respuesta = _resumen_actividades(actividades)
-    else:  # recomendar_locales
+    elif accion == "recomendar_locales":
         locales = recomendar_locales(conexion, rotador, sesion.estado.destino, mensaje, k=k)
         respuesta = _resumen_locales(locales)
+    else:  # responder_faq_viajero
+        respuestas_faq = responder_faq_viajero(conexion, rotador, sesion.estado.destino, mensaje, k=k)
+        respuesta = _resumen_faq(respuestas_faq)
 
     info = _disparar_info_destino_si_corresponde(sesion)
     if info is not None:
