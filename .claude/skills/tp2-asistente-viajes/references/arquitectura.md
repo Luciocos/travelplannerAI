@@ -54,6 +54,8 @@
 │   │   ├── buscar_vuelos.py      # RF7, sobre services/rapidapi (fly_scraper + fallback booking)
 │   │   └── responder_faq_viajero.py # RF9, sobre recuperacion/faq.py (corpus curado)
 │   └── agente.py                 # orquestador, memoria, registro de tools
+├── ui/
+│   └── chat_app.py               # GUI de demo (Streamlit, Fase 7B, no es parte de la consigna)
 ├── notebooks/
 │   └── demo_tp2.ipynb            # ENTREGABLE OFICIAL
 ├── scripts/
@@ -65,9 +67,9 @@
 
 ## Dependencias
 
-`langchain`, `langchain-core`, `langchain-community`, `langchain-postgres`, `langchain-google-genai`, `sentence-transformers`, `psycopg[binary]`, `pgvector`, `pydantic`, `python-dotenv`, `httpx`, `jupyter`, `pytest`, `pytest-mock`, `ruff` (sólo desarrollo).
+`langchain`, `langchain-core`, `langchain-community`, `langchain-postgres`, `langchain-google-genai`, `sentence-transformers`, `psycopg[binary]`, `pgvector`, `pydantic`, `python-dotenv`, `httpx`, `jupyter`, `pytest`, `pytest-mock`, `ruff` (sólo desarrollo), `streamlit` (sólo la GUI de demo de `ui/chat_app.py`, Fase 7B).
 
-Cualquier dependencia fuera de esta lista se justifica antes de agregarla.
+Cualquier dependencia fuera de esta lista se justifica antes de agregarla. `streamlit` se justifica así: es una capa de presentación en Python puro que no toca `src/asistente_viajes/` (importa `agente.py` igual que el notebook y `scripts/chat.py`), no está pedida por la cátedra (ver `consigna-catedra.md`, el entregable sigue siendo el notebook), y se agregó por pedido explícito del usuario para mejorar la demo.
 
 ## Variables de entorno
 

@@ -10,6 +10,7 @@ pydantic
 python-dotenv
 httpx
 jupyter
+streamlit
 pytest
 pytest-mock
 ruff

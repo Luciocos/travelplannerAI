@@ -129,12 +129,12 @@ def _disparar_info_destino_si_corresponde(sesion: SesionAgente) -> InfoDestino |
 
 
 def _resumen_plan(plan: PlanDeViaje) -> str:
-    lineas = [f"Armé un plan de {len(plan.dias)} día(s) para {plan.destino}:"]
+    lineas = [f"Armé un plan de {len(plan.dias)} día(s) para **{plan.destino}**:"]
     for dia in plan.dias:
         nombres = ", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades)
-        lineas.append(f"Día {dia.dia}: {nombres} (costo estimado ${dia.costo_dia:.0f})")
+        lineas.append(f"- **Día {dia.dia}**: {nombres} (costo estimado ${dia.costo_dia:.0f})")
     lineas.append(
-        f"Costo total estimado: ${plan.costo_total_estimado:.0f} por persona, "
+        f"\nCosto total estimado: ${plan.costo_total_estimado:.0f} por persona, "
         f"${plan.costo_total_grupo:.0f} para el grupo de {plan.cantidad_personas}."
     )
     return "\n".join(lineas)
@@ -143,21 +143,21 @@ def _resumen_plan(plan: PlanDeViaje) -> str:
 def _resumen_actividades(actividades: list[ActividadRecomendada]) -> str:
     if not actividades:
         return "No encontré actividades para recomendarte con esos intereses en este destino."
-    lineas = [f"- {a.nombre}: {a.justificacion}" for a in actividades]
+    lineas = [f"- **{a.nombre}**: {a.justificacion}" for a in actividades]
     return "\n".join(lineas)
 
 
 def _resumen_locales(locales: list[LocalRecomendado]) -> str:
     if not locales:
         return "No encontré locales para recomendarte con esa consulta en este destino."
-    lineas = [f"- {local.nombre}: {local.justificacion}" for local in locales]
+    lineas = [f"- **{local.nombre}**: {local.justificacion}" for local in locales]
     return "\n".join(lineas)
 
 
 def _resumen_faq(respuestas: list[RespuestaFaq]) -> str:
     if not respuestas:
         return "No tengo información sobre seguridad, estafas o costumbres para esa consulta en este destino."
-    lineas = [f"- {r.tema}: {r.respuesta}" for r in respuestas]
+    lineas = [f"- **{r.tema}**: {r.respuesta}" for r in respuestas]
     return "\n".join(lineas)
 
 

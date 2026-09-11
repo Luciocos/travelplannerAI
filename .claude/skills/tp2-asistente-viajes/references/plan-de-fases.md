@@ -71,6 +71,19 @@ Orden por valor sobre esfuerzo, de mayor a menor. Si el tiempo se acorta, se cor
 4. ~~**Gastos (RF10).**~~ **Omitido, decisión del usuario (D-11 en `docs/DECISIONES.md`).** No se implementa.
 5. **Recomendación de comercios (RF4), retomar si hay tiempo.** Movido de núcleo a extensión (D-07). Tool y RAG ya implementados y testeados con mocks; falta corpus real, vía curaduría manual dedicada en `data/curated/` o una fuente con más volumen (ej. Yelp API). Es la de menor prioridad porque ya se probó que el esfuerzo para cerrarla es alto (8+ horas), no por falta de valor.
 
+## Fase 7B, interfaz de chat (GUI)
+
+**No forma parte de la consigna de la cátedra** (el entregable oficial sigue siendo el notebook, ver `consigna-catedra.md`). Se agrega por pedido explícito del usuario, para que la demo se vea mejor que un CLI de texto plano. No reemplaza al notebook ni a `scripts/chat.py`.
+
+- **Stack:** Streamlit. Elegido sobre Gradio por dar más control fino sobre botones de opciones predefinidas junto al historial de chat, y porque `st.chat_message`/`st.chat_input` ya resuelven la UI de chat sin código propio. Nueva dependencia, agregada a `requirements.txt` y justificada en `arquitectura.md`.
+- **Capa de presentación pura:** `ui/chat_app.py` importa `SesionAgente`/`procesar_mensaje` de `asistente_viajes.agente`, igual que `scripts/chat.py` y el notebook. **Cero lógica de negocio nueva en la UI** (mismo principio que ya aplica al notebook, ver "Qué es el proyecto" en `SKILL.md`).
+- **Botones de opciones predefinidas:** disparadores de conversación (ej. "Quiero armar un viaje a Cancún", "¿Qué puedo visitar en Barcelona?", "¿Es seguro tomar un taxi en Cancún?") que mandan el mismo texto que tipearía un usuario. **No eligen una tool ni un modo**: pasan por `procesar_mensaje` igual que cualquier mensaje escrito a mano, así que el orquestador sigue siendo el único que decide (RF12 no se toca).
+- **Formateo:** el historial se renderiza con `st.chat_message` (markdown nativo), aprovechando que `_resumen_actividades`/`_resumen_locales`/`_resumen_faq` ya devuelven listas con guiones (markdown válido). Se resalta el nombre de cada ítem en negrita para que se lea como tarjeta, no como bloque de texto plano.
+- **Estado:** una `SesionAgente` por sesión de navegador (`st.session_state`), en memoria del proceso, mismo alcance que ya tiene RF11 (no se persiste entre sesiones).
+- **Tests:** no hay tests de pytest para `ui/chat_app.py` (mismo criterio que `scripts/chat.py`: es una capa interactiva que necesita LLM y Postgres reales para correr, no lógica mockeable). Se verifica levantando el server y probándolo a mano/con navegador antes de dar la fase por cerrada.
+
+**Aceptación:** `streamlit run ui/chat_app.py` levanta sin errores, una conversación de varios turnos por texto libre funciona igual que por `scripts/chat.py`, y al menos un botón de opción predefinida dispara correctamente la tool esperada a través del orquestador (no hardcodeado).
+
 ## Fase 8, notebook de demo (días 17 a 20)
 
 `notebooks/demo_tp2.ipynb`, estructura fija:
