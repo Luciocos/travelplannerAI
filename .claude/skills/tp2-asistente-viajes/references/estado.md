@@ -21,34 +21,34 @@
 
 ## Fase actual
 
-**Código de las Fases 0 a 4 y de RF6/RF7/RF8 (Fase 7) escrito, con tests en verde y ya validado con infraestructura y APIs reales (local, no Supabase todavía).** Sigue sin mergear a `main` ni confirmarse como cerrado en el sentido de `plan-de-fases.md`, pero a diferencia del corte anterior, buena parte de esto ya corrió de verdad: Postgres local, OpenTripMap, Gemini y Booking.com15 reales, no solo mocks.
+**Núcleo completo (Fases 0 a 6, RF1/RF2/RF3/RF5/RF11/RF12) escrito, testeado y verificado de punta a punta contra infraestructura y APIs reales — Postgres local, OpenTripMap, Gemini real y Booking.com15 real, no solo mocks.** Según `plan-de-fases.md` (Fase 6), con el núcleo cerrado el TP ya es aprobable. **Pendiente de confirmación formal del usuario/equipo y de mergear a `main`**, pero el criterio técnico de cada fase ya se cumplió una por una:
 
-- **Fase 0** (scaffolding): estructura del repo, hook de commits, workflows de CI, `config.py`, rotador de claves con failover (`llm.py`), esquema SQL. **`docker-compose up -d` levantado y funcionando**, esquema aplicado con `inicializar_db` contra esa base local, `smoke_llm.py` corrido a mano: **5/5 claves responden `200 OK`** con `gemini-3.5-flash-lite` (ver D-03).
-- **Fase 1** (ingesta), **CERRADA en núcleo**: cliente de OpenTripMap en dos pasos, normalización, CLI `scripts/ingestar_destino.py` (con `--rate`/`--limite`), curaduría manual en `data/curated/cancun_atractivos.json` (13 lugares reales, verificados por búsqueda web antes de escribir cada entrada, `fuente='curado'`).
+- **Fase 0** (scaffolding): `docker-compose up -d` levantado y funcionando, esquema aplicado con `inicializar_db`, `smoke_llm.py` corrido a mano: **5/5 claves responden `200 OK`** con `gemini-3.5-flash-lite` (D-03).
+- **Fase 1** (ingesta): los tres destinos superan el mínimo de atractivos (20, D-07) con datos reales — Barcelona 41, Miami 75 (ambos solo OpenTripMap), Cancún 20 (7 OpenTripMap + 13 curados, verificados por búsqueda web, `fuente='curado'`). RF4 (comercios) movido a extensión (D-07).
+- **Fase 2** (vector store): los tres destinos cargados en `documento_rag` contra Postgres local con embeddings reales (Barcelona 43 docs, Miami 77, Cancún 20). Retrieval semántico verificado a mano.
+- **Fase 3** (RF3, `recomendar_actividades`): **corrido con el LLM real** contra el corpus real de Cancún — recupera los lugares correctos y genera justificaciones que citan solo hechos del texto recuperado, nada inventado.
+- **Fase 4** (RF1/RF2, `completar_slots`): **corrido con el LLM real**, dos turnos. No repisa lo ya cargado. Encontrado y corregido en el camino: `gemini-3.5-flash-lite` devuelve `.content` como lista de bloques, no string plano (nuevo helper `contenido_texto` en `llm.py`, afecta también `recomendar_actividades`/`recomendar_locales`). También se corrigió `plan-de-fases.md`: el criterio de aceptación original decía que el primer turno debía preguntar por "cantidad de personas y fechas", pero como el destino no está en el mensaje de ejemplo, lo correcto (y lo que efectivamente pasa) es preguntar primero por destino y tipo de destino.
+- **Fase 6** (RF5, `armar_plan`, nuevo): itinerario día a día con costo estimado por una tabla fija de categoría (sin LLM). **Corrido contra el corpus real de Cancún**: itinerario de 3 días, 9 actividades sin repetir, persistido en `itinerario`/`itinerario_item`.
+- **Fase 5** (RF11/RF12, orquestador, nuevo — `agente.py`): `SesionAgente` mantiene el estado entre turnos (RF11); en cada turno un LLM con salida estructurada decide sola qué tool corresponde (RF12), excepto `info_destino` que se dispara aparte, una sola vez, al confirmarse destino y fechas. **Verificado con una conversación real de 6 turnos** (LLM + corpus + Postgres reales): el estado se acumuló sin perder nada, la tool elegida en cada turno fue la correcta (`completar_slots` x4, `armar_plan`, `recomendar_locales`), `info_destino` se disparó exactamente una vez. El turno de comercios devolvió "no encontré locales" — correcto y esperado, es la limitación real y documentada de RF4 (D-07), no un bug.
+- **RF8** (clima + idioma/moneda, extensión adelantada): `tools/info_destino.py`, verificado dentro de la conversación de 6 turnos de arriba.
+- **RF6/RF7** (alojamiento y vuelos, extensión adelantada): Amadeus dado de baja, migrado a RapidAPI/Booking.com15 (D-05/D-06). Verificado de punta a punta contra la base local y la API real.
 
-  | Destino | Atractivos (min. 20, núcleo, D-07) | Comercios (extensión, D-07) |
-  |---|---|---|
-  | Barcelona | 41 ✅ (todo OpenTripMap) | 2 |
-  | Miami | 75 ✅ (todo OpenTripMap) | 2 |
-  | Cancún | 20 ✅ (7 OpenTripMap + 13 curados) | 0 |
-
-  RF4 (comercios) movido a extensión (D-07), ya no bloquea. El mínimo de atractivos se bajó de 25 a 20 (D-07, misma causa: baja densidad editorial de OpenTripMap en Cancún). **Los tres destinos superan el mínimo de núcleo.**
-- **Fase 2** (vector store), **CERRADA en núcleo**: `embeddings.py` + `db.py` + `ingesta/cargar_vectores.py` + `scripts/cargar_destino.py` (nuevo, combina OpenTripMap + curados por destino). **Corrido de verdad contra Postgres local**: Barcelona 43 documentos, Miami 77, Cancún 20, todos en `documento_rag` con embedding real. Consulta semántica de prueba (`buscar_atractivos(destino="Cancun", intereses=["ruinas mayas","historia"])`) devolvió como top 5 el Museo Maya, El Meco, Templo de Ixchel, San Miguelito y Yamil Lu'um — exactamente el resultado esperado, mezclando fuente OpenTripMap y curada.
-- **Fase 3** (retrievers y tools de RAG, RF3 núcleo / RF4 extensión): `recuperacion/*.py` + `recomendar_actividades`/`recomendar_locales`. Test con retriever y LLM mockeados en verde; la consulta real de arriba ya prueba el retriever contra corpus real, falta correr `recomendar_actividades` completo (con LLM real) contra ese corpus.
-- **Fase 4** (estado y slot filling, RF1/RF2): `estado.py` + `completar_slots`. Test con LLM mockeado.
-- **RF8** (clima + idioma/moneda): `tools/info_destino.py`, clima en vivo de Open-Meteo, idioma/moneda desde `paises.json`.
-- **RF6/RF7** (alojamiento y vuelos): Amadeus dado de baja, migrado a RapidAPI/Booking.com15 (D-05/D-06). `services/rapidapi/` + tools `buscar_alojamiento`/`buscar_vuelos`. **Verificado de punta a punta contra la base local y la API real**: destinos piloto precargados en `destino_externo` (Barcelona/Cancún para hoteles, Buenos Aires/Cancún para vuelos), `buscar_alojamiento("Barcelona", ...)` corrido de verdad devolvió 20 hoteles reales usando el cache (sin re-resolver destino). Fly Scraper reducido a `price-calendar` como dato complementario.
-
-69 tests unitarios (`pytest`) mockeados y en verde, más las verificaciones manuales reales de arriba. Lint (`ruff`) en verde. Venv local (`.venv`) armado porque esta máquina no tenía dependencias instaladas.
+101 tests unitarios (`pytest`) mockeados y en verde, más todas las verificaciones manuales reales de arriba. Lint (`ruff`) en verde. Venv local (`.venv`) armado porque esta máquina no tenía dependencias instaladas.
 
 Todo en la rama `fase/0-scaffolding`, pusheada a origin, todavía no mergeada a `main`.
 
-Falta para cerrar Fase 0 del todo: decidir con el equipo si se pasa a Supabase o se sigue en local por ahora, cargar los repository secrets de GitHub, y mergear a `main`.
+Falta para cerrar del todo: decidir con el equipo si se pasa a Supabase o se sigue en local por ahora, cargar los repository secrets de GitHub, confirmar el cierre de núcleo con el equipo, y mergear a `main`. Después de eso, extensiones (Fase 7: RF9 FAQ, RF10 gastos, retomar RF4 si hay tiempo).
 
 ## Fases cerradas
 
 - **Fase 1** (ingesta), 2026-09-10: los tres destinos piloto superan el mínimo de atractivos (20) con datos reales, OpenTripMap + curaduría manual verificada por búsqueda web para Cancún. Comercios queda fuera del criterio (RF4 es extensión, D-07).
-- **Fase 2** (vector store), 2026-09-10: los tres destinos cargados en `documento_rag` contra Postgres local con embeddings reales (`sentence-transformers`). Consulta semántica de prueba verificada a mano (ver Fase actual). **Pendiente de confirmación formal del usuario/equipo antes de considerarla cerrada en el sentido estricto de `plan-de-fases.md`**, pero el criterio técnico ya se cumplió.
+- **Fase 2** (vector store), 2026-09-10: los tres destinos cargados en `documento_rag` contra Postgres local con embeddings reales.
+- **Fase 3** (RF3), 2026-09-11: `recomendar_actividades` corrido con LLM y corpus reales.
+- **Fase 4** (RF1/RF2), 2026-09-11: `completar_slots` corrido con LLM real, dos turnos, sin repisar lo cargado.
+- **Fase 6** (RF5), 2026-09-11: `armar_plan` corrido contra corpus real, persistencia verificada.
+- **Fase 5** (RF11/RF12), 2026-09-11: orquestador (`agente.py`) verificado con conversación real de 6 turnos.
+
+**Pendiente de confirmación formal del usuario/equipo antes de considerar todo esto cerrado en el sentido estricto de `plan-de-fases.md`**, pero el criterio técnico de cada fase ya se cumplió.
 
 ## Decisiones tomadas
 
@@ -82,8 +82,11 @@ Decisiones tomadas en Fase 1 (arranque):
 ## Decisiones abiertas
 
 - **Fase 2:** `langchain_postgres.PGVector` contra tabla propia envuelta en un `BaseRetriever`. En la práctica ya se avanzó con la tabla propia (ver arriba) porque destrabó Fase 3 sin esperar; sigue abierto si el equipo prefiere migrar a `PGVector` antes de la defensa.
-- **Fase 5:** agente de tools plano contra LangGraph con nodos explícitos. Todavía no se escribió `agente.py`. Se decide cuando el flujo lo pida, no antes.
 - **CrewAI:** sólo si el usuario trae confirmación explícita del profesor. Por defecto, no.
+
+Decisiones tomadas en Fase 5:
+
+- Orquestador implementado como una decisión de LLM con salida estructurada (mismo patrón que `completar_slots`), no como agente de tools de LangChain con `bind_tools` ni como grafo de LangGraph. Más simple de testear y de explicar en la defensa; se documenta como punto de partida, migrar a LangGraph si el flujo crece (arquitectura.md ya lo prevé).
 
 ## Bloqueos
 
@@ -100,9 +103,10 @@ Decisiones tomadas en Fase 1 (arranque):
 4.b. ~~Decidir alcance de RF4/comercios~~ — resuelto, movido a extensión (D-07). Ya no bloquea Fase 1.
 5. ~~Completar la curaduría manual de atractivos de Cancún~~ — resuelto, 13 lugares reales verificados en `data/curated/cancun_atractivos.json`. Cancún llega a 20/20.
 6. ~~Cargar los vectores reales de los tres destinos~~ — resuelto, `scripts/cargar_destino.py` (nuevo) corrido contra Postgres local: Barcelona 43, Miami 77, Cancún 20 documentos en `documento_rag`. Retrieval semántico verificado a mano.
-7. **Correr Fase 3 (RF3, `recomendar_actividades`) y Fase 4 (slot filling) contra el corpus real y el LLM real**, no solo mocks — es lo que sigue para cerrar núcleo de punta a punta.
+7. ~~Correr Fase 3, Fase 4, Fase 6 (armar_plan) y Fase 5 (orquestador) contra el corpus y el LLM reales~~ — resuelto, ver "Fase actual". Núcleo completo verificado de punta a punta con una conversación real de 6 turnos.
 8. Cargar los repository secrets en GitHub y proteger `main` (checks `calidad`, `commits`, `secretos`).
-8. Confirmar con el usuario y mergear `fase/0-scaffolding` a `main`.
+9. Confirmar el cierre de núcleo con el usuario/equipo y mergear `fase/0-scaffolding` a `main`.
+10. Con el núcleo cerrado, pasar a extensiones (Fase 7): RF9 (FAQ) primero, RF10 (gastos) después, y retomar RF4 (comercios) solo si queda tiempo (D-07).
 
 ---
 
