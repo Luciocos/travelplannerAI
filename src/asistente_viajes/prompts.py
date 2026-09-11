@@ -19,9 +19,12 @@ Campos:
   Unidos") en vez de nombrar la ciudad, y esa descripción coincide
   claramente con uno solo de estos destinos, completá destino con el
   nombre de esa ciudad igual. Si no coincide claramente con ninguno, o
-  coincide con más de uno, dejá destino sin completar.
-- tipo_destino: tipo de destino buscado (por ejemplo: playa, ciudad, montaña, naturaleza).
-- intereses: lista de intereses o actividades (por ejemplo: historia, caminatas, gastronomía, compras).
+  coincide con más de uno, dejá destino sin completar. Esas
+  características de cada destino son solo para identificar a qué
+  ciudad se refiere una descripción regional, no son gustos del
+  usuario: nunca las copies en tipo_destino ni en intereses.
+- tipo_destino: tipo de destino buscado (por ejemplo: playa, ciudad, montaña, naturaleza), solo si el mensaje lo dice de forma explícita o implícita sobre lo que el usuario busca, nunca copiado de la lista de características de arriba.
+- intereses: lista de intereses o actividades (por ejemplo: historia, caminatas, gastronomía, compras), solo si el mensaje los menciona, nunca copiados de la lista de características de arriba.
 - presupuesto: nivel de presupuesto (bajo, medio, alto), si lo menciona.
 - fecha_inicio y fecha_fin: fechas del viaje, si las menciona.
 - cantidad_personas: cantidad de viajeros, si la menciona.
@@ -35,23 +38,28 @@ Sos un asistente de viajes que habla en español rioplatense neutro.
 Al usuario le falta completar estos datos de su viaje: {slots_faltantes}.
 {nota_destino_inferido}
 Generá una sola pregunta breve y natural para pedir como máximo estos datos
-(no más de dos por turno), sin sonar a formulario. No repreguntes nada que
-no esté en la lista.
+(no más de dos por turno), sin sonar a formulario. Tiene que leerse como
+una sola idea fluida, no como dos preguntas distintas pegadas con un
+punto. No repreguntes nada que no esté en la lista.
 """
 
 NOTA_CONFIRMAR_DESTINO_INFERIDO = """\
-Además: el usuario no nombró la ciudad, pero describió algo que coincide
-con {destino}. Antes de seguir, incluí en la misma pregunta una
-confirmación breve tipo "¿te referís a {destino}?", para no asumirlo sin
-chequear.
+Además, el usuario no nombró la ciudad, pero describió algo que coincide
+con {destino}. Arrancá la respuesta dando por hecho ese destino de forma
+natural y copada (por ejemplo "dale, {destino} entonces" o similar), y
+dejá una salida breve tipo "avisame si no es así" para que pueda
+corregirte, en vez de abrir con una pregunta de sí o no separada. Todo
+esto tiene que integrarse en una sola oración fluida junto con lo que
+falta preguntar, no como dos pensamientos pegados.
 """
 
 PROMPT_CONFIRMAR_DESTINO_INFERIDO = """\
 Sos un asistente de viajes que habla en español rioplatense neutro. El
 usuario no nombró una ciudad, pero describió algo que coincide con
 {destino}. Ya tenés todos los demás datos del viaje. Generá una sola
-pregunta breve confirmando si el destino es {destino}, sin agregar nada
-más.
+frase breve y natural dando por hecho ese destino (por ejemplo "dale,
+{destino} entonces") y dejando una salida corta tipo "avisame si no es
+así" para que pueda corregirte, sin agregar nada más.
 """
 
 PROMPT_DECIDIR_ACCION = """\

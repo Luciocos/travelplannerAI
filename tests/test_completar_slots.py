@@ -36,6 +36,19 @@ def test_completar_slots_fusiona_y_pregunta_lo_que_falta() -> None:
     rotador.con_salida_estructurada.assert_called_once_with(PreferenciasViaje)
 
 
+def test_prompt_extraccion_aclara_que_caracteristicas_no_son_gustos_del_usuario() -> None:
+    """Regresion: el LLM real llego a copiar las caracteristicas del
+    destino inferido (dadas solo para identificar la ciudad) como si
+    fueran tipo_destino/intereses del usuario, violando 'nada inventado'
+    (restriccion 5). El prompt tiene que dejarlo explicito."""
+    rotador = _rotador_falso(PreferenciasViaje())
+
+    completar_slots(rotador, "quiero ir de viaje 7 dias a europa", PreferenciasViaje())
+
+    prompt_enviado = rotador.con_salida_estructurada.return_value.invoke.call_args.args[0]
+    assert "nunca las copies en tipo_destino ni en intereses" in prompt_enviado
+
+
 def test_completar_slots_no_pisa_lo_ya_cargado() -> None:
     estado_actual = PreferenciasViaje(destino="Miami")
     extraidos = PreferenciasViaje(cantidad_personas=2)
