@@ -46,11 +46,9 @@ def _inicializar_estado() -> None:
         st.session_state.historial = []
 
 
-def _enviar(mensaje: str) -> None:
-    st.session_state.historial.append({"rol": "user", "contenido": mensaje})
+def _responder(mensaje: str) -> str:
     with obtener_conexion() as conexion:
-        respuesta = procesar_mensaje(conexion, _rotador(), st.session_state.sesion, mensaje)
-    st.session_state.historial.append({"rol": "assistant", "contenido": respuesta})
+        return procesar_mensaje(conexion, _rotador(), st.session_state.sesion, mensaje)
 
 
 def main() -> None:
@@ -65,22 +63,30 @@ def main() -> None:
 
     _inicializar_estado()
 
+    mensaje_de_boton = None
     with st.sidebar:
         st.subheader("Para arrancar")
         st.caption("Estos botones mandan el mismo texto que escribirías a mano: el orquestador sigue decidiendo solo qué tool usar (RF12).")
         for opcion in OPCIONES_PREDEFINIDAS:
             if st.button(opcion, use_container_width=True, key=opcion):
-                _enviar(opcion)
-                st.rerun()
+                mensaje_de_boton = opcion
 
     for turno in st.session_state.historial:
         with st.chat_message(turno["rol"]):
             st.markdown(turno["contenido"])
 
-    mensaje = st.chat_input("Escribí tu mensaje...")
+    mensaje_escrito = st.chat_input("Escribí tu mensaje...")
+    mensaje = mensaje_de_boton or mensaje_escrito
+
     if mensaje:
-        _enviar(mensaje)
-        st.rerun()
+        st.session_state.historial.append({"rol": "user", "contenido": mensaje})
+        with st.chat_message("user"):
+            st.markdown(mensaje)
+        with st.chat_message("assistant"):
+            with st.spinner("Pensando... (puede tardar, la cuota gratis de Gemini a veces anda lenta)"):
+                respuesta = _responder(mensaje)
+            st.markdown(respuesta)
+        st.session_state.historial.append({"rol": "assistant", "contenido": respuesta})
 
 
 if __name__ == "__main__":
