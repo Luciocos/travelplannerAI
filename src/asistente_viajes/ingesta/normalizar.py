@@ -8,14 +8,26 @@ para poder embeberlo, eso violaria la restriccion de datos no inventados.
 
 from __future__ import annotations
 
+import re
 from typing import Literal
 
 from pydantic import BaseModel
+
+from asistente_viajes.texto import normalizar
 
 LONGITUD_MINIMA_TEXTO = 200
 
 CATEGORIAS_ATRACTIVOS = {"historic", "museums", "natural", "cultural", "architecture"}
 CATEGORIAS_COMERCIOS = {"foods", "shops", "marketplaces"}
+
+# Kinds que OpenTripMap mete bajo "architecture"/"interesting_places" pero que
+# no son atractivos turisticos reales: torres de departamentos, oficinas y
+# hoteles (ver P-08 en DIFICULTADES.md, hallado con el corpus real de Miami:
+# 49 de 75 "atractivos" eran edificios residenciales sin nada que visitar).
+# Se descarta por el kind PRIMARIO (el primero de la lista, el que pasa a
+# `categoria`), no por interseccion: un lugar realmente historico puede tener
+# "architecture" como kind secundario sin ser, en sí, una torre generica.
+CATEGORIAS_EXCLUIDAS_COMO_PRIMARIO = {"skyscrapers", "other_buildings", "resorts", "accomodations"}
 
 TipoCorpus = Literal["atractivos", "comercios", "faq"]
 
@@ -53,8 +65,13 @@ def _extraer_texto(detalle: dict) -> str:
 
 def normalizar_poi_opentripmap(detalle: dict, destino: str) -> DocumentoCorpus | None:
     """POI crudo de OpenTripMap -> DocumentoCorpus, o None si no alcanza
-    la longitud minima de texto o no matchea ningun corpus conocido."""
+    la longitud minima de texto, no matchea ningun corpus conocido, o su
+    kind primario esta en CATEGORIAS_EXCLUIDAS_COMO_PRIMARIO (torres de
+    departamentos, hoteles, ver P-08)."""
     kinds = detalle.get("kinds", "")
+    if kinds.split(",")[0] in CATEGORIAS_EXCLUIDAS_COMO_PRIMARIO:
+        return None
+
     corpus = _corpus_por_kinds(kinds)
     if corpus is None:
         return None
@@ -87,10 +104,45 @@ def normalizar_poi_opentripmap(detalle: dict, destino: str) -> DocumentoCorpus |
     )
 
 
+def deduplicar_documentos(documentos: list[DocumentoCorpus]) -> list[DocumentoCorpus]:
+    """Descarta duplicados por (corpus, destino, nombre normalizado),
+    quedandose con el texto mas largo de cada grupo (ver P-08: Barcelona
+    tenia "Font ornamental del passeig de Gracia" 3 veces, con distinto xid
+    de OpenTripMap para el mismo lugar). Documentos sin nombre nunca se
+    consideran duplicados entre si."""
+    mejores: dict[tuple[str, str, str], DocumentoCorpus] = {}
+    sin_nombre: list[DocumentoCorpus] = []
+
+    for documento in documentos:
+        if not documento.nombre:
+            sin_nombre.append(documento)
+            continue
+        clave = (documento.corpus, normalizar(documento.destino), normalizar(documento.nombre))
+        actual = mejores.get(clave)
+        if actual is None or len(documento.texto) > len(actual.texto):
+            mejores[clave] = documento
+
+    return list(mejores.values()) + sin_nombre
+
+
+def _slug_curado(corpus: str, destino: str, nombre: str) -> str:
+    """xid deterministico para un registro curado, a partir de
+    corpus+destino+nombre. Hace que cargar_documentos (upsert por xid) sea
+    idempotente: re-correr la carga actualiza el mismo registro en vez de
+    insertar un duplicado (ver P-08 en DIFICULTADES.md)."""
+    partes = f"{corpus}-{destino}-{nombre}"
+    return "curado-" + re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", normalizar(partes))).strip("-")
+
+
 def normalizar_curado(registro: dict) -> DocumentoCorpus:
     """Registro completado a mano en data/curated/ -> DocumentoCorpus.
     No pasa por el filtro de longitud minima: se asume que quien lo carga
-    a mano ya escribio un texto util. fuente queda fija en 'curado'."""
+    a mano ya escribio un texto util. fuente queda fija en 'curado'. Si el
+    registro no trae xid propio, se genera uno deterministico (ver
+    _slug_curado) para que la carga sea idempotente."""
+    xid = registro.get("xid") or _slug_curado(
+        registro["corpus"], registro["destino"], registro.get("nombre") or registro["texto"][:50]
+    )
     return DocumentoCorpus(
         corpus=registro["corpus"],
         destino=registro["destino"],
@@ -102,5 +154,5 @@ def normalizar_curado(registro: dict) -> DocumentoCorpus:
         lat=registro.get("lat"),
         lon=registro.get("lon"),
         fuente="curado",
-        xid=registro.get("xid"),
+        xid=xid,
     )

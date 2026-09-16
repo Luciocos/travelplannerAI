@@ -15,6 +15,7 @@ from pathlib import Path
 from asistente_viajes.ingesta.cargar_vectores import cargar_documentos
 from asistente_viajes.ingesta.normalizar import (
     DocumentoCorpus,
+    deduplicar_documentos,
     normalizar_curado,
     normalizar_poi_opentripmap,
 )
@@ -49,14 +50,26 @@ def _documentos_curados(destino: str, directorio_curated: Path) -> list[Document
     return documentos
 
 
+def documentos_de_destino(
+    destino: str,
+    directorio_raw: Path = DIRECTORIO_RAW,
+    directorio_curated: Path = DIRECTORIO_CURATED,
+) -> list[DocumentoCorpus]:
+    """OpenTripMap + curados de un destino, deduplicados por nombre (ver
+    P-08 en DIFICULTADES.md). Punto unico que reusa tambien
+    scripts/cargar_todos.py."""
+    documentos = _documentos_de_opentripmap(destino, directorio_raw) + _documentos_curados(
+        destino, directorio_curated
+    )
+    return deduplicar_documentos(documentos)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--destino", required=True)
     argumentos = parser.parse_args()
 
-    documentos = _documentos_de_opentripmap(
-        argumentos.destino, DIRECTORIO_RAW
-    ) + _documentos_curados(argumentos.destino, DIRECTORIO_CURATED)
+    documentos = documentos_de_destino(argumentos.destino, DIRECTORIO_RAW, DIRECTORIO_CURATED)
 
     if not documentos:
         logger.error("no hay documentos para cargar para %s", argumentos.destino)
