@@ -17,9 +17,6 @@ load_dotenv()
 
 _PATRON_CLAVE_GEMINI = re.compile(r"^GEMINI_API_KEY_(\d+)$")
 
-# Destinos piloto habilitados para esta entrega. Ver estado.md de la skill.
-DESTINOS_HABILITADOS: list[str] = ["Europa", "Miami", "Caribe"]
-
 
 class ConfiguracionInvalida(RuntimeError):
     """Falta una variable de entorno requerida o esta mal formada."""
