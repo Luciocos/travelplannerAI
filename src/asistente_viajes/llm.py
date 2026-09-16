@@ -36,7 +36,13 @@ class _EstadoClave:
 
 def _es_error_cuota(error: Exception) -> bool:
     texto = str(error).lower()
-    return "429" in texto or "quota" in texto or "resource_exhausted" in texto
+    return (
+        "429" in texto
+        or "quota" in texto
+        or "resource_exhausted" in texto
+        or "503" in texto
+        or "unavailable" in texto
+    )
 
 
 def _es_limite_diario(error: Exception) -> bool:
@@ -171,11 +177,25 @@ def contenido_texto(respuesta: object) -> str:
     return str(contenido).strip()
 
 
+TIMEOUT_SEGUNDOS_LLM = 30
+MAX_REINTENTOS_SDK = 1
+
+
 def crear_rotador(configuracion: Configuracion | None = None) -> RotadorClavesGemini:
-    """Factory principal. Usa la configuracion cargada de .env si no se pasa una."""
+    """Factory principal. Usa la configuracion cargada de .env si no se pasa una.
+
+    max_retries=1 y timeout bajo son deliberados (P-06 en DIFICULTADES.md):
+    el SDK de google-genai reintenta un 429/503 con backoff exponencial
+    propio (~1+2+4+8+16s) ANTES de que la excepcion llegue al rotador, asi
+    que una key agotada tardaba hasta 42s en vez de fallar rapido y rotar.
+    Con max_retries=1 el rotador es el unico que reintenta, y lo hace
+    rotando de key (barato) en vez de reintentando la misma (caro)."""
     configuracion = configuracion or cargar_configuracion()
     if configuracion.llm_provider != "gemini":
         raise ValueError(f"Proveedor no soportado: {configuracion.llm_provider}")
     return RotadorClavesGemini(
-        claves=configuracion.claves_gemini, modelo=configuracion.gemini_model
+        claves=configuracion.claves_gemini,
+        modelo=configuracion.gemini_model,
+        max_retries=MAX_REINTENTOS_SDK,
+        timeout=TIMEOUT_SEGUNDOS_LLM,
     )
