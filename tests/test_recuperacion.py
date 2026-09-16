@@ -27,13 +27,25 @@ def _conexion_falsa(filas: list[tuple]) -> MagicMock:
 
 
 def test_buscar_filtra_por_corpus_y_destino_y_devuelve_resultados() -> None:
-    fila = ("Museo de Arqueologia", "museums", "texto largo sobre el museo", None, None)
+    fila = (
+        1,
+        "Museo de Arqueologia",
+        "museums",
+        "texto largo sobre el museo",
+        None,
+        None,
+        -24.7,
+        -65.4,
+    )
     conexion = _conexion_falsa([fila])
 
     resultados = _consulta.buscar(conexion, corpus="atractivos", destino="Salta", consulta="museos")
 
     assert len(resultados) == 1
     assert resultados[0].nombre == "Museo de Arqueologia"
+    assert resultados[0].id == 1
+    assert resultados[0].lat == -24.7
+    assert resultados[0].lon == -65.4
 
     cursor_usado = conexion.cursor.return_value.__enter__.return_value
     parametros_enviados = cursor_usado.execute.call_args.args[1]

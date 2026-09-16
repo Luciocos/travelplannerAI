@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from asistente_viajes.embeddings import embeber_texto
 
 SQL_CONSULTA_CANONICA = """
-SELECT nombre, categoria, texto, direccion, rango_precio
+SELECT id, nombre, categoria, texto, direccion, rango_precio, lat, lon
 FROM documento_rag
 WHERE corpus = %(corpus)s AND lower(unaccent(destino)) = lower(unaccent(%(destino)s))
 ORDER BY embedding <=> %(consulta)s::vector
@@ -20,11 +20,14 @@ LIMIT %(k)s;
 
 
 class ResultadoRecuperado(BaseModel):
+    id: int | None = None
     nombre: str | None = None
     categoria: str | None = None
     texto: str
     direccion: str | None = None
     rango_precio: str | None = None
+    lat: float | None = None
+    lon: float | None = None
 
 
 def buscar(
@@ -46,5 +49,5 @@ def buscar(
         )
         filas = cursor.fetchall()
 
-    columnas = ["nombre", "categoria", "texto", "direccion", "rango_precio"]
+    columnas = ["id", "nombre", "categoria", "texto", "direccion", "rango_precio", "lat", "lon"]
     return [ResultadoRecuperado(**dict(zip(columnas, fila, strict=True))) for fila in filas]
