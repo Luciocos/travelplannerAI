@@ -53,7 +53,7 @@ def _responder(mensaje: str) -> str:
 
 def main() -> None:
     st.title("🧳 Asistente de viajes")
-    st.caption("Destinos piloto: Barcelona, Miami o Cancún. Contame qué viaje estás buscando.")
+    st.caption("Destinos piloto: Barcelona, Miami o Cancún. Cuénteme qué viaje está buscando.")
 
     try:
         _rotador()
@@ -75,7 +75,7 @@ def main() -> None:
         with st.chat_message(turno["rol"]):
             st.markdown(turno["contenido"])
 
-    mensaje_escrito = st.chat_input("Escribí tu mensaje...")
+    mensaje_escrito = st.chat_input("Escriba su mensaje...")
     mensaje = mensaje_de_boton or mensaje_escrito
 
     if mensaje:

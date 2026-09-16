@@ -142,14 +142,14 @@ def _resumen_plan(plan: PlanDeViaje) -> str:
 
 def _resumen_actividades(actividades: list[ActividadRecomendada]) -> str:
     if not actividades:
-        return "No encontré actividades para recomendarte con esos intereses en este destino."
+        return "No encontré actividades para recomendarle con esos intereses en este destino."
     lineas = [f"- **{a.nombre}**: {a.justificacion}" for a in actividades]
     return "\n".join(lineas)
 
 
 def _resumen_locales(locales: list[LocalRecomendado]) -> str:
     if not locales:
-        return "No encontré locales para recomendarte con esa consulta en este destino."
+        return "No encontré locales para recomendarle con esa consulta en este destino."
     lineas = [f"- **{local.nombre}**: {local.justificacion}" for local in locales]
     return "\n".join(lineas)
 
@@ -177,7 +177,7 @@ def procesar_mensaje(
 
     if accion == "completar_slots":
         sesion.estado, pregunta = completar_slots(rotador, mensaje, sesion.estado)
-        respuesta = pregunta or "Ya tengo todo lo que necesito para armar tu viaje."
+        respuesta = pregunta or "Ya tengo todo lo que necesito para armar su viaje."
     elif accion == "armar_plan":
         plan = armar_plan(conexion, sesion.estado)
         guardar_itinerario(conexion, sesion.estado, plan)

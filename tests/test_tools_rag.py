@@ -39,7 +39,7 @@ def test_recomendar_actividades_justifica_solo_con_el_texto_recuperado(
 
     prompt_enviado = rotador.invocar.call_args.args[0]
     assert "Texto real recuperado del corpus." in prompt_enviado
-    assert "no agregues datos" in prompt_enviado.lower()
+    assert "no agregue datos" in prompt_enviado.lower()
 
 
 def test_recomendar_locales_incluye_direccion_y_precio(monkeypatch) -> None:
@@ -101,7 +101,7 @@ def test_responder_faq_viajero_responde_solo_con_el_texto_recuperado(monkeypatch
 
     prompt_enviado = rotador.invocar.call_args.args[0]
     assert "Texto real del corpus de FAQ." in prompt_enviado
-    assert "no agregues datos" in prompt_enviado.lower()
+    assert "no agregue datos" in prompt_enviado.lower()
 
 
 def test_tool_responder_faq_viajero_tiene_docstring_y_args_schema() -> None:
