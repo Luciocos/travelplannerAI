@@ -77,7 +77,9 @@ def _destino_fue_inferido(mensaje: str, destino: str) -> bool:
 
 
 def _generar_pregunta(
-    rotador: RotadorClavesGemini, slots_a_preguntar: list[str], destino_a_confirmar: str | None = None
+    rotador: RotadorClavesGemini,
+    slots_a_preguntar: list[str],
+    destino_a_confirmar: str | None = None,
 ) -> str:
     nombres = ", ".join(NOMBRES_LEGIBLES_SLOTS[slot] for slot in slots_a_preguntar)
     nota = (
@@ -85,7 +87,9 @@ def _generar_pregunta(
         if destino_a_confirmar
         else ""
     )
-    prompt = PROMPT_PREGUNTAR_SLOTS_FALTANTES.format(slots_faltantes=nombres, nota_destino_inferido=nota)
+    prompt = PROMPT_PREGUNTAR_SLOTS_FALTANTES.format(
+        slots_faltantes=nombres, nota_destino_inferido=nota
+    )
     respuesta = rotador.invocar(prompt)
     return contenido_texto(respuesta)
 

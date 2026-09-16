@@ -46,7 +46,9 @@ def test_decidir_accion_propaga_cantidad_resultados_pedida() -> None:
 def test_procesar_mensaje_completar_slots_actualiza_la_sesion(monkeypatch) -> None:
     rotador = _rotador_con_decision("completar_slots")
     nuevo_estado = PreferenciasViaje(destino="Cancun")
-    monkeypatch.setattr(mod, "completar_slots", lambda *_, **__: (nuevo_estado, "¿Qué tipo de destino buscás?"))
+    monkeypatch.setattr(
+        mod, "completar_slots", lambda *_, **__: (nuevo_estado, "¿Qué tipo de destino buscás?")
+    )
 
     sesion = mod.SesionAgente()
     respuesta = mod.procesar_mensaje(MagicMock(), rotador, sesion, "quiero ir a Cancun")
@@ -59,7 +61,15 @@ def test_procesar_mensaje_armar_plan_llama_a_la_tool_y_persiste(monkeypatch) -> 
     rotador = _rotador_con_decision("armar_plan")
     plan = PlanDeViaje(
         destino="Cancun",
-        dias=[DiaDelPlan(dia=1, actividades=[ActividadDelPlan(nombre="Museo", categoria="museums", costo_estimado=10.0)], costo_dia=10.0)],
+        dias=[
+            DiaDelPlan(
+                dia=1,
+                actividades=[
+                    ActividadDelPlan(nombre="Museo", categoria="museums", costo_estimado=10.0)
+                ],
+                costo_dia=10.0,
+            )
+        ],
         costo_total_estimado=10.0,
         cantidad_personas=1,
         costo_total_grupo=10.0,
@@ -78,7 +88,9 @@ def test_procesar_mensaje_armar_plan_llama_a_la_tool_y_persiste(monkeypatch) -> 
 
 def test_procesar_mensaje_recomendar_actividades(monkeypatch) -> None:
     rotador = _rotador_con_decision("recomendar_actividades")
-    actividad = ActividadRecomendada(nombre="El Meco", categoria="historic", justificacion="Es un sitio maya real.")
+    actividad = ActividadRecomendada(
+        nombre="El Meco", categoria="historic", justificacion="Es un sitio maya real."
+    )
     llamada = MagicMock(return_value=[actividad])
     monkeypatch.setattr(mod, "recomendar_actividades", llamada)
 
@@ -105,7 +117,13 @@ def test_procesar_mensaje_recomendar_locales(monkeypatch) -> None:
     rotador = _rotador_con_decision("recomendar_locales")
     from asistente_viajes.tools.recomendar_locales import LocalRecomendado
 
-    local = LocalRecomendado(nombre="Mercado 28", categoria="shops", direccion=None, rango_precio="$$", justificacion="Vende artesanias tipicas.")
+    local = LocalRecomendado(
+        nombre="Mercado 28",
+        categoria="shops",
+        direccion=None,
+        rango_precio="$$",
+        justificacion="Vende artesanias tipicas.",
+    )
     llamada = MagicMock(return_value=[local])
     monkeypatch.setattr(mod, "recomendar_locales", llamada)
 
@@ -134,7 +152,11 @@ def test_procesar_mensaje_responder_faq_viajero(monkeypatch) -> None:
 
 
 def test_coordenadas_destino_conocido(monkeypatch) -> None:
-    monkeypatch.setattr(mod, "buscar_destino_piloto", lambda destino: ("Cancun", {"pais": "Mexico", "lat": 21.1, "lon": -86.8}))
+    monkeypatch.setattr(
+        mod,
+        "buscar_destino_piloto",
+        lambda destino: ("Cancun", {"pais": "Mexico", "lat": 21.1, "lon": -86.8}),
+    )
 
     assert mod._coordenadas_destino("Cancun") == {"pais": "Mexico", "lat": 21.1, "lon": -86.8}
 
@@ -154,11 +176,15 @@ def _info_destino_falsa() -> InfoDestino:
 
 
 def test_disparar_info_destino_se_dispara_una_sola_vez(monkeypatch) -> None:
-    monkeypatch.setattr(mod, "_coordenadas_destino", lambda destino: {"pais": "Mexico", "lat": 21.1, "lon": -86.8})
+    monkeypatch.setattr(
+        mod, "_coordenadas_destino", lambda destino: {"pais": "Mexico", "lat": 21.1, "lon": -86.8}
+    )
     monkeypatch.setattr(mod, "info_destino", lambda **_: _info_destino_falsa())
 
     sesion = mod.SesionAgente(
-        estado=PreferenciasViaje(destino="Cancun", fecha_inicio=date(2026, 11, 1), fecha_fin=date(2026, 11, 3))
+        estado=PreferenciasViaje(
+            destino="Cancun", fecha_inicio=date(2026, 11, 1), fecha_fin=date(2026, 11, 3)
+        )
     )
 
     primera = mod._disparar_info_destino_si_corresponde(sesion)
@@ -170,7 +196,9 @@ def test_disparar_info_destino_se_dispara_una_sola_vez(monkeypatch) -> None:
 
 
 def test_disparar_info_destino_no_dispara_sin_fechas(monkeypatch) -> None:
-    monkeypatch.setattr(mod, "_coordenadas_destino", lambda destino: {"pais": "Mexico", "lat": 21.1, "lon": -86.8})
+    monkeypatch.setattr(
+        mod, "_coordenadas_destino", lambda destino: {"pais": "Mexico", "lat": 21.1, "lon": -86.8}
+    )
 
     sesion = mod.SesionAgente(estado=PreferenciasViaje(destino="Cancun"))
 
@@ -182,7 +210,9 @@ def test_disparar_info_destino_no_dispara_si_destino_desconocido(monkeypatch) ->
     monkeypatch.setattr(mod, "_coordenadas_destino", lambda destino: None)
 
     sesion = mod.SesionAgente(
-        estado=PreferenciasViaje(destino="Narnia", fecha_inicio=date(2026, 11, 1), fecha_fin=date(2026, 11, 3))
+        estado=PreferenciasViaje(
+            destino="Narnia", fecha_inicio=date(2026, 11, 1), fecha_fin=date(2026, 11, 3)
+        )
     )
 
     assert mod._disparar_info_destino_si_corresponde(sesion) is None
@@ -194,11 +224,15 @@ def test_procesar_mensaje_incluye_info_destino_cuando_se_confirma(monkeypatch) -
         destino="Cancun", fecha_inicio=date(2026, 11, 1), fecha_fin=date(2026, 11, 3)
     )
     monkeypatch.setattr(mod, "completar_slots", lambda *_, **__: (nuevo_estado, None))
-    monkeypatch.setattr(mod, "_coordenadas_destino", lambda destino: {"pais": "Mexico", "lat": 21.1, "lon": -86.8})
+    monkeypatch.setattr(
+        mod, "_coordenadas_destino", lambda destino: {"pais": "Mexico", "lat": 21.1, "lon": -86.8}
+    )
     monkeypatch.setattr(mod, "info_destino", lambda **_: _info_destino_falsa())
 
     sesion = mod.SesionAgente()
-    respuesta = mod.procesar_mensaje(MagicMock(), rotador, sesion, "viajamos del 1 al 3 de noviembre a Cancun")
+    respuesta = mod.procesar_mensaje(
+        MagicMock(), rotador, sesion, "viajamos del 1 al 3 de noviembre a Cancun"
+    )
 
     assert "Pronostico en vivo" in respuesta
     assert "espanol" in respuesta

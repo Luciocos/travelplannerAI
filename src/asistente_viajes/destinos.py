@@ -12,7 +12,9 @@ from pathlib import Path
 
 from asistente_viajes.texto import normalizar
 
-RUTA_DESTINOS = Path(__file__).resolve().parent.parent.parent / "data" / "reference" / "destinos.json"
+RUTA_DESTINOS = (
+    Path(__file__).resolve().parent.parent.parent / "data" / "reference" / "destinos.json"
+)
 
 
 def cargar_destinos_piloto(ruta: Path = RUTA_DESTINOS) -> dict[str, dict]:

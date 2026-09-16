@@ -18,7 +18,9 @@ import pytest
 _PATRONES_A_LIMPIAR = [
     re.compile(r"^GEMINI_API_KEY(_\d+)?$"),
     re.compile(r"^RAPIDAPI_"),
-    re.compile(r"^(LLM_PROVIDER|GEMINI_MODEL|GROQ_API_KEY|OPENTRIPMAP_API_KEY|DATABASE_URL|USE_FIXTURES)$"),
+    re.compile(
+        r"^(LLM_PROVIDER|GEMINI_MODEL|GROQ_API_KEY|OPENTRIPMAP_API_KEY|DATABASE_URL|USE_FIXTURES)$"
+    ),
 ]
 
 

@@ -78,7 +78,9 @@ class SesionAgente:
     info_destino_disparada: bool = False
 
 
-def _decidir_accion(rotador: RotadorClavesGemini, mensaje: str, estado: PreferenciasViaje) -> DecisionAccion:
+def _decidir_accion(
+    rotador: RotadorClavesGemini, mensaje: str, estado: PreferenciasViaje
+) -> DecisionAccion:
     """RF12: la decision de que tool usar, y con que parametros de
     refinamiento, es siempre del orquestador, nunca del usuario. Los
     parametros que ya son estado validado (destino, fechas, intereses)
@@ -114,7 +116,9 @@ def _disparar_info_destino_si_corresponde(sesion: SesionAgente) -> InfoDestino |
 
     coordenadas = _coordenadas_destino(estado.destino)
     if coordenadas is None:
-        logger.warning("destino '%s' sin coordenadas de referencia, no se dispara info_destino", estado.destino)
+        logger.warning(
+            "destino '%s' sin coordenadas de referencia, no se dispara info_destino", estado.destino
+        )
         return None
 
     sesion.info_destino_disparada = True
@@ -191,7 +195,9 @@ def procesar_mensaje(
         locales = recomendar_locales(conexion, rotador, sesion.estado.destino, mensaje, k=k)
         respuesta = _resumen_locales(locales)
     else:  # responder_faq_viajero
-        respuestas_faq = responder_faq_viajero(conexion, rotador, sesion.estado.destino, mensaje, k=k)
+        respuestas_faq = responder_faq_viajero(
+            conexion, rotador, sesion.estado.destino, mensaje, k=k
+        )
         respuesta = _resumen_faq(respuestas_faq)
 
     info = _disparar_info_destino_si_corresponde(sesion)

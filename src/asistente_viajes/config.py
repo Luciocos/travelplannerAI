@@ -75,7 +75,9 @@ def cargar_configuracion() -> Configuracion:
         database_url=_variable_requerida("DATABASE_URL"),
         opentripmap_api_key=os.environ.get("OPENTRIPMAP_API_KEY") or None,
         rapidapi_key=os.environ.get("RAPIDAPI_KEY") or None,
-        rapidapi_host_booking=os.environ.get("RAPIDAPI_HOST_BOOKING", "booking-com15.p.rapidapi.com"),
+        rapidapi_host_booking=os.environ.get(
+            "RAPIDAPI_HOST_BOOKING", "booking-com15.p.rapidapi.com"
+        ),
         rapidapi_host_fly_scraper=os.environ.get(
             "RAPIDAPI_HOST_FLY_SCRAPER", "fly-scraper.p.rapidapi.com"
         ),

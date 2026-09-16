@@ -105,7 +105,9 @@ def test_guardar_itinerario_inserta_cabecera_y_items() -> None:
         dias=[
             mod.DiaDelPlan(
                 dia=1,
-                actividades=[mod.ActividadDelPlan(nombre="Museo", categoria="museums", costo_estimado=10.0)],
+                actividades=[
+                    mod.ActividadDelPlan(nombre="Museo", categoria="museums", costo_estimado=10.0)
+                ],
                 costo_dia=10.0,
             )
         ],
@@ -114,7 +116,10 @@ def test_guardar_itinerario_inserta_cabecera_y_items() -> None:
         costo_total_grupo=20.0,
     )
     estado = PreferenciasViaje(
-        destino="Cancun", fecha_inicio=date(2026, 10, 15), fecha_fin=date(2026, 10, 15), presupuesto="medio"
+        destino="Cancun",
+        fecha_inicio=date(2026, 10, 15),
+        fecha_fin=date(2026, 10, 15),
+        presupuesto="medio",
     )
 
     itinerario_id = mod.guardar_itinerario(conexion, estado, plan)

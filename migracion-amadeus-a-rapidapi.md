@@ -99,29 +99,31 @@ Este es el punto clave del diseño: **la forma cruda de cada API no puede llegar
 
 ```python
 class DestinoResuelto:
-    proveedor: str          # "booking" | "fly_scraper"
-    texto_consultado: str   # "Buenos Aires"
-    id_externo: str         # dest_id (Booking) | entityId (Fly Scraper)
-    tipo: str | None        # search_type en Booking: "CITY", "REGION", "district"...
+    proveedor: str  # "booking" | "fly_scraper"
+    texto_consultado: str  # "Buenos Aires"
+    id_externo: str  # dest_id (Booking) | entityId (Fly Scraper)
+    tipo: str | None  # search_type en Booking: "CITY", "REGION", "district"...
     nombre: str
     pais: str | None
     lat: float | None
     lon: float | None
 
+
 class Alojamiento:
     nombre: str
     precio_total: float | None
     moneda: str | None
-    puntaje: float | None       # escala 0-10
+    puntaje: float | None  # escala 0-10
     cantidad_resenias: int | None
     direccion: str | None
     url_imagen: str | None
     proveedor: str
 
+
 class OpcionVuelo:
-    origen: str                 # IATA
-    destino: str                # IATA
-    fecha_salida: str           # ISO
+    origen: str  # IATA
+    destino: str  # IATA
+    fecha_salida: str  # ISO
     fecha_regreso: str | None
     precio_total: float | None
     moneda: str | None

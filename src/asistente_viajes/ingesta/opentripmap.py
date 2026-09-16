@@ -108,7 +108,9 @@ def ingerir_destino(
     ruta_detalles = _ruta_cruda(directorio_raw, destino, "detalles")
 
     try:
-        lista = buscar_por_radio(api_key, lat, lon, radio_metros, kinds=kinds, limite=limite, rate=rate)
+        lista = buscar_por_radio(
+            api_key, lat, lon, radio_metros, kinds=kinds, limite=limite, rate=rate
+        )
         ruta_lista.write_text(json.dumps(lista, ensure_ascii=False, indent=2), encoding="utf-8")
     except ErrorOpenTripMap as error:
         logger.warning(

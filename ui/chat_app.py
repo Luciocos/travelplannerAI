@@ -66,7 +66,9 @@ def main() -> None:
     mensaje_de_boton = None
     with st.sidebar:
         st.subheader("Para arrancar")
-        st.caption("Estos botones mandan el mismo texto que escribirías a mano: el orquestador sigue decidiendo solo qué tool usar (RF12).")
+        st.caption(
+            "Estos botones mandan el mismo texto que escribirías a mano: el orquestador sigue decidiendo solo qué tool usar (RF12)."
+        )
         for opcion in OPCIONES_PREDEFINIDAS:
             if st.button(opcion, use_container_width=True, key=opcion):
                 mensaje_de_boton = opcion
@@ -83,7 +85,9 @@ def main() -> None:
         with st.chat_message("user"):
             st.markdown(mensaje)
         with st.chat_message("assistant"):
-            with st.spinner("Pensando... (puede tardar, la cuota gratis de Gemini a veces anda lenta)"):
+            with st.spinner(
+                "Pensando... (puede tardar, la cuota gratis de Gemini a veces anda lenta)"
+            ):
                 respuesta = _responder(mensaje)
             st.markdown(respuesta)
         st.session_state.historial.append({"rol": "assistant", "contenido": respuesta})

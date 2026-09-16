@@ -133,7 +133,13 @@ def llamar(
         )
         return leer_fixture(proveedor, endpoint)
     if cuota and usadas >= cuota * UMBRAL_ALERTA_CUOTA:
-        logger.warning("cuota de %s al %s%% o mas (%s/%s)", proveedor, int(UMBRAL_ALERTA_CUOTA * 100), usadas, cuota)
+        logger.warning(
+            "cuota de %s al %s%% o mas (%s/%s)",
+            proveedor,
+            int(UMBRAL_ALERTA_CUOTA * 100),
+            usadas,
+            cuota,
+        )
 
     url = f"https://{host}/{endpoint.lstrip('/')}"
     headers = {"x-rapidapi-key": configuracion.rapidapi_key or "", "x-rapidapi-host": host}
@@ -166,7 +172,9 @@ def llamar(
         _dormir(2**intento)
 
     if respuesta.status_code == 429:
-        logger.warning("429 persistente de %s tras %s intentos, cuota agotada", proveedor, intento + 1)
+        logger.warning(
+            "429 persistente de %s tras %s intentos, cuota agotada", proveedor, intento + 1
+        )
         raise ErrorCuotaAgotada(f"{proveedor} {endpoint}: 429 tras reintentos")
 
     if respuesta.status_code >= 400:

@@ -19,15 +19,15 @@ def test_contenido_texto_con_string_plano() -> None:
 
 
 def test_contenido_texto_con_lista_de_bloques() -> None:
-    respuesta = MagicMock(
-        content=[{"type": "text", "text": "hola", "extras": {"signature": "x"}}]
-    )
+    respuesta = MagicMock(content=[{"type": "text", "text": "hola", "extras": {"signature": "x"}}])
 
     assert contenido_texto(respuesta) == "hola"
 
 
 def test_contenido_texto_con_varios_bloques_de_texto_los_concatena() -> None:
-    respuesta = MagicMock(content=[{"type": "text", "text": "hola "}, {"type": "text", "text": "mundo"}])
+    respuesta = MagicMock(
+        content=[{"type": "text", "text": "hola "}, {"type": "text", "text": "mundo"}]
+    )
 
     assert contenido_texto(respuesta) == "hola mundo"
 

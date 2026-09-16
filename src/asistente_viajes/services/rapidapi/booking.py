@@ -59,7 +59,9 @@ def _verificar_envelope(body: dict[str, Any]) -> dict[str, Any]:
     return body
 
 
-def _elegir_candidato(candidatos: list[dict[str, Any]], campo_tipo: str, orden: list[str]) -> dict[str, Any]:
+def _elegir_candidato(
+    candidatos: list[dict[str, Any]], campo_tipo: str, orden: list[str]
+) -> dict[str, Any]:
     if not candidatos:
         raise client.ErrorRapidAPI("searchDestination sin resultados")
     for tipo in orden:
@@ -79,7 +81,11 @@ def resolver_destino_hotel(conexion: psycopg.Connection, texto: str) -> DestinoR
     configuracion = cargar_configuracion()
     body = _verificar_envelope(
         client.llamar(
-            conexion, PROVEEDOR_QUOTA, configuracion.rapidapi_host_booking, ENDPOINT_HOTELES_DESTINO, {"query": texto}
+            conexion,
+            PROVEEDOR_QUOTA,
+            configuracion.rapidapi_host_booking,
+            ENDPOINT_HOTELES_DESTINO,
+            {"query": texto},
         )
     )
     candidato = _elegir_candidato(body.get("data") or [], "search_type", ORDEN_TIPO_HOTEL)
@@ -108,7 +114,11 @@ def resolver_destino_vuelo(conexion: psycopg.Connection, texto: str) -> DestinoR
     configuracion = cargar_configuracion()
     body = _verificar_envelope(
         client.llamar(
-            conexion, PROVEEDOR_QUOTA, configuracion.rapidapi_host_booking, ENDPOINT_VUELOS_DESTINO, {"query": texto}
+            conexion,
+            PROVEEDOR_QUOTA,
+            configuracion.rapidapi_host_booking,
+            ENDPOINT_VUELOS_DESTINO,
+            {"query": texto},
         )
     )
     candidato = _elegir_candidato(body.get("data") or [], "type", ORDEN_TIPO_VUELO)
@@ -269,13 +279,19 @@ def buscar_vuelos(
 
         body = _verificar_envelope(
             client.llamar(
-                conexion, PROVEEDOR_QUOTA, configuracion.rapidapi_host_booking, ENDPOINT_VUELOS_BUSCAR, parametros
+                conexion,
+                PROVEEDOR_QUOTA,
+                configuracion.rapidapi_host_booking,
+                ENDPOINT_VUELOS_BUSCAR,
+                parametros,
             )
         )
         ofertas = (body.get("data") or {}).get("flightOffers") or []
         return [_a_opcion_vuelo(oferta) for oferta in ofertas]
     except client.ErrorRapidAPI as error:
-        logger.warning("buscar_vuelos(%s -> %s) fallo, sirviendo fixture: %s", origen, destino, error)
+        logger.warning(
+            "buscar_vuelos(%s -> %s) fallo, sirviendo fixture: %s", origen, destino, error
+        )
         body = client.leer_fixture(PROVEEDOR_QUOTA, ENDPOINT_VUELOS_BUSCAR)
         ofertas = (body.get("data") or {}).get("flightOffers") or []
         return _marcar_como_fixture([_a_opcion_vuelo(oferta) for oferta in ofertas])

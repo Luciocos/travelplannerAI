@@ -15,7 +15,14 @@ from asistente_viajes.services.rapidapi import booking as mod
 from asistente_viajes.services.rapidapi import client
 from asistente_viajes.services.rapidapi.models import DestinoResuelto
 
-RUTA_FIXTURES = Path(__file__).resolve().parent.parent / "src" / "asistente_viajes" / "services" / "rapidapi" / "fixtures"
+RUTA_FIXTURES = (
+    Path(__file__).resolve().parent.parent
+    / "src"
+    / "asistente_viajes"
+    / "services"
+    / "rapidapi"
+    / "fixtures"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -122,7 +129,11 @@ def test_verificar_envelope_devuelve_body_si_status_true() -> None:
 
 def test_resolver_destino_hotel_usa_cache_si_hay_hit(monkeypatch: pytest.MonkeyPatch) -> None:
     cacheado = DestinoResuelto(
-        proveedor="booking_hoteles", texto_consultado="Barcelona", id_externo="-372490", tipo="city", nombre="Barcelona"
+        proveedor="booking_hoteles",
+        texto_consultado="Barcelona",
+        id_externo="-372490",
+        tipo="city",
+        nombre="Barcelona",
     )
     monkeypatch.setattr(mod, "buscar_destino_cacheado", lambda *_, **__: cacheado)
     llamado = MagicMock(side_effect=AssertionError("no deberia llamar a la red si hay cache"))
@@ -148,16 +159,26 @@ def test_resolver_destino_hotel_sin_cache_llama_y_guarda(monkeypatch: pytest.Mon
     guardado.assert_called_once()
 
 
-def test_buscar_alojamiento_sirve_fixture_si_rapidapi_falla(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_buscar_alojamiento_sirve_fixture_si_rapidapi_falla(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     resuelto = DestinoResuelto(
-        proveedor="booking_hoteles", texto_consultado="Barcelona", id_externo="-372490", tipo="city", nombre="Barcelona"
+        proveedor="booking_hoteles",
+        texto_consultado="Barcelona",
+        id_externo="-372490",
+        tipo="city",
+        nombre="Barcelona",
     )
     monkeypatch.setattr(mod, "resolver_destino_hotel", lambda *_, **__: resuelto)
-    monkeypatch.setattr(client, "llamar", MagicMock(side_effect=client.ErrorCuotaAgotada("sin cuota")))
+    monkeypatch.setattr(
+        client, "llamar", MagicMock(side_effect=client.ErrorCuotaAgotada("sin cuota"))
+    )
 
     from datetime import date
 
-    resultados = mod.buscar_alojamiento(MagicMock(), "Barcelona", date(2026, 10, 15), date(2026, 10, 18))
+    resultados = mod.buscar_alojamiento(
+        MagicMock(), "Barcelona", date(2026, 10, 15), date(2026, 10, 18)
+    )
 
     assert resultados
     assert all(alojamiento.es_fixture for alojamiento in resultados)

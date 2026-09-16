@@ -13,7 +13,14 @@ import pytest
 
 from asistente_viajes.services.rapidapi import client as mod
 
-RUTA_FIXTURES = Path(__file__).resolve().parent.parent / "src" / "asistente_viajes" / "services" / "rapidapi" / "fixtures"
+RUTA_FIXTURES = (
+    Path(__file__).resolve().parent.parent
+    / "src"
+    / "asistente_viajes"
+    / "services"
+    / "rapidapi"
+    / "fixtures"
+)
 
 
 def _configuracion_falsa(**overrides):
@@ -39,19 +46,27 @@ def _conexion_con_contador(cantidad_usada: int) -> MagicMock:
 
 
 def test_llamar_usa_fixture_si_use_fixtures(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(mod, "cargar_configuracion", lambda: _configuracion_falsa(usar_fixtures=True))
+    monkeypatch.setattr(
+        mod, "cargar_configuracion", lambda: _configuracion_falsa(usar_fixtures=True)
+    )
     datos_falsos = {"status": True, "data": []}
     monkeypatch.setattr(mod, "leer_fixture", lambda *_: datos_falsos)
 
-    resultado = mod.llamar(MagicMock(), "booking", "booking-com15.p.rapidapi.com", "api/v1/hotels/searchHotels", {})
+    resultado = mod.llamar(
+        MagicMock(), "booking", "booking-com15.p.rapidapi.com", "api/v1/hotels/searchHotels", {}
+    )
 
     assert resultado is datos_falsos
 
 
 def test_llamar_sirve_fixture_si_cuota_al_100_por_ciento(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(mod, "cargar_configuracion", lambda: _configuracion_falsa(rapidapi_quota_booking=10))
+    monkeypatch.setattr(
+        mod, "cargar_configuracion", lambda: _configuracion_falsa(rapidapi_quota_booking=10)
+    )
     monkeypatch.setattr(mod, "leer_fixture", lambda *_: {"status": True, "data": []})
-    llamado_http = MagicMock(side_effect=AssertionError("no deberia salir a la red con cuota agotada"))
+    llamado_http = MagicMock(
+        side_effect=AssertionError("no deberia salir a la red con cuota agotada")
+    )
     monkeypatch.setattr(httpx, "get", llamado_http)
 
     conexion = _conexion_con_contador(10)
@@ -60,7 +75,9 @@ def test_llamar_sirve_fixture_si_cuota_al_100_por_ciento(monkeypatch: pytest.Mon
     llamado_http.assert_not_called()
 
 
-def test_llamar_reintenta_en_429_y_levanta_error_cuota_agotada(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_llamar_reintenta_en_429_y_levanta_error_cuota_agotada(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(mod, "cargar_configuracion", lambda: _configuracion_falsa())
     monkeypatch.setattr(mod, "_dormir", lambda _: None)
     monkeypatch.setattr(mod, "_incrementar_contador", lambda *_: None)
@@ -69,7 +86,9 @@ def test_llamar_reintenta_en_429_y_levanta_error_cuota_agotada(monkeypatch: pyte
 
     def get_falso(url, headers, params, timeout):
         llamadas.append(1)
-        return httpx.Response(429, json={"message": "quota exceeded"}, request=httpx.Request("GET", url))
+        return httpx.Response(
+            429, json={"message": "quota exceeded"}, request=httpx.Request("GET", url)
+        )
 
     monkeypatch.setattr(httpx, "get", get_falso)
 
@@ -87,7 +106,9 @@ def test_llamar_no_reintenta_error_4xx_no_reintentable(monkeypatch: pytest.Monke
 
     def get_falso(url, headers, params, timeout):
         llamadas.append(1)
-        return httpx.Response(400, json={"message": "bad request"}, request=httpx.Request("GET", url))
+        return httpx.Response(
+            400, json={"message": "bad request"}, request=httpx.Request("GET", url)
+        )
 
     monkeypatch.setattr(httpx, "get", get_falso)
 
@@ -114,7 +135,9 @@ def test_llamar_devuelve_json_en_respuesta_exitosa(monkeypatch: pytest.MonkeyPat
     monkeypatch.setattr(mod, "_incrementar_contador", lambda *_: None)
 
     def get_falso(url, headers, params, timeout):
-        return httpx.Response(200, json={"status": True, "data": []}, request=httpx.Request("GET", url))
+        return httpx.Response(
+            200, json={"status": True, "data": []}, request=httpx.Request("GET", url)
+        )
 
     monkeypatch.setattr(httpx, "get", get_falso)
 

@@ -123,7 +123,10 @@ def armar_plan(conexion: psycopg.Connection, estado: PreferenciasViaje) -> PlanD
     dias_totales = _cantidad_dias(estado.fecha_inicio, estado.fecha_fin)
     intereses = estado.intereses or []
     candidatos = buscar_atractivos(
-        conexion, destino=estado.destino, intereses=intereses, k=dias_totales * ACTIVIDADES_POR_DIA_MAX
+        conexion,
+        destino=estado.destino,
+        intereses=intereses,
+        k=dias_totales * ACTIVIDADES_POR_DIA_MAX,
     )
 
     dias = _repartir_por_dia(candidatos, dias_totales)
@@ -139,7 +142,9 @@ def armar_plan(conexion: psycopg.Connection, estado: PreferenciasViaje) -> PlanD
     )
 
 
-def guardar_itinerario(conexion: psycopg.Connection, estado: PreferenciasViaje, plan: PlanDeViaje) -> int:
+def guardar_itinerario(
+    conexion: psycopg.Connection, estado: PreferenciasViaje, plan: PlanDeViaje
+) -> int:
     """Persiste el plan en itinerario/itinerario_item. Devuelve el id del
     itinerario creado."""
     with conexion.cursor() as cursor:

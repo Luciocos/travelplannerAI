@@ -13,7 +13,14 @@ import pytest
 from asistente_viajes.services.rapidapi import client
 from asistente_viajes.services.rapidapi import fly_scraper as mod
 
-RUTA_FIXTURES = Path(__file__).resolve().parent.parent / "src" / "asistente_viajes" / "services" / "rapidapi" / "fixtures"
+RUTA_FIXTURES = (
+    Path(__file__).resolve().parent.parent
+    / "src"
+    / "asistente_viajes"
+    / "services"
+    / "rapidapi"
+    / "fixtures"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -62,7 +69,9 @@ def test_calendario_precios_llamada_exitosa(monkeypatch) -> None:
 
 
 def test_calendario_precios_usa_fixture_si_falla(monkeypatch) -> None:
-    monkeypatch.setattr(client, "llamar", MagicMock(side_effect=client.ErrorCuotaAgotada("sin cuota")))
+    monkeypatch.setattr(
+        client, "llamar", MagicMock(side_effect=client.ErrorCuotaAgotada("sin cuota"))
+    )
 
     resultado = mod.calendario_precios(MagicMock(), "BCN", "CUN")
 
