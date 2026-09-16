@@ -67,9 +67,13 @@ def test_procesar_mensaje_armar_plan_llama_a_la_tool_y_persiste(monkeypatch) -> 
                 actividades=[
                     ActividadDelPlan(nombre="Museo", categoria="museums", costo_estimado=10.0)
                 ],
+                costo_actividades=10.0,
+                gasto_estimado_dia=0.0,
                 costo_dia=10.0,
             )
         ],
+        costo_actividades_total=10.0,
+        gasto_estimado_total=0.0,
         costo_total_estimado=10.0,
         cantidad_personas=1,
         costo_total_grupo=10.0,
