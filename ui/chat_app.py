@@ -170,8 +170,12 @@ def _cuerpo_principal(conexion) -> bool:
         return True
 
     for turno in st.session_state.sesion.historial:
-        with st.chat_message("user" if turno["rol"] == "usuario" else "assistant"):
-            st.markdown(turno["texto"])
+        es_usuario = turno["rol"] == "usuario"
+        with st.chat_message("user" if es_usuario else "assistant"):
+            # El HTML (tarjetas de plan/actividades/etc, ver presentacion.py)
+            # solo lo genera el asistente, con todo dato dinamico ya
+            # escapado; el texto del usuario nunca se renderiza como HTML.
+            st.markdown(turno["texto"], unsafe_allow_html=not es_usuario)
 
     itinerario_md = servicio.itinerario_descargable(st.session_state.sesion)
     if itinerario_md:
@@ -207,7 +211,7 @@ def _cuerpo_principal(conexion) -> bool:
                     "gratuita de Gemini o a la base de datos; intente de nuevo en un momento."
                 )
             else:
-                st.markdown(respuesta)
+                st.markdown(respuesta, unsafe_allow_html=True)
     return False
 
 

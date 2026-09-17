@@ -77,6 +77,7 @@ from asistente_viajes.preguntas import (
     tipo_destino_de,
     valores_sugeridos,
 )
+from asistente_viajes.presentacion import escapar, tarjeta
 from asistente_viajes.prompts import PROMPT_CONVERSAR, PROMPT_INTERPRETAR_TURNO
 from asistente_viajes.services.cambio import convertir_desde_usd
 from asistente_viajes.services.rapidapi.booking import buscar_alojamiento, buscar_vuelos
@@ -320,30 +321,42 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
 
 
 def _resumen_plan(plan: PlanDeViaje) -> str:
-    lineas = [f"Armé un plan de {len(plan.dias)} día(s) para **{plan.destino}**:"]
+    filas = []
     for dia in plan.dias:
-        nombres = ", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades)
+        nombres = escapar(", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades))
         etiqueta = f"Día {dia.dia}" + (f" ({dia.fecha.strftime('%d/%m')})" if dia.fecha else "")
-        lineas.append(f"- **{etiqueta}**: {nombres} (costo estimado ${dia.costo_dia:.0f})")
-    lineas.append(
-        f"\nCosto total estimado: {plan.moneda} {plan.costo_total_estimado:.0f} por persona, "
-        f"{plan.moneda} {plan.costo_total_grupo:.0f} para el grupo de {plan.cantidad_personas}."
+        filas.append(
+            f"<strong>{escapar(etiqueta)}</strong>: {nombres} (costo estimado ${dia.costo_dia:.0f})"
+        )
+    pie = escapar("; ".join(plan.supuestos)) if plan.supuestos else None
+    tarjeta_html = tarjeta(f"Plan de viaje: {escapar(plan.destino)}", filas, pie)
+    total = (
+        f"Costo total estimado: {escapar(plan.moneda)} {plan.costo_total_estimado:.0f} por persona, "
+        f"{escapar(plan.moneda)} {plan.costo_total_grupo:.0f} para el grupo de {plan.cantidad_personas}."
     )
-    if plan.supuestos:
-        lineas.append("(" + "; ".join(plan.supuestos) + ")")
-    return "\n".join(lineas)
+    return (
+        f"Armé un plan de {len(plan.dias)} día(s) para <strong>{escapar(plan.destino)}</strong>:\n\n"
+        f"{tarjeta_html}\n\n{total}"
+    )
 
 
 def _resumen_actividades(actividades: list[ActividadRecomendada]) -> str:
     if not actividades:
         return "No encontré actividades para recomendarle con esos intereses en este destino."
-    return "\n".join(f"- **{a.nombre}**: {a.justificacion}" for a in actividades)
+    filas = [
+        f"<strong>{escapar(a.nombre)}</strong>: {escapar(a.justificacion)}" for a in actividades
+    ]
+    return tarjeta("Actividades recomendadas", filas)
 
 
 def _resumen_locales(locales: list[LocalRecomendado]) -> str:
     if not locales:
         return "No encontré locales para recomendarle con esa consulta en este destino."
-    return "\n".join(f"- **{local.nombre}**: {local.justificacion}" for local in locales)
+    filas = [
+        f"<strong>{escapar(local.nombre)}</strong>: {escapar(local.justificacion)}"
+        for local in locales
+    ]
+    return tarjeta("Locales recomendados", filas)
 
 
 def _marca_fixture(es_fixture: bool) -> str:
@@ -356,26 +369,25 @@ def _marca_fixture(es_fixture: bool) -> str:
 def _resumen_alojamiento(alojamientos: list[Alojamiento]) -> str:
     if not alojamientos:
         return "No encontré opciones de alojamiento para esas fechas."
-    lineas = ["Opciones de alojamiento:"]
-    for alojamiento in alojamientos[:3]:
-        lineas.append(
-            f"- **{alojamiento.nombre}**: {alojamiento.precio_total:.0f} {alojamiento.moneda}"
-            f"{_marca_fixture(alojamiento.es_fixture)}"
-        )
-    return "\n".join(lineas)
+    filas = [
+        f"<strong>{escapar(alojamiento.nombre)}</strong>: {alojamiento.precio_total:.0f} "
+        f"{escapar(alojamiento.moneda)}{escapar(_marca_fixture(alojamiento.es_fixture))}"
+        for alojamiento in alojamientos[:3]
+    ]
+    return tarjeta("Opciones de alojamiento", filas)
 
 
 def _resumen_vuelos(vuelos: list[OpcionVuelo]) -> str:
     if not vuelos:
         return "No encontré opciones de vuelo para ese origen y esas fechas."
-    lineas = ["Opciones de vuelo:"]
+    filas = []
     for vuelo in vuelos[:3]:
-        aerolineas = ", ".join(vuelo.aerolineas) or "aerolínea sin especificar"
-        lineas.append(
-            f"- **{aerolineas}**: {vuelo.precio_total:.0f} {vuelo.moneda}, "
-            f"{vuelo.escalas or 0} escala(s){_marca_fixture(vuelo.es_fixture)}"
+        aerolineas = escapar(", ".join(vuelo.aerolineas) or "aerolínea sin especificar")
+        filas.append(
+            f"<strong>{aerolineas}</strong>: {vuelo.precio_total:.0f} {escapar(vuelo.moneda)}, "
+            f"{vuelo.escalas or 0} escala(s){escapar(_marca_fixture(vuelo.es_fixture))}"
         )
-    return "\n".join(lineas)
+    return tarjeta("Opciones de vuelo", filas)
 
 
 def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
@@ -508,7 +520,11 @@ def nodo_disparar_info_destino(estado_grafo: EstadoGrafo) -> dict:
         logger.exception("fallo info_destino, se omite en este turno")
         return {"info_destino_mostrada_para": estado.destino}
 
-    texto = f"{info.clima.detalle} Idioma: {info.idioma_moneda.idioma}, moneda: {info.idioma_moneda.moneda}."
+    filas = [
+        escapar(info.clima.detalle),
+        f"Idioma: {escapar(info.idioma_moneda.idioma)}, moneda: {escapar(info.idioma_moneda.moneda)}.",
+    ]
+    texto = tarjeta(f"Sobre {escapar(estado.destino)}", filas)
     fragmentos = [*estado_grafo["fragmentos"], {"tipo": "info_destino", "texto": texto}]
     return {"fragmentos": fragmentos, "info_destino_mostrada_para": estado.destino}
 
