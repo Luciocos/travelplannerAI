@@ -78,6 +78,8 @@ from asistente_viajes.preguntas import (
     valores_sugeridos,
 )
 from asistente_viajes.prompts import PROMPT_CONVERSAR, PROMPT_INTERPRETAR_TURNO
+from asistente_viajes.services.rapidapi.booking import buscar_alojamiento, buscar_vuelos
+from asistente_viajes.services.rapidapi.models import Alojamiento, OpcionVuelo
 from asistente_viajes.tools.armar_plan import (
     ErrorFechasIncompletas,
     PlanDeViaje,
@@ -95,7 +97,12 @@ from asistente_viajes.tools.responder_faq_viajero import responder_faq_viajero
 logger = logging.getLogger(__name__)
 
 TipoAccion = Literal[
-    "armar_plan", "recomendar_actividades", "recomendar_locales", "responder_faq_viajero"
+    "armar_plan",
+    "recomendar_actividades",
+    "recomendar_locales",
+    "responder_faq_viajero",
+    "buscar_alojamiento",
+    "buscar_vuelos",
 ]
 
 MAXIMO_FRAGMENTOS_POR_TURNO = 4
@@ -138,6 +145,7 @@ class InterpretacionTurno(BaseModel):
     fecha_fin: str | None = None
     duracion_dias: int | None = None
     cantidad_personas: int | None = None
+    origen: str | None = None  # ciudad de salida, solo relevante para buscar_vuelos (RF7)
     usar_sugerencias: bool = False
     acciones: list[AccionPedida] = Field(default_factory=list)
 
@@ -223,6 +231,7 @@ def nodo_actualizar_estado(estado_grafo: EstadoGrafo) -> dict:
         fecha_fin=_parsear_fecha(interpretacion.fecha_fin),
         duracion_dias=interpretacion.duracion_dias,
         cantidad_personas=interpretacion.cantidad_personas,
+        origen=interpretacion.origen,
     )
     fusionado = fusionar_preferencias(estado_actual, extraidos)
 
@@ -274,6 +283,17 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
             continue
         if tipo != "armar_plan" and not estado.destino:
             continue
+        if tipo in ("buscar_alojamiento", "buscar_vuelos") and not (
+            estado.fecha_inicio and estado.fecha_fin
+        ):
+            # Alojamiento y vuelos (RapidAPI) necesitan fechas de calendario
+            # reales para buscar disponibilidad, a diferencia del plan
+            # (armar_plan), que puede armarse solo con duracion_dias.
+            pendientes.append({"tipo": "pedir_fechas_exactas"})
+            continue
+        if tipo == "buscar_vuelos" and not estado.origen:
+            pendientes.append({"tipo": "pedir_origen_vuelo"})
+            continue
         pendientes.append(accion)
 
     ultimo_plan = estado_grafo.get("ultimo_plan")
@@ -316,6 +336,38 @@ def _resumen_locales(locales: list[LocalRecomendado]) -> str:
     return "\n".join(f"- **{local.nombre}**: {local.justificacion}" for local in locales)
 
 
+def _marca_fixture(es_fixture: bool) -> str:
+    # RF6/RF7: si la API real falla, la tool sirve datos de ejemplo
+    # (es_fixture=True) para no dejar al cliente sin nada, pero nunca se
+    # le puede afirmar que son precios reales (regla dura 5).
+    return " (dato de ejemplo, no una tarifa real vigente)" if es_fixture else ""
+
+
+def _resumen_alojamiento(alojamientos: list[Alojamiento]) -> str:
+    if not alojamientos:
+        return "No encontré opciones de alojamiento para esas fechas."
+    lineas = ["Opciones de alojamiento:"]
+    for alojamiento in alojamientos[:3]:
+        lineas.append(
+            f"- **{alojamiento.nombre}**: {alojamiento.precio_total:.0f} {alojamiento.moneda}"
+            f"{_marca_fixture(alojamiento.es_fixture)}"
+        )
+    return "\n".join(lineas)
+
+
+def _resumen_vuelos(vuelos: list[OpcionVuelo]) -> str:
+    if not vuelos:
+        return "No encontré opciones de vuelo para ese origen y esas fechas."
+    lineas = ["Opciones de vuelo:"]
+    for vuelo in vuelos[:3]:
+        aerolineas = ", ".join(vuelo.aerolineas) or "aerolínea sin especificar"
+        lineas.append(
+            f"- **{aerolineas}**: {vuelo.precio_total:.0f} {vuelo.moneda}, "
+            f"{vuelo.escalas or 0} escala(s){_marca_fixture(vuelo.es_fixture)}"
+        )
+    return "\n".join(lineas)
+
+
 def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
     runtime = get_runtime(ContextoGrafo)
     conexion = runtime.context.conexion
@@ -355,6 +407,36 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
             elif tipo == "responder_faq_viajero":
                 respuesta = responder_faq_viajero(conexion, rotador, estado.destino, consulta, k=k)
                 fragmentos.append({"tipo": tipo, "texto": respuesta.respuesta})
+            elif tipo == "pedir_fechas_exactas":
+                fragmentos.append(
+                    {
+                        "tipo": tipo,
+                        "texto": "Para buscar alojamiento o vuelos necesito fechas exactas de ida y vuelta, no solo la cantidad de días. ¿Me las confirma?",
+                    }
+                )
+            elif tipo == "pedir_origen_vuelo":
+                fragmentos.append({"tipo": tipo, "texto": "¿Desde qué ciudad sale el vuelo?"})
+            elif tipo == "buscar_alojamiento":
+                habitaciones = -(-(estado.cantidad_personas or 1) // 2)  # ceil(personas/2)
+                alojamientos = buscar_alojamiento(
+                    conexion,
+                    estado.destino,
+                    estado.fecha_inicio,
+                    estado.fecha_fin,
+                    adultos=estado.cantidad_personas or 1,
+                    habitaciones=habitaciones,
+                )
+                fragmentos.append({"tipo": tipo, "texto": _resumen_alojamiento(alojamientos)})
+            elif tipo == "buscar_vuelos":
+                vuelos = buscar_vuelos(
+                    conexion,
+                    estado.origen,
+                    estado.destino,
+                    estado.fecha_inicio,
+                    estado.fecha_fin,
+                    adultos=estado.cantidad_personas or 1,
+                )
+                fragmentos.append({"tipo": tipo, "texto": _resumen_vuelos(vuelos)})
         except ErrorFechasIncompletas:
             fragmentos.append(
                 {

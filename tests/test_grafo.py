@@ -12,6 +12,7 @@ import pytest
 from asistente_viajes import grafo as mod
 from asistente_viajes.estado import PreferenciasViaje
 from asistente_viajes.grafo import AccionPedida, InterpretacionTurno, procesar_turno
+from asistente_viajes.services.rapidapi.models import Alojamiento, OpcionVuelo
 from asistente_viajes.tools.armar_plan import (
     ActividadDelPlan,
     DiaDelPlan,
@@ -391,6 +392,118 @@ def test_accion_sin_consulta_propia_usa_el_mensaje_completo(monkeypatch) -> None
     _turno(rotador, "donde como algo tipico y barato", estado=estado)
 
     assert consultas_recibidas["locales"] == "donde como algo tipico y barato"
+
+
+# --- buscar_alojamiento / buscar_vuelos (RF6/RF7) -------------------------
+
+
+def _estado_completo(**overrides) -> PreferenciasViaje:
+    base = {
+        "destino": "Barcelona",
+        "tipo_destino": "ciudad",
+        "intereses": ["historia"],
+        "presupuesto": "medio",
+        "fecha_inicio": date(2027, 3, 5),
+        "fecha_fin": date(2027, 3, 10),
+        "cantidad_personas": 2,
+    }
+    base.update(overrides)
+    return PreferenciasViaje(**base)
+
+
+def test_actualizar_estado_extrae_origen() -> None:
+    rotador = _rotador_con_interpretacion(InterpretacionTurno(origen="Buenos Aires"))
+    resultado = _turno(rotador, "el vuelo sale de Buenos Aires")
+    assert resultado["estado"]["origen"] == "Buenos Aires"
+
+
+def test_planificar_pide_fechas_exactas_si_solo_hay_duracion_dias() -> None:
+    estado = _estado_completo(fecha_inicio=None, fecha_fin=None, duracion_dias=5)
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_alojamiento")])
+    )
+    resultado = _turno(rotador, "buscame un hotel", estado=estado)
+    assert resultado["pendientes"] == [{"tipo": "pedir_fechas_exactas"}]
+    assert "fechas exactas" in resultado["respuesta_texto"].lower()
+
+
+def test_planificar_pide_origen_si_falta_para_vuelos() -> None:
+    estado = _estado_completo()
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_vuelos")])
+    )
+    resultado = _turno(rotador, "quiero vuelos", estado=estado)
+    assert resultado["pendientes"] == [{"tipo": "pedir_origen_vuelo"}]
+    assert "qué ciudad" in resultado["respuesta_texto"].lower()
+
+
+def test_buscar_alojamiento_se_ejecuta_con_datos_completos(monkeypatch) -> None:
+    estado = _estado_completo(cantidad_personas=3)
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_alojamiento")])
+    )
+    llamada = MagicMock(
+        return_value=[
+            Alojamiento(nombre="Hotel Test", proveedor="booking", precio_total=500.0, moneda="USD")
+        ]
+    )
+    monkeypatch.setattr(mod, "buscar_alojamiento", llamada)
+
+    resultado = _turno(rotador, "buscame alojamiento", estado=estado)
+
+    assert llamada.call_args.args[0] is not None
+    assert llamada.call_args.kwargs["adultos"] == 3
+    assert llamada.call_args.kwargs["habitaciones"] == 2  # ceil(3/2)
+    assert "Hotel Test" in resultado["respuesta_texto"]
+    assert "500" in resultado["respuesta_texto"]
+
+
+def test_buscar_alojamiento_marca_los_datos_de_ejemplo(monkeypatch) -> None:
+    estado = _estado_completo()
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_alojamiento")])
+    )
+    monkeypatch.setattr(
+        mod,
+        "buscar_alojamiento",
+        lambda *a, **k: [
+            Alojamiento(
+                nombre="Hotel Fixture",
+                proveedor="booking",
+                precio_total=100.0,
+                moneda="USD",
+                es_fixture=True,
+            )
+        ],
+    )
+
+    resultado = _turno(rotador, "buscame alojamiento", estado=estado)
+
+    assert "dato de ejemplo" in resultado["respuesta_texto"]
+
+
+def test_buscar_vuelos_se_ejecuta_con_origen(monkeypatch) -> None:
+    estado = _estado_completo(origen="Buenos Aires")
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_vuelos")])
+    )
+    llamada = MagicMock(
+        return_value=[
+            OpcionVuelo(
+                proveedor="fly_scraper",
+                precio_total=300.0,
+                moneda="USD",
+                aerolineas=["Aerolineas Test"],
+                escalas=0,
+            )
+        ]
+    )
+    monkeypatch.setattr(mod, "buscar_vuelos", llamada)
+
+    resultado = _turno(rotador, "buscame vuelos", estado=estado)
+
+    assert llamada.call_args.args[1] == "Buenos Aires"  # args[0] es la conexion
+    assert "Aerolineas Test" in resultado["respuesta_texto"]
 
 
 # --- disparar_info_destino -----------------------------------------------

@@ -58,6 +58,9 @@ cosas a la vez:
    - usar_sugerencias: true solo si el cliente pidió explícitamente usar
      los valores sugeridos o por defecto (por ejemplo "usar sugerencias",
      "dale, lo que sugieras", "como recomiendes").
+   - origen: ciudad de salida, SOLO si el cliente pide vuelos y la
+     menciona (por ejemplo "vuelo desde Buenos Aires"). Irrelevante para
+     cualquier otro pedido.
 
 2. Decida qué acciones pidió el cliente en este mensaje (puede ser más de
    una, o ninguna si solo está dando datos o charlando):
@@ -68,6 +71,8 @@ cosas a la vez:
      local en particular.
    - responder_faq_viajero: pregunta puntual sobre seguridad, estafas
      comunes, o costumbres locales, no sobre actividades ni comercios.
+   - buscar_alojamiento: pide hotel o dónde alojarse.
+   - buscar_vuelos: pide vuelos o cómo llegar al destino.
    Si el cliente pidió una cantidad explícita de resultados para una
    acción (por ejemplo "dame 5 opciones"), complete cantidad_resultados
    para esa acción. Como mucho 3 acciones por turno.
