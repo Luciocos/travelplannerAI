@@ -143,9 +143,11 @@ def test_procesar_mensaje_responder_faq_viajero(monkeypatch) -> None:
     from asistente_viajes.tools.responder_faq_viajero import RespuestaFaq
 
     respuesta_faq = RespuestaFaq(
-        tema="Taxis y tarifas", categoria="estafas", respuesta="Acordá el precio antes de subir."
+        respondida=True,
+        respuesta="Acordá el precio antes de subir.",
+        temas_usados=["Taxis y tarifas"],
     )
-    llamada = MagicMock(return_value=[respuesta_faq])
+    llamada = MagicMock(return_value=respuesta_faq)
     monkeypatch.setattr(mod, "responder_faq_viajero", llamada)
 
     sesion = mod.SesionAgente(estado=PreferenciasViaje(destino="Cancun"))

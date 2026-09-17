@@ -158,11 +158,8 @@ def _resumen_locales(locales: list[LocalRecomendado]) -> str:
     return "\n".join(lineas)
 
 
-def _resumen_faq(respuestas: list[RespuestaFaq]) -> str:
-    if not respuestas:
-        return "No tengo información sobre seguridad, estafas o costumbres para esa consulta en este destino."
-    lineas = [f"- **{r.tema}**: {r.respuesta}" for r in respuestas]
-    return "\n".join(lineas)
+def _resumen_faq(respuesta_faq: RespuestaFaq) -> str:
+    return respuesta_faq.respuesta
 
 
 def procesar_mensaje(
@@ -195,10 +192,10 @@ def procesar_mensaje(
         locales = recomendar_locales(conexion, rotador, sesion.estado.destino, mensaje, k=k)
         respuesta = _resumen_locales(locales)
     else:  # responder_faq_viajero
-        respuestas_faq = responder_faq_viajero(
+        respuesta_faq = responder_faq_viajero(
             conexion, rotador, sesion.estado.destino, mensaje, k=k
         )
-        respuesta = _resumen_faq(respuestas_faq)
+        respuesta = _resumen_faq(respuesta_faq)
 
     info = _disparar_info_destino_si_corresponde(sesion)
     if info is not None:

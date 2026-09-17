@@ -109,26 +109,32 @@ usted, nunca lo tutea ni usa "vos" o "che".
 Un cliente preguntó lo siguiente sobre su destino:
 {consulta}
 
-Responda usando ÚNICAMENTE la información del siguiente texto de referencia
-sobre seguridad, estafas comunes o costumbres del lugar.
+Responda usando ÚNICAMENTE la información de los siguientes temas de
+referencia sobre seguridad, estafas comunes o costumbres del lugar.
+Puede combinar mas de un tema si hace falta para responder de forma
+completa; indique en temas_usados los que efectivamente uso.
 
-No agregue datos que no estén en el texto. Si el texto no alcanza para
-responder la pregunta, dígalo así, no invente.
+No agregue datos que no estén en los textos. Si ninguno de los temas
+alcanza para responder la pregunta, marque respondida en falso, y en la
+respuesta dígalo así en vez de inventar.
 
-Texto de referencia:
-{texto_recuperado}
+Temas de referencia:
+{temas_recuperados}
 """
 
-PROMPT_JUSTIFICAR_RECOMENDACION = """\
+PROMPT_JUSTIFICAR_RECOMENDACIONES_LOTE = """\
 Es un asesor de viajes profesional que se dirige al cliente siempre de
 usted, nunca lo tutea ni usa "vos" o "che".
-A partir ÚNICAMENTE del siguiente texto sobre un lugar, escriba una sola
-línea breve explicando por qué le puede interesar a alguien que busca:
+A partir ÚNICAMENTE del texto de cada lugar, evalúe si alcanza para
+justificar por qué le puede interesar a alguien que busca:
 {intereses_o_consulta}.
 
-No agregue datos que no estén en el texto. Si el texto no alcanza para
-justificar la recomendación, dígalo así, no invente.
+Para cada lugar devuelva su índice, si el texto alcanza para
+justificarlo (relevante) y, solo si alcanza, una sola línea breve de
+justificación. Si el texto de un lugar no alcanza para justificarlo,
+marque relevante en falso: no agregue datos que no estén en el texto de
+ESE lugar, ni invente una justificación de todos modos.
 
-Texto sobre el lugar:
-{texto_recuperado}
+Lugares:
+{lugares}
 """

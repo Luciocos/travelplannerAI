@@ -11,8 +11,8 @@ import psycopg
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 
-from asistente_viajes.llm import RotadorClavesGemini, contenido_texto
-from asistente_viajes.prompts import PROMPT_JUSTIFICAR_RECOMENDACION
+from asistente_viajes.justificacion import justificar_lote
+from asistente_viajes.llm import RotadorClavesGemini
 from asistente_viajes.recuperacion.atractivos import buscar_atractivos
 
 
@@ -28,14 +28,6 @@ class ArgsRecomendarActividades(BaseModel):
     k: int = Field(default=5, description="Cantidad maxima de actividades a recomendar")
 
 
-def _justificar(rotador: RotadorClavesGemini, texto: str, intereses: list[str]) -> str:
-    prompt = PROMPT_JUSTIFICAR_RECOMENDACION.format(
-        intereses_o_consulta=", ".join(intereses), texto_recuperado=texto
-    )
-    respuesta = rotador.invocar(prompt)
-    return contenido_texto(respuesta)
-
-
 def recomendar_actividades(
     conexion: psycopg.Connection,
     rotador: RotadorClavesGemini,
@@ -45,16 +37,25 @@ def recomendar_actividades(
 ) -> list[ActividadRecomendada]:
     """Logica pura de la tool, sin el decorador, para poder testearla
     inyectando conexion y rotador falsos. `crear_tool_recomendar_actividades`
-    la envuelve para el agente."""
+    la envuelve para el agente. Justifica todos los resultados en una sola
+    llamada al LLM (ver justificacion.py) y descarta los que el LLM marco
+    como no relevantes en vez de mostrar una justificacion vacia."""
     resultados = buscar_atractivos(conexion, destino=destino, intereses=intereses, k=k)
-    return [
-        ActividadRecomendada(
-            nombre=resultado.nombre,
-            categoria=resultado.categoria,
-            justificacion=_justificar(rotador, resultado.texto, intereses),
+    justificaciones = justificar_lote(rotador, ", ".join(intereses), [r.texto for r in resultados])
+
+    actividades = []
+    for indice, resultado in enumerate(resultados):
+        item = justificaciones.get(indice)
+        if item is None or not item.relevante:
+            continue
+        actividades.append(
+            ActividadRecomendada(
+                nombre=resultado.nombre,
+                categoria=resultado.categoria,
+                justificacion=item.justificacion,
+            )
         )
-        for resultado in resultados
-    ]
+    return actividades
 
 
 def crear_tool_recomendar_actividades(conexion: psycopg.Connection, rotador: RotadorClavesGemini):

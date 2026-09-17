@@ -10,8 +10,8 @@ import psycopg
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 
-from asistente_viajes.llm import RotadorClavesGemini, contenido_texto
-from asistente_viajes.prompts import PROMPT_JUSTIFICAR_RECOMENDACION
+from asistente_viajes.justificacion import justificar_lote
+from asistente_viajes.llm import RotadorClavesGemini
 from asistente_viajes.recuperacion.comercios import buscar_comercios
 
 
@@ -31,14 +31,6 @@ class ArgsRecomendarLocales(BaseModel):
     k: int = Field(default=5, description="Cantidad maxima de locales a recomendar")
 
 
-def _justificar(rotador: RotadorClavesGemini, texto: str, consulta: str) -> str:
-    prompt = PROMPT_JUSTIFICAR_RECOMENDACION.format(
-        intereses_o_consulta=consulta, texto_recuperado=texto
-    )
-    respuesta = rotador.invocar(prompt)
-    return contenido_texto(respuesta)
-
-
 def recomendar_locales(
     conexion: psycopg.Connection,
     rotador: RotadorClavesGemini,
@@ -47,18 +39,26 @@ def recomendar_locales(
     k: int = 5,
 ) -> list[LocalRecomendado]:
     """Logica pura de la tool, sin el decorador, para poder testearla
-    inyectando conexion y rotador falsos."""
+    inyectando conexion y rotador falsos. Justifica todos los resultados en
+    una sola llamada al LLM (ver justificacion.py)."""
     resultados = buscar_comercios(conexion, destino=destino, consulta=consulta, k=k)
-    return [
-        LocalRecomendado(
-            nombre=resultado.nombre,
-            categoria=resultado.categoria,
-            direccion=resultado.direccion,
-            rango_precio=resultado.rango_precio,
-            justificacion=_justificar(rotador, resultado.texto, consulta),
+    justificaciones = justificar_lote(rotador, consulta, [r.texto for r in resultados])
+
+    locales = []
+    for indice, resultado in enumerate(resultados):
+        item = justificaciones.get(indice)
+        if item is None or not item.relevante:
+            continue
+        locales.append(
+            LocalRecomendado(
+                nombre=resultado.nombre,
+                categoria=resultado.categoria,
+                direccion=resultado.direccion,
+                rango_precio=resultado.rango_precio,
+                justificacion=item.justificacion,
+            )
         )
-        for resultado in resultados
-    ]
+    return locales
 
 
 def crear_tool_recomendar_locales(conexion: psycopg.Connection, rotador: RotadorClavesGemini):
