@@ -21,13 +21,6 @@ SLOTS_OBLIGATORIOS = (
     "cantidad_personas",
 )
 
-# D-14: el orquestador pide todo lo que falta en una sola pregunta
-# consolidada (con opciones y una sugerencia por campo), no de a 2 por
-# turno como preveia el diseño original (arquitectura.md). Se mantiene la
-# constante por compatibilidad de nombres en el codigo existente, pero ya
-# no limita cuantos slots se piden por turno.
-MAXIMO_SLOTS_A_PREGUNTAR_POR_TURNO = 2
-
 DURACION_MAXIMA_DIAS = 21
 CANTIDAD_PERSONAS_MAXIMA = 20
 

@@ -32,3 +32,16 @@ def buscar_destino_piloto(destino: str, ruta: Path = RUTA_DESTINOS) -> tuple[str
     destinos = cargar_destinos_piloto(ruta)
     normalizados = {normalizar(nombre): (nombre, valor) for nombre, valor in destinos.items()}
     return normalizados.get(normalizar(destino))
+
+
+def blurb_caracteristicas_destinos(ruta: Path = RUTA_DESTINOS) -> str:
+    """Nombre y caracteristicas de cada destino piloto en texto, para
+    inyectar en el prompt de extraccion: asi el LLM puede mapear una
+    descripcion regional ("un lugar caribeño") a un destino piloto sin
+    exigir que el usuario nombre la ciudad (D-09)."""
+    destinos = cargar_destinos_piloto(ruta)
+    lineas = [
+        f"{nombre}: {', '.join(datos.get('caracteristicas', []))}"
+        for nombre, datos in destinos.items()
+    ]
+    return "\n  ".join(lineas)
