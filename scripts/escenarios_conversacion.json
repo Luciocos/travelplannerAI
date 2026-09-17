@@ -30,7 +30,7 @@
     "turnos": [
       {
         "mensaje": "Quiero ir de viaje a Tokio",
-        "debe_contener": ["Tokio", "Barcelona", "Miami", "Cancún"]
+        "debe_contener": ["Tokio", "Barcelona", "Miami", "Cancun"]
       }
     ]
   },
@@ -39,8 +39,8 @@
     "descripcion": "Un mensaje con varios pedidos ejecuta todos, no solo el primero (P-10).",
     "turnos": [
       {
-        "mensaje": "Cancún, playa, presupuesto medio, del 1 al 5 de diciembre de 2026, somos 2 personas. Armame el plan, decime dónde comer barato y si es seguro caminar de noche",
-        "debe_contener": ["Cancún"]
+        "mensaje": "Cancún, naturaleza, presupuesto medio, del 1 al 5 de diciembre de 2026, somos 2 personas. Armame el plan, decime dónde comer barato y si es seguro caminar de noche",
+        "debe_contener": ["Cancun"]
       }
     ]
   },
@@ -50,7 +50,7 @@
     "turnos": [
       {
         "mensaje": "Hola, quiero armar un viaje",
-        "debe_contener": ["Barcelona", "Miami", "Cancún"]
+        "debe_contener": ["Barcelona", "Miami", "Cancun"]
       },
       {
         "mensaje": "Usá las sugerencias",
@@ -63,8 +63,8 @@
     "descripcion": "Convertir el costo del último plan a pesos argentinos, sin inventar una cotización (D-19).",
     "turnos": [
       {
-        "mensaje": "Cancún, playa, presupuesto medio, del 1 al 5 de diciembre de 2026, somos 2 personas. Armame el plan.",
-        "debe_contener": ["Cancún"]
+        "mensaje": "Cancún, naturaleza, presupuesto medio, del 1 al 5 de diciembre de 2026, somos 2 personas. Armame el plan.",
+        "debe_contener": ["Cancun"]
       },
       {
         "mensaje": "¿Cuánto es eso en pesos?",
