@@ -53,12 +53,30 @@ class InfoDestino(BaseModel):
     idioma_moneda: InfoIdiomaMoneda
 
 
+def _resumir_pronostico(
+    temperatura_maxima: list[float], temperatura_minima: list[float], precipitacion_mm: list[float]
+) -> str:
+    """Une los arrays diarios en una sola linea legible, con numeros
+    reales (antes se mostraba solo un "pronostico en vivo" generico y las
+    temperaturas nunca llegaban al usuario, aunque ya se pedian a la
+    API)."""
+    maxima = max(temperatura_maxima)
+    minima = min(temperatura_minima)
+    dias_con_lluvia = sum(1 for mm in precipitacion_mm if mm > 0)
+    detalle = f"Temperatura prevista entre {minima:.0f}°C y {maxima:.0f}°C."
+    if dias_con_lluvia:
+        detalle += f" Lluvia estimada en {dias_con_lluvia} de {len(precipitacion_mm)} día(s)."
+    return detalle
+
+
 def obtener_clima(
     lat: float, lon: float, fecha_inicio: date, fecha_fin: date, hoy: date | None = None
 ) -> InfoClima:
-    """Pronostico en vivo si las fechas caen dentro del horizonte de
-    Open-Meteo (~16 dias). Fuera de ese horizonte, devuelve la limitacion
-    explicita en vez de inventar un numero."""
+    """Pronostico en vivo si las fechas caen dentro del horizonte de la
+    fuente (~16 dias). Fuera de ese horizonte, devuelve la limitacion
+    explicita en vez de inventar un numero. Textos en tono de asesor de
+    viajes: no nombran al proveedor ni exponen texto crudo de excepcion
+    (eso queda en el log, no en la respuesta al cliente)."""
     hoy = hoy or datetime.now(tz=UTC).date()
     limite = hoy + timedelta(days=HORIZONTE_PRONOSTICO_DIAS)
 
@@ -66,9 +84,9 @@ def obtener_clima(
         return InfoClima(
             disponible=False,
             detalle=(
-                f"El pronostico de Open-Meteo solo cubre los proximos "
-                f"{HORIZONTE_PRONOSTICO_DIAS} dias. Para fechas mas lejanas no hay dato "
-                f"en vivo confiable, se aclara en vez de inventar un numero."
+                f"Todavía no tengo pronóstico confiable para esas fechas (el clima en vivo solo "
+                f"llega hasta {HORIZONTE_PRONOSTICO_DIAS} días por delante); más cerca del viaje "
+                f"puedo consultarlo de nuevo."
             ),
         )
 
@@ -86,16 +104,23 @@ def obtener_clima(
         respuesta.raise_for_status()
         datos = respuesta.json()
     except httpx.HTTPError as error:
-        logger.warning("Open-Meteo no respondio: %s", error)
-        return InfoClima(disponible=False, detalle=f"No se pudo consultar el clima ahora: {error}")
+        logger.warning("fallo la consulta de clima en vivo: %s", error)
+        return InfoClima(disponible=False, detalle="No pude consultar el clima en este momento.")
 
     diario = datos.get("daily", {})
+    temperatura_maxima = diario.get("temperature_2m_max") or []
+    temperatura_minima = diario.get("temperature_2m_min") or []
+    precipitacion_mm = diario.get("precipitation_sum") or []
+
+    if not (temperatura_maxima and temperatura_minima):
+        return InfoClima(disponible=False, detalle="No pude consultar el clima en este momento.")
+
     return InfoClima(
         disponible=True,
-        detalle="Pronostico en vivo de Open-Meteo.",
-        temperatura_maxima=diario.get("temperature_2m_max"),
-        temperatura_minima=diario.get("temperature_2m_min"),
-        precipitacion_mm=diario.get("precipitation_sum"),
+        detalle=_resumir_pronostico(temperatura_maxima, temperatura_minima, precipitacion_mm),
+        temperatura_maxima=temperatura_maxima,
+        temperatura_minima=temperatura_minima,
+        precipitacion_mm=precipitacion_mm,
     )
 
 

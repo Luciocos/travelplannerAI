@@ -40,6 +40,9 @@ def test_obtener_clima_devuelve_pronostico_dentro_del_horizonte(
 
     assert clima.disponible
     assert clima.temperatura_maxima == [30.0, 31.0]
+    assert "22" in clima.detalle  # minima real, no un texto generico
+    assert "31" in clima.detalle  # maxima real
+    assert "Open-Meteo" not in clima.detalle  # tono de asesor, no de desarrollador
 
 
 def test_obtener_clima_fuera_de_horizonte_no_inventa_dato() -> None:
@@ -72,6 +75,7 @@ def test_obtener_clima_api_caida_no_rompe(monkeypatch: pytest.MonkeyPatch) -> No
     )
 
     assert not clima.disponible
+    assert "caida simulada" not in clima.detalle  # nunca texto crudo de excepcion al cliente
 
 
 def test_obtener_idioma_moneda_lee_la_tabla_de_referencia(tmp_path: Path) -> None:
