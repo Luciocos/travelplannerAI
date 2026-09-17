@@ -21,7 +21,7 @@
 
 ## Fase actual: Fase 7D, extensiones sobre el grafo nuevo
 
-Rama `fase/7d-extensiones`, creada desde `main` justo después de mergear el notebook (commit `db3c598`). Fase 7C + el notebook ya están en `main` (mergeados con el "push to main" pedido por el usuario). Esta rama agrega lo que había quedado afuera de 7C: RF6/RF7 enganchados, conversión de moneda, descarga de itinerario, tarjetas HTML en el chat, harness de evaluación y tests de `AppTest`. También surgió y se resolvió un bug real de la UI (P-11) probando en vivo con Playwright, y otro de Python/imports (P-12) escribiendo los tests de `AppTest`. **Nada de esta rama está todavía en `main`.**
+Rama `fase/7d-extensiones`, creada desde `main` justo después de mergear el notebook (commit `db3c598`). Fase 7C + el notebook ya están en `main` (mergeados con el "push to main" pedido por el usuario). Esta rama agrega lo que había quedado afuera de 7C: RF6/RF7 enganchados, conversión de moneda, descarga de itinerario, tarjetas HTML en el chat, harness de evaluación y tests de `AppTest`. Se encontraron y arreglaron 3 bugs reales probando todo esto en vivo: P-11 (UI), P-12 (tests) y P-13 (conversación). **Nada de esta rama está todavía en `main`.**
 
 **Lo que se agregó, de mayor a menor impacto:**
 
@@ -29,22 +29,22 @@ Rama `fase/7d-extensiones`, creada desde `main` justo después de mergear el not
 - **Conversión de moneda (D-19).** `services/cambio.py` + `tools/convertir_moneda.py`: USD→ARS (oficial y tarjeta, dolarapi.com) y USD→otras monedas (open.er-api.com), cacheado 1h, nunca inventa una cotización. Convierte por defecto el total del último plan armado. Verificado contra las APIs reales.
 - **Descarga de itinerario.** `armar_plan.resumen_markdown()` + `servicio.itinerario_descargable()`: botón en la UI que exporta el plan armado a Markdown.
 - **Tarjetas HTML en el chat (D-20).** `presentacion.py` (nuevo): un helper de tarjeta HTML genérico + `escapar()`. Las funciones `_resumen_*` de `grafo.py` (plan, actividades, locales, alojamiento, vuelos, info de destino) devuelven una tarjeta en vez de bullets de markdown; `ui/chat_app.py` renderiza con `st.markdown(..., unsafe_allow_html=True)` solo para los mensajes del asistente. No se hizo la arquitectura de bloques tipados del plan original de 7C (`respuesta.py`); se logra el resultado visual pedido sin tocar el contrato de `EstadoGrafo`. Verificado con Playwright: tarjetas visibles como cajas separadas, cero HTML crudo en pantalla.
-- **Harness de evaluación (`scripts/evaluar_conversaciones.py`).** Corre escenarios guionados (`scripts/escenarios_conversacion.json`, 7 iniciales) contra Gemini y Postgres reales, turno a turno, con checks `debe_contener`/`no_debe_contener`, y escribe un reporte en `docs/evaluacion/`. Nunca se corre en CI (consume cuota real); es un script manual, como el resto de la verificación con LLM real de este proyecto. Corrido una vez de verdad (escenario `recap_memoria`, 2/2 turnos OK, reporte commiteado como evidencia).
+- **Harness de evaluación (`scripts/evaluar_conversaciones.py`).** Corre escenarios guionados (`scripts/escenarios_conversacion.json`, 7 escenarios) contra Gemini y Postgres reales, turno a turno, con checks `debe_contener`/`no_debe_contener`, y escribe un reporte en `docs/evaluacion/`. Nunca se corre en CI (consume cuota real); es un script manual, como el resto de la verificación con LLM real de este proyecto. Corrido de punta a punta: 11/11 turnos OK, reporte commiteado como evidencia.
 - **Tests de la UI con `streamlit.testing.v1.AppTest` (`tests/test_ui_chat_app.py`).** 7 tests: carga sin errores, botones de arranque, click de sugerencia + respuesta, historial persistido entre turnos, camino de error sin romper la app, ausencia del botón de descarga sin plan, y una regresión de P-11. Ningún test toca Postgres ni Gemini real.
 - **P-11 (bug real, ver DIFICULTADES).** `st.rerun()` llamado desde dentro del `with obtener_conexion()` de `ui/chat_app.py` hacía rollback de la propia escritura que acababa de confirmar (crear/cambiar/borrar/renombrar un chat), dejando `session_state` apuntando a una conversación fantasma nunca persistida → `ForeignKeyViolation` al mandar el siguiente mensaje. Encontrado y arreglado probando en vivo con Playwright el botón de descarga; `_sidebar()`/`_cuerpo_principal()` ahora devuelven un `bool` en vez de llamar `st.rerun()` directo, y `main()` lo llama una sola vez después de que el `with` cerró y confirmó.
 - **P-12 (bug real, ver DIFICULTADES).** Escribiendo `test_ui_chat_app.py`, parchear `asistente_viajes.agente.procesar_mensaje` pasaba en aislamiento pero fallaba corriendo el archivo completo: `ui/servicio.py` hace `from asistente_viajes.agente import procesar_mensaje` una sola vez por proceso (Python cachea el módulo), así que un parche posterior al original no llega a la copia ya congelada. Se parchea `servicio.py` directo, que es el que resuelve ese nombre en su propio namespace en cada llamada.
+- **P-13, D-21 (bug real, ver DIFICULTADES/DECISIONES).** Corriendo el harness de verdad se encontró que `nodo_planificar` repetía la misma pregunta consolidada en cada turno mientras faltara algún dato, aunque el mensaje fuera un agradecimiento sin datos nuevos ("gracias" quedaba tapado). Nuevo campo de sesión `pedir_datos_mostrado_para` (mismo patrón que `info_destino_mostrada_para`): solo repregunta si los faltantes cambiaron, si el estado cambió, o si el cliente pidió algo explícito. Verificado antes/después con el mismo escenario real.
 - **Sidebar movida al chat principal.** Los botones "Para arrancar" ya no viven en la sidebar; se muestran en el área central, solo cuando el chat está vacío (pedido explícito del usuario con screenshot). Este cambio se hizo antes de crear `fase/7d-extensiones` y viajó con Fase 7C a `main`.
 
 **No hecho todavía** (quedan para la próxima sesión, ninguno bloquea lo demás):
 - Repository secrets de GitHub y protección de `main` (bloqueo, requiere acceso del usuario/equipo a GitHub).
 - Mergear `fase/7d-extensiones` a `main` (todavía no se pidió).
-- Correr el resto de los escenarios del harness de evaluación (solo se corrió 1 de 7 para verificar que funciona).
 
 ## Fases cerradas
 
 - **Fases 0 a 6** (núcleo, RF1/RF2/RF3/RF5/RF11/RF12): cerradas en sesiones anteriores. Con el núcleo cerrado el TP ya era aprobable según `plan-de-fases.md`.
 - **Fase 7C** (orquestador LangGraph + persistencia de chats + fine-tuning conversacional): cerrada y **mergeada a `main`**.
-- **Fase 7D** (este documento, en curso): RF6/RF7 enganchados, moneda, descarga de itinerario, tarjetas HTML, harness de evaluación, tests de `AppTest`, P-11, P-12. Todo sigue en `fase/7d-extensiones`, sin mergear a `main` todavía.
+- **Fase 7D** (este documento, en curso): RF6/RF7 enganchados, moneda, descarga de itinerario, tarjetas HTML, harness de evaluación, tests de `AppTest`, P-11, P-12, P-13. Todo sigue en `fase/7d-extensiones`, sin mergear a `main` todavía.
 
 ## Decisiones tomadas
 
@@ -59,6 +59,7 @@ Una línea por decisión, el detalle va en `docs/DECISIONES.md` del repo. D-01 a
 - **D-18 (Fase 7D):** RF6/RF7 enganchados al grafo, con precondición propia (fechas exactas, vuelos además `origen`).
 - **D-19 (Fase 7D):** conversión de moneda vía dolarapi.com (ARS oficial/tarjeta) y open.er-api.com (otras monedas), cacheada 1h, nunca inventada.
 - **D-20 (Fase 7D):** tarjetas HTML para los resultados del chat (`presentacion.py`), sin la reescritura a bloques tipados que proponía el plan original de 7C.
+- **D-21 (Fase 7D):** `pedir_datos_mostrado_para` recuerda qué faltantes ya se preguntaron, para no repetir la misma pregunta ante un turno sin datos nuevos (P-13).
 
 Decisiones que vienen dadas y no se rediscuten sin motivo nuevo:
 
