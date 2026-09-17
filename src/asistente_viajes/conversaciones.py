@@ -64,6 +64,7 @@ def _sesion_desde_jsonb(datos: dict) -> SesionAgente:
         estado=estado,
         ultimo_plan=datos.get("ultimo_plan"),
         info_destino_mostrada_para=datos.get("info_destino_mostrada_para"),
+        pedir_datos_mostrado_para=datos.get("pedir_datos_mostrado_para"),
     )
 
 
@@ -158,6 +159,7 @@ def guardar_turno(
                 "estado": sesion.estado.model_dump(mode="json"),
                 "ultimo_plan": sesion.ultimo_plan,
                 "info_destino_mostrada_para": sesion.info_destino_mostrada_para,
+                "pedir_datos_mostrado_para": sesion.pedir_datos_mostrado_para,
             }
         )
         titulo_automatico = _titulo_automatico(sesion)

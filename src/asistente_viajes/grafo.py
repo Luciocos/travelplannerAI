@@ -26,10 +26,14 @@ Flujo (ver tambien construir_grafo().get_graph().draw_mermaid()):
 - planificar: logica pura. Decide que ejecutar este turno: si falta
   algun dato obligatorio, una pregunta consolidada (D-14) mas, si ya hay
   destino, una recomendacion barata de regalo (nunca se deja al cliente
-  solo con la pregunta); si el plan ya armado quedo desactualizado por
-  un cambio de dato (ver estado.detectar_cambios), se re-arma solo; las
-  acciones que pidio el cliente se agregan si sus precondiciones estan
-  cubiertas.
+  solo con la pregunta) — pero solo si algo cambio o el cliente pidio
+  algo este turno; si ya se hizo exactamente esa misma pregunta el turno
+  anterior y el cliente no aporto nada nuevo (un agradecimiento, un
+  comentario), no se repite, y el turno cae en redactar/conversar (bug
+  real, P-13: "gracias" quedaba tapado por la misma pregunta de siempre).
+  Si el plan ya armado quedo desactualizado por un cambio de dato (ver
+  estado.detectar_cambios), se re-arma solo; las acciones que pidio el
+  cliente se agregan si sus precondiciones estan cubiertas.
 - ejecutar_acciones: corre cada accion pendiente en un solo nodo, con un
   loop de Python (no un nodo de grafo por tool: ver D-12, mismo
   criterio de arquitectura.md de no complicar el flujo mas de lo que
@@ -182,6 +186,7 @@ class EstadoGrafo(TypedDict):
     estado_anterior: dict
     ultimo_plan: dict | None
     info_destino_mostrada_para: str | None
+    pedir_datos_mostrado_para: list[str] | None
     interpretacion: dict | None
     destino_no_soportado: str | None
     acciones_pedidas: list[dict]
@@ -271,17 +276,31 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
     estado = PreferenciasViaje(**estado_grafo["estado"])
     estado_anterior = PreferenciasViaje(**estado_grafo["estado_anterior"])
     faltantes = estado.slots_faltantes()
+    faltantes_ordenados = sorted(faltantes)
     pendientes: list[dict] = []
 
     if estado_grafo.get("destino_no_soportado"):
         pendientes.append({"tipo": "destino_no_soportado"})
 
+    pedir_datos_mostrado_para = estado_grafo.get("pedir_datos_mostrado_para")
     if faltantes:
-        pendientes.append({"tipo": "pedir_datos"})
-        if estado.destino:
-            # Nunca se deja al cliente solo con la pregunta: si ya hay
-            # destino, se suma algo util en el mismo turno.
-            pendientes.append({"tipo": "recomendar_actividades", "cantidad_resultados": 3})
+        # P-13: si ya se hizo exactamente esta misma pregunta el turno
+        # anterior, y el cliente no aporto ningun dato nuevo ni pidio
+        # ninguna accion, no se repite (tapaba respuestas a "gracias" o
+        # comentarios sueltos con la misma pregunta de siempre). Un
+        # cambio de estado o un pedido explicito si la vuelve a disparar.
+        ya_se_pregunto_lo_mismo = pedir_datos_mostrado_para == faltantes_ordenados
+        hubo_cambio = detectar_cambios(estado_anterior, estado)
+        hay_pedido_explicito = bool(estado_grafo["acciones_pedidas"])
+        if not ya_se_pregunto_lo_mismo or hubo_cambio or hay_pedido_explicito:
+            pendientes.append({"tipo": "pedir_datos"})
+            if estado.destino:
+                # Nunca se deja al cliente solo con la pregunta: si ya hay
+                # destino, se suma algo util en el mismo turno.
+                pendientes.append({"tipo": "recomendar_actividades", "cantidad_resultados": 3})
+            pedir_datos_mostrado_para = faltantes_ordenados
+    else:
+        pedir_datos_mostrado_para = None
 
     for accion in estado_grafo["acciones_pedidas"]:
         tipo = accion["tipo"]
@@ -317,7 +336,10 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
     ):
         pendientes.append({"tipo": "armar_plan"})
 
-    return {"pendientes": pendientes[:MAXIMO_FRAGMENTOS_POR_TURNO]}
+    return {
+        "pendientes": pendientes[:MAXIMO_FRAGMENTOS_POR_TURNO],
+        "pedir_datos_mostrado_para": pedir_datos_mostrado_para,
+    }
 
 
 def _resumen_plan(plan: PlanDeViaje) -> str:
@@ -594,6 +616,7 @@ def procesar_turno(
     estado: dict,
     ultimo_plan: dict | None,
     info_destino_mostrada_para: str | None,
+    pedir_datos_mostrado_para: list[str] | None = None,
     hoy: date | None = None,
 ) -> EstadoGrafo:
     """Punto de entrada del grafo para un turno. agente.py lo envuelve en
@@ -607,6 +630,7 @@ def procesar_turno(
         "estado_anterior": estado,
         "ultimo_plan": ultimo_plan,
         "info_destino_mostrada_para": info_destino_mostrada_para,
+        "pedir_datos_mostrado_para": pedir_datos_mostrado_para,
         "interpretacion": None,
         "destino_no_soportado": None,
         "acciones_pedidas": [],

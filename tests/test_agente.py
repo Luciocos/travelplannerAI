@@ -20,6 +20,7 @@ def _resultado_grafo(**overrides) -> dict:
         "estado": PreferenciasViaje(destino="Cancun").model_dump(mode="json"),
         "ultimo_plan": None,
         "info_destino_mostrada_para": None,
+        "pedir_datos_mostrado_para": None,
         "respuesta_texto": "¿Qué le interesa hacer?",
     }
     base.update(overrides)

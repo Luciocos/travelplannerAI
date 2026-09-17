@@ -44,7 +44,15 @@ def _rotador_con_interpretacion(interpretacion: InterpretacionTurno) -> MagicMoc
     return rotador
 
 
-def _turno(rotador, mensaje, estado=None, historial=None, ultimo_plan=None, info_destino_para=None):
+def _turno(
+    rotador,
+    mensaje,
+    estado=None,
+    historial=None,
+    ultimo_plan=None,
+    info_destino_para=None,
+    pedir_datos_para=None,
+):
     return procesar_turno(
         conexion=MagicMock(),
         rotador=rotador,
@@ -53,6 +61,7 @@ def _turno(rotador, mensaje, estado=None, historial=None, ultimo_plan=None, info
         estado=(estado or PreferenciasViaje()).model_dump(mode="json"),
         ultimo_plan=ultimo_plan,
         info_destino_mostrada_para=info_destino_para,
+        pedir_datos_mostrado_para=pedir_datos_para,
         hoy=HOY,
     )
 
@@ -157,6 +166,95 @@ def test_planificar_no_pide_datos_si_ya_esta_completo(monkeypatch) -> None:
     rotador = _rotador_con_interpretacion(InterpretacionTurno())
     resultado = _turno(rotador, "hola", estado=estado)
     assert resultado["pendientes"] == []
+
+
+# --- pedir_datos no se repite sin motivo (P-13) ---------------------------
+
+
+def _estado_con_intereses_faltante() -> PreferenciasViaje:
+    return PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        presupuesto="medio",
+        fecha_inicio=date(2026, 12, 1),
+        fecha_fin=date(2026, 12, 5),
+        cantidad_personas=2,
+    )  # falta unicamente "intereses"
+
+
+def test_pedir_datos_no_se_repite_si_nada_cambio_y_no_hay_pedido() -> None:
+    """Bug real: un 'gracias' sin datos nuevos repetia la misma pregunta
+    consolidada de siempre en vez de reconocer el agradecimiento."""
+    rotador = _rotador_con_interpretacion(InterpretacionTurno())
+
+    resultado = _turno(
+        rotador,
+        "gracias, me sirvió mucho",
+        estado=_estado_con_intereses_faltante(),
+        pedir_datos_para=["intereses"],
+    )
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" not in tipos
+
+
+def test_pedir_datos_se_repite_si_algo_cambio_aunque_ya_se_habia_preguntado() -> None:
+    rotador = _rotador_con_interpretacion(InterpretacionTurno(cantidad_personas=4))
+
+    resultado = _turno(
+        rotador,
+        "somos 4 en vez de 2",
+        estado=_estado_con_intereses_faltante(),
+        pedir_datos_para=["intereses"],
+    )
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" in tipos
+
+
+def test_pedir_datos_se_repite_si_hay_un_pedido_explicito_aunque_ya_se_habia_preguntado() -> None:
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="armar_plan")])
+    )
+
+    resultado = _turno(
+        rotador,
+        "armame el plan",
+        estado=_estado_con_intereses_faltante(),
+        pedir_datos_para=["intereses"],
+    )
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" in tipos
+
+
+def test_pedir_datos_se_repite_la_primera_vez_aunque_nada_cambie() -> None:
+    """pedir_datos_mostrado_para arranca en None: la primera pregunta
+    siempre tiene que salir, aunque "nada cambio" respecto de un estado
+    vacio inicial (no hay confundir "primera vez" con "ya se pregunto")."""
+    rotador = _rotador_con_interpretacion(InterpretacionTurno())
+
+    resultado = _turno(rotador, "hola", estado=_estado_con_intereses_faltante())
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" in tipos
+
+
+def test_pedir_datos_mostrado_para_se_limpia_cuando_ya_no_falta_nada() -> None:
+    estado = PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        intereses=["naturaleza"],
+        presupuesto="medio",
+        fecha_inicio=date(2026, 12, 1),
+        fecha_fin=date(2026, 12, 5),
+        cantidad_personas=2,
+    )
+    rotador = _rotador_con_interpretacion(InterpretacionTurno())
+
+    resultado = _turno(rotador, "hola", estado=estado, pedir_datos_para=["intereses"])
+
+    assert resultado["pedir_datos_mostrado_para"] is None
 
 
 def test_planificar_multiples_acciones_en_un_solo_mensaje(monkeypatch) -> None:
