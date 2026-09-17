@@ -35,13 +35,25 @@ class _EstadoClave:
 
 
 def _es_error_cuota(error: Exception) -> bool:
+    """True para cualquier error transitorio ante el que tiene sentido
+    rotar de clave en vez de fallar duro: cuota agotada (429), el
+    servidor sobrecargado (503/504), o un timeout de red. Un timeout
+    entra aca a proposito: con max_retries=1 en el ChatModel (ver
+    crear_rotador, P-06), un timeout es la UNICA senial de que esa key
+    esta lenta ahora mismo, y sin esto el rotador fallaba duro en la
+    primera key en vez de probar las otras dos (hallado en vivo,
+    ver DIFICULTADES.md)."""
     texto = str(error).lower()
     return (
         "429" in texto
         or "quota" in texto
         or "resource_exhausted" in texto
         or "503" in texto
+        or "504" in texto
         or "unavailable" in texto
+        or "deadline" in texto
+        or "timed out" in texto
+        or "timeout" in texto
     )
 
 
@@ -177,19 +189,26 @@ def contenido_texto(respuesta: object) -> str:
     return str(contenido).strip()
 
 
-TIMEOUT_SEGUNDOS_LLM = 30
+TIMEOUT_SEGUNDOS_LLM = 45
 MAX_REINTENTOS_SDK = 1
 
 
 def crear_rotador(configuracion: Configuracion | None = None) -> RotadorClavesGemini:
     """Factory principal. Usa la configuracion cargada de .env si no se pasa una.
 
-    max_retries=1 y timeout bajo son deliberados (P-06 en DIFICULTADES.md):
-    el SDK de google-genai reintenta un 429/503 con backoff exponencial
-    propio (~1+2+4+8+16s) ANTES de que la excepcion llegue al rotador, asi
-    que una key agotada tardaba hasta 42s en vez de fallar rapido y rotar.
+    max_retries=1 es deliberado (P-06 en DIFICULTADES.md): el SDK de
+    google-genai reintenta un 429/503 con backoff exponencial propio
+    (~1+2+4+8+16s) ANTES de que la excepcion llegue al rotador, asi que
+    una key agotada tardaba hasta 42s en vez de fallar rapido y rotar.
     Con max_retries=1 el rotador es el unico que reintenta, y lo hace
-    rotando de key (barato) en vez de reintentando la misma (caro)."""
+    rotando de key (barato) en vez de reintentando la misma (caro).
+
+    timeout=45s (no mas bajo): verificado en vivo que con max_retries=1
+    un solo intento real, bajo carga acumulada de sesion, puede tardar
+    mas de 30s y no es un cuelgue (es la latencia real documentada en
+    P-06, hasta 42s). Un timeout mas agresivo cortaba respuestas
+    legitimas a mitad de camino. 45s deja margen y sigue siendo mucho
+    mas corto que la espera vieja de ~42s + reintento interno del SDK."""
     configuracion = configuracion or cargar_configuracion()
     if configuracion.llm_provider != "gemini":
         raise ValueError(f"Proveedor no soportado: {configuracion.llm_provider}")

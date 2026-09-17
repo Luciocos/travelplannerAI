@@ -53,19 +53,29 @@ def test_contenido_texto_sin_content_usa_str_de_la_respuesta() -> None:
     assert contenido_texto("respuesta cruda") == "respuesta cruda"
 
 
-def test_es_error_cuota_detecta_429_y_503() -> None:
-    """P-06: el SDK de google-genai reintenta un 503/UNAVAILABLE con el
-    mismo backoff exponencial que un 429 agotado, asi que el rotador tiene
-    que tratarlos igual para rotar de key en vez de esperar el reintento
-    interno del SDK."""
+def test_es_error_cuota_detecta_429_503_504() -> None:
+    """P-06: el SDK de google-genai reintenta un 503/504/UNAVAILABLE con
+    el mismo backoff exponencial que un 429 agotado, asi que el rotador
+    tiene que tratarlos igual para rotar de key en vez de esperar el
+    reintento interno del SDK."""
     assert _es_error_cuota(Exception("429 Too Many Requests")) is True
     assert _es_error_cuota(Exception("503 Service Unavailable")) is True
+    assert _es_error_cuota(Exception("504 DEADLINE_EXCEEDED")) is True
     assert _es_error_cuota(Exception("UNAVAILABLE: overloaded")) is True
     assert _es_error_cuota(Exception("400 Bad Request")) is False
 
 
-def test_es_limite_diario_no_confunde_503_con_limite_diario() -> None:
+def test_es_error_cuota_detecta_timeouts() -> None:
+    """Hallado en vivo: con max_retries=1, un timeout de red (httpx) es
+    la unica senial de que esa key esta lenta ahora. Sin esto, el
+    rotador fallaba duro en la primera key sin probar las otras dos."""
+    assert _es_error_cuota(Exception("The read operation timed out")) is True
+    assert _es_error_cuota(TimeoutError("Request timeout")) is True
+
+
+def test_es_limite_diario_no_confunde_503_ni_timeout_con_limite_diario() -> None:
     assert _es_limite_diario(Exception("503 Service Unavailable")) is False
+    assert _es_limite_diario(Exception("The read operation timed out")) is False
 
 
 def test_crear_rotador_limita_reintentos_del_sdk_y_el_timeout() -> None:
