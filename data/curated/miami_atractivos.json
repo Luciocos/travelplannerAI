@@ -1,0 +1,122 @@
+[
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "South Beach",
+    "categoria": "cultural",
+    "texto": "South Beach es el barrio de Miami Beach entre la bahia de Biscayne y el Oceano Atlantico, conocido por tener la mayor coleccion de arquitectura Art Deco estilo Streamline Moderne del mundo. En 1979 casi una milla cuadrada de la zona fue declarada Distrito Arquitectonico Historico. De ser una comunidad de jubilados deteriorada en los anios 80, se transformo en un barrio de moda con cientos de discotecas, restaurantes y boutiques, y hoy es un centro global de vida nocturna, playas y entretenimiento.",
+    "direccion": "Ocean Drive, South Beach, Miami Beach",
+    "rango_precio": null,
+    "lat": 25.7825,
+    "lon": -80.1340,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Wynwood Walls",
+    "categoria": "cultural",
+    "texto": "Wynwood Walls es una exhibicion de arte callejero al aire libre en el Distrito de Arte de Wynwood, concebida en 2009 por el desarrollador urbano Tony Goldman para revitalizar un distrito industrial abandonado transformando almacenes en obras de arte. Hoy funciona como el museo de arte callejero al aire libre mas grande del mundo, con murales rotativos de artistas reconocidos internacionalmente, y atrae millones de visitantes al anio. El proyecto tambien impulso la llegada de galerias, restaurantes y negocios de diseño a la zona.",
+    "direccion": "NW 2nd Ave, Wynwood, Miami",
+    "rango_precio": null,
+    "lat": 25.8010,
+    "lon": -80.1997,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Little Havana (Calle Ocho)",
+    "categoria": "cultural",
+    "texto": "Little Havana es el barrio que desde los anios 60 funciona como capital cultural y politica de los cubanoamericanos en Miami, hogar de exiliados cubanos e inmigrantes centro y sudamericanos. Su arteria principal es Calle Ocho, famosa por su ambiente y sus festivales anuales que atraen a millones de visitantes. El Parque Maximo Gomez (Domino Park) es el punto de encuentro donde los inmigrantes cubanos toman cafe, fuman puros y juegan domino. El barrio tiene tambien un Walk of Fame que honra a figuras latinas como Celia Cruz y Gloria Estefan.",
+    "direccion": "SW 8th St (Calle Ocho), Little Havana, Miami",
+    "rango_precio": null,
+    "lat": 25.7658,
+    "lon": -80.2196,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Vizcaya Museum and Gardens",
+    "categoria": "historic",
+    "texto": "Vizcaya es la antigua villa de invierno del empresario James Deering en Coconut Grove, construida entre 1914 y 1923 en estilo Mediterranean Revival con influencia del renacimiento italiano del Veneto y la Toscana, con elementos barrocos. La disenio el arquitecto F. Burrall Hoffman junto al director de diseño Paul Chalfin y el paisajista Diego Suarez. El condado de Miami-Dade adquirio la propiedad en 1952 y la abrio como museo en 1953; en 1994 fue declarada Monumento Historico Nacional. Hoy se visita por su mansion, sus jardines formales y sus vistas a la bahia de Biscayne.",
+    "direccion": "3251 S Miami Ave, Coconut Grove, Miami",
+    "rango_precio": "$$",
+    "lat": 25.7444,
+    "lon": -80.2103,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Perez Art Museum Miami (PAMM)",
+    "categoria": "museums",
+    "texto": "El Perez Art Museum Miami (PAMM) es un museo de arte contemporaneo en Museum Park, centro de Miami, disenado por los arquitectos suizos Herzog & de Meuron y abierto en diciembre de 2013. Se enfoca en arte del siglo XX y XXI, con especial atencion a obras de las Americas, Europa Occidental y Africa. En sus primeros cuatro meses recibio mas de 150.000 visitantes.",
+    "direccion": "1103 Biscayne Blvd, Museum Park, Miami",
+    "rango_precio": "$$",
+    "lat": 25.7859,
+    "lon": -80.1868,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Bill Baggs Cape Florida State Park",
+    "categoria": "natural",
+    "texto": "El parque estatal Bill Baggs Cape Florida ocupa el extremo sur de Key Biscayne, con unas 400 acres y cerca de 850.000 visitantes al anio desde su creacion en 1967. Su atraccion principal es el Faro de Cape Florida, la estructura en pie mas antigua del Gran Miami, que se puede visitar en recorridos guiados junto a las dependencias del antiguo farero. En 2004 el sitio fue incorporado a la Red Nacional del Ferrocarril Clandestino hacia la Libertad, en homenaje a los Seminoles negros que escaparon hacia las Bahamas a comienzos del siglo XIX.",
+    "direccion": "1200 S Crandon Blvd, Key Biscayne, Miami",
+    "rango_precio": "$",
+    "lat": 25.6685,
+    "lon": -80.1564,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Frost Museum of Science",
+    "categoria": "museums",
+    "texto": "El Museo de Ciencia Phillip y Patricia Frost combina museo de ciencias, planetario y acuario en Maurice A. Ferre Park, centro de Miami, en un edificio de 250.000 pies cuadrados disenado por Grimshaw Architects que abrio el 8 de mayo de 2017 (reubicado desde Coconut Grove). El planetario tiene un domo de 67 pies con proyeccion 8K, y el acuario de tres niveles alberga 500.000 galones de agua con tiburones martillo, rayas y otra fauna marina subtropical. El proyecto se hizo posible por una donacion de 35 millones de dolares de Phillip y Patricia Frost en 2011.",
+    "direccion": "1101 Biscayne Blvd, Museum Park, Miami",
+    "rango_precio": "$$",
+    "lat": 25.7858,
+    "lon": -80.1868,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Bayfront Park",
+    "categoria": "natural",
+    "texto": "Bayfront Park es un parque urbano de 32 acres en el centro de Miami, frente a la bahia de Biscayne, cuya construccion arranco en 1924 bajo el diseno de Warren Henry Manning y abrio oficialmente en marzo de 1925; el artista Isamu Noguchi lo rediseno a partir de 1980. Alberga un anfiteatro para 10.000 personas usado para conciertos y eventos, ademas del Memorial Challenger (una escultura de acero de 100 pies dedicada a la tripulacion del transbordador espacial) y la Antorcha de la Amistad, construida en 1960 como simbolo de bienvenida a los inmigrantes. Hoy sigue siendo sede de festivales de musica y de los festejos de Anio Nuevo de la ciudad.",
+    "direccion": "301 Biscayne Blvd, Downtown Miami",
+    "rango_precio": null,
+    "lat": 25.7748,
+    "lon": -80.1868,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Coconut Grove",
+    "categoria": "cultural",
+    "texto": "Coconut Grove es el barrio habitado de forma continua mas antiguo de Miami, establecido en 1825 y anexado a la ciudad en 1925, conocido como 'The Grove'. Se caracteriza por su vegetacion abundante y su historia como centro de la contracultura de los anios 60, con un caracter bohemio que atrajo artistas, navegantes y naturalistas desde sus origenes. Hoy combina restaurantes, cafes al aire libre, bares y comercio con vida nocturna, y sostiene su identidad con festivales anuales como el Coconut Grove Arts Festival y el Goombay Festival, que celebra la herencia bahamiana.",
+    "direccion": "Coconut Grove, Miami",
+    "rango_precio": null,
+    "lat": 25.7275,
+    "lon": -80.2436,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Miami",
+    "nombre": "Biltmore Hotel (Coral Gables)",
+    "categoria": "historic",
+    "texto": "El Biltmore Hotel de Coral Gables se construyo en 1926 en diez meses por 10 millones de dolares, disenado por el estudio Schultze and Weaver combinando estilos Mission, Revival espaniol y renacimiento italiano; su torre esta inspirada en la Giralda de la catedral de Sevilla. Con 315 pies de altura fue el edificio mas alto de Florida hasta 1928. Funciono como hospital militar en la Segunda Guerra Mundial y luego como sede de la Administracion de Veteranos y una facultad de medicina hasta 1968, antes de reabrir como hotel de lujo en 1987. Fue declarado Monumento Historico Nacional en 1996.",
+    "direccion": "1200 Anastasia Ave, Coral Gables, Miami",
+    "rango_precio": null,
+    "lat": 25.7489,
+    "lon": -80.2827,
+    "fuente": "curado"
+  }
+]

@@ -154,5 +154,89 @@
     "lat": 20.7561,
     "lon": -87.0272,
     "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Cancun",
+    "nombre": "Museo Subacuatico de Arte (MUSA)",
+    "categoria": "cultural",
+    "texto": "El Museo Subacuatico de Arte (MUSA) es una organizacion sin fines de lucro que combina arte con conservacion marina dentro del Parque Nacional Marino de Cancun. Contiene alrededor de 500 esculturas sumergidas entre tres y seis metros de profundidad, concebidas por Jaime Gonzalez Cano junto al escultor Jason deCaires Taylor. El objetivo es doble: desviar a los buceadores de los arrecifes de coral danados hacia estas obras, y crear habitats artificiales donde el coral pueda crecer. Abrio en noviembre de 2010 y recibe cerca de 200.000 visitantes al anio, principalmente en excursiones de buceo o snorkel.",
+    "direccion": "Parque Nacional Marino de Cancun, frente a Punta Nizuc, Cancun",
+    "rango_precio": null,
+    "lat": 21.0680,
+    "lon": -86.7680,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Cancun",
+    "nombre": "Mercado 28",
+    "categoria": "cultural",
+    "texto": "Mercado 28 es un mercado al aire libre en el centro de Cancun, establecido en los anios 80. Originalmente vendia frutas, verduras y carnes, pero tras la crisis economica de los 90 se reoriento hacia artesanias mexicanas y productos tradicionales, con puestos de talla, textiles y recuerdos. Queda a unos 2 kilometros de la zona hotelera, cerca del Parque de las Palapas, accesible a pie, en taxi o en el autobus R2.",
+    "direccion": "Av. Xcaret, SM 28, Centro, Cancun",
+    "rango_precio": "$",
+    "lat": 21.1584,
+    "lon": -86.8347,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Cancun",
+    "nombre": "El Meco",
+    "categoria": "historic",
+    "texto": "El Meco es una zona arqueologica maya ubicada unos 8 kilometros al norte de Cancun, cerca de Puerto Juarez. El asentamiento arranco alrededor del anio 600 d.C. como una comunidad pesquera ligada a Coba, y llego a ser un puerto comercial maritimo importante conectado con Chichen Itza y Mayapan, con su mayor desarrollo entre 1200 y 1500 d.C. Su estructura principal, El Castillo, es una piramide de cinco niveles y 12,5 metros de altura, y es el unico templo maya conocido construido de frente al mar, posiblemente para observar la puesta de sol.",
+    "direccion": "Carretera Puerto Juarez - Punta Sam, Puerto Juarez, Cancun",
+    "rango_precio": null,
+    "lat": 21.2214,
+    "lon": -86.8129,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Cancun",
+    "nombre": "Playa Norte (Isla Mujeres)",
+    "categoria": "natural",
+    "texto": "Playa Norte, en el extremo norte de Isla Mujeres, es una de las playas mas conocidas de la isla, de aguas poco profundas y arena blanca. Se recupero rapido despues del paso del huracan Wilma en 2005 y sigue siendo uno de los puntos mas visitados de Isla Mujeres, a la que se llega en ferry desde Puerto Juarez, Cancun o Gran Puerto (unos 13 kilometros de la costa de Yucatan).",
+    "direccion": "Zona Norte, Isla Mujeres, Quintana Roo",
+    "rango_precio": null,
+    "lat": 21.2467,
+    "lon": -86.7331,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Cancun",
+    "nombre": "Chichen Itza",
+    "categoria": "historic",
+    "texto": "Chichen Itza fue una gran ciudad maya del periodo Clasico Terminal, en la peninsula de Yucatan, y uno de los destinos arqueologicos mas visitados de Mexico. Su estructura mas emblematica es el Templo de Kukulcan (El Castillo), una piramide escalonada de unos 30 metros dedicada a la deidad de la serpiente emplumada. Fue declarado Patrimonio de la Humanidad por la UNESCO en 1988 y elegido una de las Nuevas Siete Maravillas del Mundo en 2007. En los equinoccios de primavera y otonio se produce un fenomeno optico famoso: la sombra proyectada en la escalinata simula una serpiente descendiendo. Se visita habitualmente como excursion de un dia completo en micro desde los resorts de Cancun.",
+    "direccion": "Zona arqueologica de Chichen Itza, Yucatan",
+    "rango_precio": null,
+    "lat": 20.6843,
+    "lon": -88.5678,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Cancun",
+    "nombre": "Tulum (zona arqueologica)",
+    "categoria": "historic",
+    "texto": "Tulum es un sitio maya amurallado que funciono como puerto comercial de Coba, y es la unica gran ciudad maya conocida construida sobre acantilados costeros (de unos 12 metros de altura) frente al Caribe. Su estructura principal, El Castillo, es una piramide de 7,5 metros que probablemente sirvio de faro para las canoas comerciales. Estuvo ocupada sobre todo durante el periodo Posclasico Tardio, entre 1200 y el siglo XVI. Es el tercer sitio arqueologico mas visitado de Mexico, con mas de 2,2 millones de visitantes al anio, popular como excursion desde Cancun y la Riviera Maya.",
+    "direccion": "Zona arqueologica de Tulum, Quintana Roo",
+    "rango_precio": null,
+    "lat": 20.2145,
+    "lon": -87.4295,
+    "fuente": "curado"
+  },
+  {
+    "corpus": "atractivos",
+    "destino": "Cancun",
+    "nombre": "Coba (zona arqueologica)",
+    "categoria": "historic",
+    "texto": "Coba es un antiguo sitio arqueologico maya en Quintana Roo, unos 47 kilometros al noroeste de Tulum. Se destaca por su piramide mas alta, Ixmoja (tambien llamada Nohoch Mul), de unos 42 metros, una de las mas altas de la region maya. Los visitantes podian subir a la piramide, algo cerrado durante la pandemia de COVID-19; el acceso se restauro en 2025 con una escalera de madera que vuelve a permitir llegar a la cima y sus vistas panoramicas.",
+    "direccion": "Zona arqueologica de Coba, Quintana Roo",
+    "rango_precio": null,
+    "lat": 20.4977,
+    "lon": -87.7342,
+    "fuente": "curado"
   }
 ]

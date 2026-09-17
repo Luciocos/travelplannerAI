@@ -50,6 +50,14 @@
   {
     "corpus": "faq",
     "destino": "Cancun",
+    "nombre": "Seguridad general",
+    "categoria": "seguridad",
+    "texto": "Cancun evito en gran medida la violencia asociada al narcotrafico durante buena parte de las decadas de 2000 y 2010, pero desde 2018 los homicidios subieron por encima del promedio nacional mexicano (33 en enero de 2018, el triple que en enero de 2017), vinculados casi siempre a disputas entre grupos criminales por rutas de trafico, no a ataques contra turistas. La gran mayoria de estos episodios violentos ocurrieron en el nucleo urbano (el centro de la ciudad), aunque hubo algunos hechos puntuales con armas de fuego reportados tambien dentro de la Zona Hotelera. Un riesgo real para el turista es que se ofrecen drogas en bares y discotecas de la zona turistica: aceptar esas ofertas expone a estafas y, en los episodios de violencia documentados, es donde se concentran. La recomendacion practica es la habitual de cualquier destino turistico masivo: moverse por zonas concurridas y bien iluminadas, evitar comprar o aceptar drogas de desconocidos en la vida nocturna, y no caminar solo de noche por calles poco transitadas del centro.",
+    "fuente": "curado"
+  },
+  {
+    "corpus": "faq",
+    "destino": "Cancun",
     "nombre": "Taxis y tarifas",
     "categoria": "estafas",
     "texto": "En Cancun la mayoria de los taxis no usan taximetro, y es comun que los conductores ofrezcan tarifas arbitrarias a los turistas, muchas veces el doble o el triple de la tarifa local real; los que operan sin licencia pueden llegar a cobrar entre 300% y 500% mas de lo regulado. La recomendacion es siempre acordar el precio antes de subir al auto, evitar tomar taxis al voleo en la calle y preferir aplicaciones de viajes compartidos como Uber o DiDi donde esten disponibles, o los taxis de las paradas designadas de hoteles y zonas turisticas.",
