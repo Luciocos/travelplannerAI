@@ -238,3 +238,35 @@ def test_tool_armar_plan_tiene_docstring_y_args_schema() -> None:
     assert tool_creada.name == "armar_plan"
     assert tool_creada.description
     assert tool_creada.args_schema is mod.ArgsArmarPlan
+
+
+def test_resumen_markdown_incluye_dias_y_costo_total() -> None:
+    plan = mod.PlanDeViaje(
+        destino="Cancun",
+        dias=[
+            mod.DiaDelPlan(
+                dia=1,
+                actividades=[
+                    mod.ActividadDelPlan(
+                        nombre="Museo Maya", categoria="museums", costo_estimado=10.0
+                    )
+                ],
+                costo_actividades=10.0,
+                gasto_estimado_dia=45.0,
+                costo_dia=55.0,
+            )
+        ],
+        costo_actividades_total=10.0,
+        gasto_estimado_total=45.0,
+        costo_total_estimado=55.0,
+        cantidad_personas=2,
+        costo_total_grupo=110.0,
+        supuestos=["presupuesto no indicado, se uso un gasto diario de referencia"],
+    )
+
+    markdown = mod.resumen_markdown(plan)
+
+    assert "Cancun" in markdown
+    assert "Museo Maya" in markdown
+    assert "110" in markdown
+    assert "presupuesto no indicado" in markdown

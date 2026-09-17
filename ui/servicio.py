@@ -22,6 +22,7 @@ from asistente_viajes.conversaciones import (
     renombrar_conversacion,
 )
 from asistente_viajes.llm import RotadorClavesGemini
+from asistente_viajes.tools.armar_plan import PlanDeViaje, resumen_markdown
 
 
 def nueva_conversacion(conexion: psycopg.Connection) -> str:
@@ -57,3 +58,11 @@ def renombrar_chat(conexion: psycopg.Connection, conversacion_id: str, titulo: s
 
 def eliminar_chat(conexion: psycopg.Connection, conversacion_id: str) -> None:
     eliminar_conversacion(conexion, conversacion_id)
+
+
+def itinerario_descargable(sesion: SesionAgente) -> str | None:
+    """Markdown del ultimo plan armado en esta sesion, para el boton de
+    descarga. None si todavia no se armo ningun plan."""
+    if sesion.ultimo_plan is None:
+        return None
+    return resumen_markdown(PlanDeViaje(**sesion.ultimo_plan))
