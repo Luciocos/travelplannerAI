@@ -3,6 +3,7 @@ langchain-core
 langchain-community
 langchain-postgres
 langchain-google-genai
+langgraph
 sentence-transformers
 psycopg[binary]
 pgvector
