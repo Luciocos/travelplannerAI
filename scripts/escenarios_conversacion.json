@@ -1,0 +1,90 @@
+[
+  {
+    "nombre": "recap_memoria",
+    "descripcion": "El agente tiene que responder desde el estado/historial, no con una frase enlatada (bug real de Fase 7B).",
+    "turnos": [
+      {
+        "mensaje": "Quiero armar un viaje a Barcelona, arquitectura y gastronomía, presupuesto medio, del 5 al 10 de marzo de 2027, somos 2 personas",
+        "debe_contener": ["Barcelona"]
+      },
+      {
+        "mensaje": "¿A qué destino dijimos que quería ir, y con qué presupuesto?",
+        "debe_contener": ["Barcelona", "medio"],
+        "no_debe_contener": ["no tengo esa información", "no sé", "no recuerdo"]
+      }
+    ]
+  },
+  {
+    "nombre": "barcelona_no_repite_tipo_destino",
+    "descripcion": "tipo_destino se deriva del destino piloto (D-14); no puede volver a preguntarse.",
+    "turnos": [
+      {
+        "mensaje": "Barcelona, arquitectura y gastronomía, 4 personas, del 5 al 10 de marzo de 2027",
+        "no_debe_contener": ["playa, ciudad o naturaleza", "tipo de destino"]
+      }
+    ]
+  },
+  {
+    "nombre": "destino_fuera_de_alcance",
+    "descripcion": "Un destino que no es piloto tiene que decirlo explícitamente y sugerir los 3 reales.",
+    "turnos": [
+      {
+        "mensaje": "Quiero ir de viaje a Tokio",
+        "debe_contener": ["Tokio", "Barcelona", "Miami", "Cancún"]
+      }
+    ]
+  },
+  {
+    "nombre": "multi_intent_un_solo_mensaje",
+    "descripcion": "Un mensaje con varios pedidos ejecuta todos, no solo el primero (P-10).",
+    "turnos": [
+      {
+        "mensaje": "Cancún, playa, presupuesto medio, del 1 al 5 de diciembre de 2026, somos 2 personas. Armame el plan, decime dónde comer barato y si es seguro caminar de noche",
+        "debe_contener": ["Cancún"]
+      }
+    ]
+  },
+  {
+    "nombre": "pregunta_consolidada_con_sugerencias",
+    "descripcion": "Falta todo: una sola pregunta con opciones y sugerencia, más un dato útil (D-14).",
+    "turnos": [
+      {
+        "mensaje": "Hola, quiero armar un viaje",
+        "debe_contener": ["Barcelona", "Miami", "Cancún"]
+      },
+      {
+        "mensaje": "Usá las sugerencias",
+        "no_debe_contener": ["no entendí", "no tengo esa información"]
+      }
+    ]
+  },
+  {
+    "nombre": "conversion_de_moneda_del_ultimo_plan",
+    "descripcion": "Convertir el costo del último plan a pesos argentinos, sin inventar una cotización (D-19).",
+    "turnos": [
+      {
+        "mensaje": "Cancún, playa, presupuesto medio, del 1 al 5 de diciembre de 2026, somos 2 personas. Armame el plan.",
+        "debe_contener": ["Cancún"]
+      },
+      {
+        "mensaje": "¿Cuánto es eso en pesos?",
+        "debe_contener": ["ARS"],
+        "no_debe_contener": ["no tengo esa información"]
+      }
+    ]
+  },
+  {
+    "nombre": "agradecimiento_small_talk",
+    "descripcion": "Un agradecimiento no puede devolver una frase enlatada de bienvenida generica sin relacion con la charla.",
+    "turnos": [
+      {
+        "mensaje": "Barcelona, presupuesto alto, del 5 al 10 de marzo de 2027, somos 2 personas",
+        "debe_contener": ["Barcelona"]
+      },
+      {
+        "mensaje": "Gracias, me sirvió mucho",
+        "no_debe_contener": ["no entendí"]
+      }
+    ]
+  }
+]
