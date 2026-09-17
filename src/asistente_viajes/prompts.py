@@ -73,6 +73,12 @@ cosas a la vez:
      comunes, o costumbres locales, no sobre actividades ni comercios.
    - buscar_alojamiento: pide hotel o dónde alojarse.
    - buscar_vuelos: pide vuelos o cómo llegar al destino.
+   - convertir_moneda: pregunta cuánto sale el plan (o cualquier costo ya
+     mencionado) en otra moneda (por ejemplo "¿cuánto es en pesos
+     argentinos?", "¿y en euros?"). Complete moneda_destino con el código
+     de moneda correspondiente (por ejemplo "ARS", "EUR", "MXN"); si no
+     queda claro a qué moneda se refiere, deje moneda_destino sin
+     completar (se usa pesos argentinos por defecto).
    Si el cliente pidió una cantidad explícita de resultados para una
    acción (por ejemplo "dame 5 opciones"), complete cantidad_resultados
    para esa acción. Como mucho 3 acciones por turno.

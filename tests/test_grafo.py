@@ -506,6 +506,50 @@ def test_buscar_vuelos_se_ejecuta_con_origen(monkeypatch) -> None:
     assert "Aerolineas Test" in resultado["respuesta_texto"]
 
 
+# --- convertir_moneda (D-18) -----------------------------------------------
+
+
+def test_convertir_moneda_pide_el_plan_primero_si_no_hay_ninguno() -> None:
+    estado = _estado_completo()
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="convertir_moneda")])
+    )
+    resultado = _turno(rotador, "cuanto es en pesos", estado=estado)
+    assert resultado["pendientes"] == [{"tipo": "pedir_plan_para_convertir"}]
+    assert "armé un plan" in resultado["respuesta_texto"].lower()
+
+
+def test_convertir_moneda_convierte_el_costo_del_ultimo_plan(monkeypatch) -> None:
+    estado = _estado_completo()
+    plan_previo = {"destino": "Barcelona", "costo_total_grupo": 500.0, "moneda": "USD"}
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="convertir_moneda", moneda_destino="ARS")])
+    )
+    llamada = MagicMock()
+    llamada.return_value.detalle = "USD 500 = ARS 750000 (dólar oficial)."
+    monkeypatch.setattr(mod, "convertir_desde_usd", llamada)
+
+    resultado = _turno(rotador, "cuanto es en pesos", estado=estado, ultimo_plan=plan_previo)
+
+    llamada.assert_called_once_with(500.0, "ARS")
+    assert "750000" in resultado["respuesta_texto"]
+
+
+def test_convertir_moneda_usa_ars_por_defecto_sin_moneda_explicita(monkeypatch) -> None:
+    estado = _estado_completo()
+    plan_previo = {"destino": "Barcelona", "costo_total_grupo": 200.0, "moneda": "USD"}
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="convertir_moneda")])
+    )
+    llamada = MagicMock()
+    llamada.return_value.detalle = "listo"
+    monkeypatch.setattr(mod, "convertir_desde_usd", llamada)
+
+    _turno(rotador, "cuanto sale eso?", estado=estado, ultimo_plan=plan_previo)
+
+    llamada.assert_called_once_with(200.0, mod.MONEDA_DESTINO_DEFECTO)
+
+
 # --- disparar_info_destino -----------------------------------------------
 
 

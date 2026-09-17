@@ -78,6 +78,7 @@ from asistente_viajes.preguntas import (
     valores_sugeridos,
 )
 from asistente_viajes.prompts import PROMPT_CONVERSAR, PROMPT_INTERPRETAR_TURNO
+from asistente_viajes.services.cambio import convertir_desde_usd
 from asistente_viajes.services.rapidapi.booking import buscar_alojamiento, buscar_vuelos
 from asistente_viajes.services.rapidapi.models import Alojamiento, OpcionVuelo
 from asistente_viajes.tools.armar_plan import (
@@ -103,7 +104,10 @@ TipoAccion = Literal[
     "responder_faq_viajero",
     "buscar_alojamiento",
     "buscar_vuelos",
+    "convertir_moneda",
 ]
+
+MONEDA_DESTINO_DEFECTO = "ARS"  # el publico de este TP es de Argentina
 
 MAXIMO_FRAGMENTOS_POR_TURNO = 4
 CANTIDAD_RESULTADOS_DEFECTO = 3
@@ -129,6 +133,9 @@ class AccionPedida(BaseModel):
     # accion diluye la busqueda semantica de cada una. None si el mensaje
     # ya es una sola consulta (se usa el mensaje completo en ese caso).
     consulta: str | None = None
+    # Solo para convertir_moneda: codigo ISO de la moneda pedida (ej.
+    # "ARS", "EUR"). Si el cliente no la menciona, se usa MONEDA_DESTINO_DEFECTO.
+    moneda_destino: str | None = None
 
 
 class InterpretacionTurno(BaseModel):
@@ -294,6 +301,9 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
         if tipo == "buscar_vuelos" and not estado.origen:
             pendientes.append({"tipo": "pedir_origen_vuelo"})
             continue
+        if tipo == "convertir_moneda" and not estado_grafo.get("ultimo_plan"):
+            pendientes.append({"tipo": "pedir_plan_para_convertir"})
+            continue
         pendientes.append(accion)
 
     ultimo_plan = estado_grafo.get("ultimo_plan")
@@ -416,6 +426,18 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
                 )
             elif tipo == "pedir_origen_vuelo":
                 fragmentos.append({"tipo": tipo, "texto": "¿Desde qué ciudad sale el vuelo?"})
+            elif tipo == "pedir_plan_para_convertir":
+                fragmentos.append(
+                    {
+                        "tipo": tipo,
+                        "texto": "Todavía no armé un plan con un costo para convertir. ¿Quiere que lo arme primero?",
+                    }
+                )
+            elif tipo == "convertir_moneda":
+                monto = (ultimo_plan or {}).get("costo_total_grupo", 0.0)
+                moneda_destino = accion.get("moneda_destino") or MONEDA_DESTINO_DEFECTO
+                cotizacion = convertir_desde_usd(monto, moneda_destino)
+                fragmentos.append({"tipo": tipo, "texto": cotizacion.detalle})
             elif tipo == "buscar_alojamiento":
                 habitaciones = -(-(estado.cantidad_personas or 1) // 2)  # ceil(personas/2)
                 alojamientos = buscar_alojamiento(
