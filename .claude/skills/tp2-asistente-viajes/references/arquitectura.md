@@ -67,7 +67,7 @@
 
 ## Dependencias
 
-`langchain`, `langchain-core`, `langchain-community`, `langchain-postgres`, `langchain-google-genai`, `sentence-transformers`, `psycopg[binary]`, `pgvector`, `pydantic`, `python-dotenv`, `httpx`, `jupyter`, `pytest`, `pytest-mock`, `ruff` (sólo desarrollo), `streamlit` (sólo la GUI de demo de `ui/chat_app.py`, Fase 7B).
+`langchain`, `langchain-core`, `langchain-community`, `langchain-postgres`, `langchain-google-genai`, `langgraph` (orquestador, D-12, Fase 7C), `sentence-transformers`, `psycopg[binary]`, `pgvector`, `pydantic`, `python-dotenv`, `httpx`, `jupyter`, `pytest`, `pytest-mock`, `ruff` (sólo desarrollo), `streamlit` (sólo la GUI de demo de `ui/chat_app.py`, Fase 7B).
 
 Cualquier dependencia fuera de esta lista se justifica antes de agregarla. `streamlit` se justifica así: es una capa de presentación en Python puro que no toca `src/asistente_viajes/` (importa `agente.py` igual que el notebook y `scripts/chat.py`), no está pedida por la cátedra (ver `consigna-catedra.md`, el entregable sigue siendo el notebook), y se agregó por pedido explícito del usuario para mejorar la demo.
 

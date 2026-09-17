@@ -83,6 +83,33 @@ Formato de cada entrada:
 - **Solución:** se agregó una aclaración explícita en el prompt: las características de cada destino son solo para identificar la ciudad, nunca se copian a `tipo_destino` ni a `intereses`; esos dos campos solo se completan con lo que el mensaje dice explícita o implícitamente. Verificado de nuevo con el LLM real contra el mismo mensaje: `tipo_destino` e `intereses` quedaron `None`. Test de regresión agregado (`test_prompt_extraccion_aclara_que_caracteristicas_no_son_gustos_del_usuario` en `test_completar_slots.py`), aunque por ser comportamiento de LLM solo verifica que la instrucción está en el prompt, no que el modelo la respete siempre.
 - **Aprendizaje:** darle al LLM contexto de referencia para una tarea (acá, características para *matchear* destino) puede filtrarse a otros campos de la misma llamada de extracción si no se acota explícitamente el uso de ese contexto. Cada dato de contexto agregado a un prompt de extracción estructurada necesita decir para qué sirve y para qué no.
 
+## P-08, la causa real de P-06 era el SDK reintentando en silencio, no el rotador
+
+- **Fecha:** 2026-09-17
+- **Fase:** 7C
+- **Síntoma:** P-06 quedó documentado como "sin resolver": una llamada aislada tardaba hasta 42s sin que `RotadorClavesGemini` logueara ningún backoff ni rotación, así que no se sabía si el problema era cuota real o algo del propio rotador.
+- **Causa:** `ChatGoogleGenerativeAI` trae `max_retries=6` por defecto, y el SDK `google-genai` reintenta un 429/503 con backoff exponencial propio (~1+2+4+8+16s) **antes** de que la excepción llegue al rotador. El rotador nunca veía el error: el SDK ya se había reintentado 6 veces solo, en la misma clave, por su cuenta.
+- **Solución:** `max_retries=1` en el `ChatModel` (`crear_rotador`): el único que reintenta es el rotador propio, rotando de clave en vez de reintentando la misma. `_es_error_cuota` se amplía para tratar 503/504/UNAVAILABLE igual que 429.
+- **Aprendizaje:** un wrapper propio de reintentos (el rotador) puede quedar completamente anulado si la librería de abajo ya trae su propio mecanismo de reintentos activado por defecto. Verificar siempre los valores por defecto del SDK antes de agregar una capa de resiliencia propia encima.
+
+## P-09, con max_retries=1, un timeout no era un error "rotable"
+
+- **Fecha:** 2026-09-17
+- **Fase:** 7C, encontrado corriendo el orquestador nuevo contra Gemini real
+- **Síntoma:** con el fix de P-08 en producción, una key lenta hacía fallar el turno completo en vez de rotar a las otras dos: `httpx.ReadTimeout: The read operation timed out` se propagaba crudo desde la primera clave.
+- **Causa:** el mensaje de un `httpx.ReadTimeout` no contiene "429", "503" ni "unavailable", así que `_es_error_cuota` lo clasificaba como no-rotable y el rotador hacía `raise` inmediato en vez de probar la clave 2. El propósito del rotador (failover entre 3 claves) quedaba anulado justo para el tipo de error que `timeout=30` (agregado en P-08) iba a producir más seguido.
+- **Solución:** `_es_error_cuota` también reconoce "timeout"/"timed out"/"deadline" como error rotable. Además, verificado en vivo que con `max_retries=1` un intento real (no colgado) puede tardar más de 30s bajo carga de sesión acumulada — la misma latencia de hasta 42s que ya documentaba P-06, no un cuelgue: `timeout` sube de 30 a 45 segundos para no cortar una respuesta legítima a mitad de camino.
+- **Aprendizaje:** agregar un timeout a un cliente HTTP introduce un tipo de error nuevo; cualquier lógica de clasificación de errores escrita antes de agregar ese timeout (como `_es_error_cuota`) hay que revisarla, no asumir que sigue cubriendo todos los casos.
+
+## P-10, mensajes con varios pedidos diluían la búsqueda semántica de cada uno
+
+- **Fecha:** 2026-09-17
+- **Fase:** 7C, encontrado probando el multi-intent del grafo nuevo contra Gemini real
+- **Síntoma:** "armame el plan, decime donde comer barato y si es seguro caminar de noche" ejecutaba las 3 acciones (bien), pero la respuesta de seguridad no tenía nada que ver con caminar de noche: "los temas de referencia disponibles no contienen información para armarle un plan de viaje completo ni para indicarle dónde comer barato".
+- **Causa:** `recomendar_locales` y `responder_faq_viajero` recibían el **mensaje completo** como consulta de búsqueda semántica, aunque el mensaje tuviera 3 pedidos mezclados. La consulta vectorial terminaba siendo un promedio confuso de "plan de viaje" + "dónde comer" + "seguridad nocturna", y el LLM de síntesis heredaba esa mezcla.
+- **Solución:** `AccionPedida` suma un campo `consulta` opcional: `interpretar` completa el fragmento del mensaje que corresponde a ESA acción puntual cuando hay más de un pedido en el turno, y lo deja vacío (se usa el mensaje completo, mismo comportamiento que antes) cuando esa acción es el único pedido.
+- **Aprendizaje:** soportar multi-intent en un orquestador no alcanza con decidir qué acciones ejecutar; cada acción que hace búsqueda semántica necesita también su propio fragmento de consulta, o la ganancia de "atender varios pedidos a la vez" se pierde en la calidad de cada respuesta individual. Esto no se ve mockeando el LLM en tests unitarios, solo probando con turnos reales que combinan pedidos.
+
 ## Candidatos previsibles, confirmar si pasan de verdad
 
 No inventar entradas. Estos son los puntos donde es probable que algo falle, listados para que se registren bien si ocurren:
