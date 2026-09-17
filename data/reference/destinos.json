@@ -1,21 +1,27 @@
 {
-  "_comentario": "Destino piloto (nombre tal como lo usa PreferenciasViaje.destino) -> pais (clave de paises.json), coordenadas y caracteristicas. Coordenadas: mismas usadas para ingestar cada destino, ver estado.md. Caracteristicas: se usan en el prompt de extraccion de slots para interpretar descripciones regionales (ej. 'un lugar caribeno') cuando el usuario no nombra la ciudad, ver D-09 en DECISIONES.md.",
+  "_comentario": "Destino piloto (nombre tal como lo usa PreferenciasViaje.destino) -> pais (clave de paises.json), coordenadas, caracteristicas y datos para la UI. Coordenadas: mismas usadas para ingestar cada destino, ver estado.md. Caracteristicas: se usan en el prompt de extraccion de slots para interpretar descripciones regionales (ej. 'un lugar caribeno') cuando el usuario no nombra la ciudad, ver D-09 en DECISIONES.md. tipos: valores validos de tipo_destino para este destino, usado para que tipo_destino se derive del destino en vez de volver a preguntarlo (D-14). descripcion: una linea factual para mostrar cuando el usuario todavia no eligio destino.",
   "Barcelona": {
     "pais": "Espana",
     "lat": 41.3874,
     "lon": 2.1686,
-    "caracteristicas": ["europeo", "ciudad", "historia", "arquitectura", "cultura", "mediterraneo"]
+    "caracteristicas": ["europeo", "ciudad", "historia", "arquitectura", "cultura", "mediterraneo"],
+    "tipos": ["ciudad"],
+    "descripcion": "Ciudad mediterranea con arquitectura modernista (Gaudi), historia y gastronomia."
   },
   "Miami": {
     "pais": "Estados Unidos",
     "lat": 25.7617,
     "lon": -80.1918,
-    "caracteristicas": ["playa", "ciudad", "estados unidos", "norteamericano"]
+    "caracteristicas": ["playa", "ciudad", "estados unidos", "norteamericano"],
+    "tipos": ["playa", "ciudad"],
+    "descripcion": "Playas, vida nocturna y una fuerte influencia latina (Little Havana, Calle Ocho)."
   },
   "Cancun": {
     "pais": "Mexico",
     "lat": 21.1619,
     "lon": -86.8515,
-    "caracteristicas": ["playa", "caribeno", "caribe", "ruinas mayas", "naturaleza", "mexico"]
+    "caracteristicas": ["playa", "caribeno", "caribe", "ruinas mayas", "naturaleza", "mexico"],
+    "tipos": ["playa", "naturaleza"],
+    "descripcion": "Playas caribenas, cenotes y ruinas mayas cerca (Chichen Itza, Tulum, Coba)."
   }
 }
