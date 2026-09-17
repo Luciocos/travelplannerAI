@@ -28,6 +28,11 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/asistente_viajes_test
+      # Los tests marcados @pytest.mark.db (conversaciones.py) usan esta
+      # variable en vez de DATABASE_URL porque conftest.py borra
+      # DATABASE_URL de os.environ en cada test para aislar al resto de
+      # los tests del .env real de quien los corre.
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/asistente_viajes_test
       LLM_PROVIDER: gemini
       GEMINI_MODEL: gemini-3.5-flash-lite
       # Valor ficticio a proposito: ningun test toca la red ni consume cuota.
@@ -54,9 +59,7 @@ jobs:
             -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
       - name: Aplicar el esquema
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d asistente_viajes_test \
-            -f sql/001_schema.sql
+        run: python -m scripts.inicializar_db
 
       - name: Lint
         run: ruff check .
