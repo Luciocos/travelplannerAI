@@ -115,6 +115,13 @@ def _hoy_argentina() -> date:
 class AccionPedida(BaseModel):
     tipo: TipoAccion
     cantidad_resultados: int | None = None
+    # Solo para recomendar_locales/responder_faq_viajero: el fragmento del
+    # mensaje relevante para ESTA accion en particular. Si el mensaje pide
+    # varias cosas a la vez ("armame el plan, decime donde comer y si es
+    # seguro de noche"), pasar el mensaje completo como consulta de cada
+    # accion diluye la busqueda semantica de cada una. None si el mensaje
+    # ya es una sola consulta (se usa el mensaje completo en ese caso).
+    consulta: str | None = None
 
 
 class InterpretacionTurno(BaseModel):
@@ -322,6 +329,7 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
     for accion in estado_grafo["pendientes"]:
         tipo = accion["tipo"]
         k = accion.get("cantidad_resultados") or CANTIDAD_RESULTADOS_DEFECTO
+        consulta = accion.get("consulta") or mensaje
         try:
             if tipo == "destino_no_soportado":
                 nombre = estado_grafo.get("destino_no_soportado") or "ese destino"
@@ -342,10 +350,10 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
                 )
                 fragmentos.append({"tipo": tipo, "texto": _resumen_actividades(actividades)})
             elif tipo == "recomendar_locales":
-                locales = recomendar_locales(conexion, rotador, estado.destino, mensaje, k=k)
+                locales = recomendar_locales(conexion, rotador, estado.destino, consulta, k=k)
                 fragmentos.append({"tipo": tipo, "texto": _resumen_locales(locales)})
             elif tipo == "responder_faq_viajero":
-                respuesta = responder_faq_viajero(conexion, rotador, estado.destino, mensaje, k=k)
+                respuesta = responder_faq_viajero(conexion, rotador, estado.destino, consulta, k=k)
                 fragmentos.append({"tipo": tipo, "texto": respuesta.respuesta})
         except ErrorFechasIncompletas:
             fragmentos.append(

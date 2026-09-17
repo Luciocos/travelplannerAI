@@ -327,6 +327,72 @@ def test_una_accion_rota_no_tira_abajo_las_demas(monkeypatch) -> None:
     assert "problema puntual" in resultado["respuesta_texto"]
 
 
+def test_cada_accion_usa_su_propia_consulta_no_el_mensaje_completo(monkeypatch) -> None:
+    """Bug real: 'armame el plan, decime donde comer y si es seguro de
+    noche' le pasaba el MENSAJE COMPLETO como consulta tanto a
+    recomendar_locales como a responder_faq_viajero, diluyendo la
+    busqueda semantica de cada una (la de seguridad terminaba hablando
+    del plan de viaje)."""
+    estado = PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        intereses=["playa"],
+        presupuesto="medio",
+        duracion_dias=3,
+        cantidad_personas=2,
+    )
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(
+            acciones=[
+                AccionPedida(tipo="recomendar_locales", consulta="donde comer"),
+                AccionPedida(tipo="responder_faq_viajero", consulta="si es seguro de noche"),
+            ]
+        )
+    )
+    consultas_recibidas = {}
+
+    def _locales(_conexion, _rotador, _destino, consulta, k):
+        consultas_recibidas["locales"] = consulta
+        return []
+
+    def _faq(_conexion, _rotador, _destino, consulta, k):
+        consultas_recibidas["faq"] = consulta
+        return RespuestaFaq(respondida=True, respuesta="ok")
+
+    monkeypatch.setattr(mod, "recomendar_locales", _locales)
+    monkeypatch.setattr(mod, "responder_faq_viajero", _faq)
+
+    _turno(rotador, "armame el plan, decime donde comer y si es seguro de noche", estado=estado)
+
+    assert consultas_recibidas["locales"] == "donde comer"
+    assert consultas_recibidas["faq"] == "si es seguro de noche"
+
+
+def test_accion_sin_consulta_propia_usa_el_mensaje_completo(monkeypatch) -> None:
+    estado = PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        intereses=["playa"],
+        presupuesto="medio",
+        duracion_dias=3,
+        cantidad_personas=2,
+    )
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="recomendar_locales")])
+    )
+    consultas_recibidas = {}
+
+    def _locales(_conexion, _rotador, _destino, consulta, k):
+        consultas_recibidas["locales"] = consulta
+        return []
+
+    monkeypatch.setattr(mod, "recomendar_locales", _locales)
+
+    _turno(rotador, "donde como algo tipico y barato", estado=estado)
+
+    assert consultas_recibidas["locales"] == "donde como algo tipico y barato"
+
+
 # --- disparar_info_destino -----------------------------------------------
 
 

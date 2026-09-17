@@ -72,6 +72,16 @@ cosas a la vez:
    acción (por ejemplo "dame 5 opciones"), complete cantidad_resultados
    para esa acción. Como mucho 3 acciones por turno.
 
+   Si pidió recomendar_locales o responder_faq_viajero JUNTO con otra
+   acción en el mismo mensaje (por ejemplo "armame el plan, decime dónde
+   comer y si es seguro de noche"), complete consulta con SOLO el
+   fragmento de ese mensaje que corresponde a esa acción puntual (para
+   este ejemplo, consulta de recomendar_locales sería "dónde comer" y la
+   de responder_faq_viajero "si es seguro de noche"), no el mensaje
+   completo: mezclar todos los pedidos en una sola consulta arruina la
+   búsqueda de cada una. Si esa acción es el único pedido del mensaje,
+   deje consulta sin completar.
+
 Historial reciente de la conversación:
 {historial}
 
