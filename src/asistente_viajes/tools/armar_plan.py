@@ -277,6 +277,26 @@ def guardar_itinerario(
     return itinerario_id
 
 
+def resumen_markdown(plan: PlanDeViaje) -> str:
+    """Version "documento" del plan (titulo, sin el tono conversacional
+    del mensaje de chat de grafo.py._resumen_plan) para el boton de
+    descarga de la UI (ui/servicio.py)."""
+    lineas = [f"# Plan de viaje: {plan.destino}", ""]
+    for dia in plan.dias:
+        nombres = ", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades)
+        etiqueta = f"Día {dia.dia}" + (f" ({dia.fecha.strftime('%d/%m')})" if dia.fecha else "")
+        lineas.append(f"- **{etiqueta}**: {nombres} (costo estimado ${dia.costo_dia:.0f})")
+    lineas.append("")
+    lineas.append(
+        f"**Costo total estimado**: {plan.moneda} {plan.costo_total_estimado:.0f} por persona, "
+        f"{plan.moneda} {plan.costo_total_grupo:.0f} para el grupo de {plan.cantidad_personas}."
+    )
+    if plan.supuestos:
+        lineas.append("")
+        lineas.append("_" + "; ".join(plan.supuestos) + "._")
+    return "\n".join(lineas)
+
+
 def crear_tool_armar_plan(conexion: psycopg.Connection):
     """Arma la tool de LangChain, con la conexion ya inyectada."""
 

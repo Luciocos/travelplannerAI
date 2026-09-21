@@ -34,6 +34,10 @@ class SesionAgente:
     historial: list[dict] = field(default_factory=list)
     ultimo_plan: dict | None = None
     info_destino_mostrada_para: str | None = None
+    # P-13: que faltantes ya se le preguntaron al cliente en el ultimo
+    # turno que le faltaba algo, para no repetir la misma pregunta
+    # tapando un "gracias" o comentario suelto (ver grafo.nodo_planificar).
+    pedir_datos_mostrado_para: list[str] | None = None
 
 
 def procesar_mensaje(
@@ -54,12 +58,14 @@ def procesar_mensaje(
         estado=sesion.estado.model_dump(mode="json"),
         ultimo_plan=sesion.ultimo_plan,
         info_destino_mostrada_para=sesion.info_destino_mostrada_para,
+        pedir_datos_mostrado_para=sesion.pedir_datos_mostrado_para,
         hoy=hoy,
     )
 
     sesion.estado = PreferenciasViaje(**resultado["estado"])
     sesion.ultimo_plan = resultado["ultimo_plan"]
     sesion.info_destino_mostrada_para = resultado["info_destino_mostrada_para"]
+    sesion.pedir_datos_mostrado_para = resultado["pedir_datos_mostrado_para"]
 
     respuesta_texto = resultado["respuesta_texto"]
     sesion.historial.append({"rol": "usuario", "texto": mensaje})

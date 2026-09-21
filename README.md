@@ -1,8 +1,8 @@
 # travelplannerAI
 
-Sistema experto conversacional de planificación de viajes (TP2, Inteligencia Artificial, UTN FRRo). El usuario describe en lenguaje natural qué viaje busca, el agente completa por preguntas lo que falta, recomienda actividades y locales vía RAG, arma un itinerario día a día con costo estimado, y responde consultas puntuales sobre el destino.
+Sistema experto conversacional de planificación de viajes (TP2, Inteligencia Artificial, UTN FRRo). El usuario describe en lenguaje natural qué viaje busca (puede pedir varias cosas en el mismo mensaje), el agente completa por una única pregunta consolidada lo que falta, recomienda actividades y locales vía RAG, arma un itinerario día a día con costo estimado agrupado por cercanía geográfica, y responde consultas puntuales sobre el destino — todo recordando la conversación entre turnos.
 
-Construido con **LangChain** (LangGraph si el flujo lo pide) y **PostgreSQL + pgvector** como vector store. Destinos piloto: Europa, Miami, Caribe.
+Construido con **LangChain + LangGraph** (el orquestador es un grafo, ver `src/asistente_viajes/grafo.py`) y **PostgreSQL + pgvector** como vector store. Destinos piloto: **Barcelona, Miami, Cancún**.
 
 El entregable oficial de la cátedra es el notebook `notebooks/demo_tp2.ipynb`. Toda la lógica de negocio vive en `src/asistente_viajes/`, el notebook solo importa y ejecuta.
 
@@ -50,10 +50,17 @@ docker compose up -d
 
 Opción B, Supabase (base compartida del equipo, ver `docs/DECISIONES.md` D-02): usar la connection string del panel del proyecto.
 
-En cualquiera de los dos casos, aplicar el esquema:
+En cualquiera de los dos casos, aplicar el esquema (todos los `sql/*.sql`, en orden):
 
 ```bash
 python -m scripts.inicializar_db
+```
+
+Cargar los corpus de los 3 destinos piloto (necesita `OPENTRIPMAP_API_KEY`; usa embeddings locales, no gasta cuota de Gemini):
+
+```bash
+python -m scripts.cargar_todos --reemplazar
+python -m scripts.verificar_corpus   # confirma que cada destino supera el minimo de 20 atractivos
 ```
 
 ### Verificar que todo arranca
@@ -62,6 +69,14 @@ python -m scripts.inicializar_db
 python -c "from asistente_viajes import config"   # no debe romper
 pytest                                              # tests que no tocan la red
 python -m scripts.smoke_llm                         # a mano, consume cuota real de las 3 claves
+```
+
+### Probar el asistente
+
+```bash
+python -m scripts.chat                # CLI de texto plano
+streamlit run ui/chat_app.py           # GUI (Fase 7B/7C): multi-chat guardado en Postgres, sidebar para crear/cambiar/renombrar/eliminar conversaciones
+jupyter notebook notebooks/demo_tp2.ipynb   # el entregable oficial, ejecutable de punta a punta
 ```
 
 ## Arquitectura

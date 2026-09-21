@@ -26,10 +26,14 @@ Flujo (ver tambien construir_grafo().get_graph().draw_mermaid()):
 - planificar: logica pura. Decide que ejecutar este turno: si falta
   algun dato obligatorio, una pregunta consolidada (D-14) mas, si ya hay
   destino, una recomendacion barata de regalo (nunca se deja al cliente
-  solo con la pregunta); si el plan ya armado quedo desactualizado por
-  un cambio de dato (ver estado.detectar_cambios), se re-arma solo; las
-  acciones que pidio el cliente se agregan si sus precondiciones estan
-  cubiertas.
+  solo con la pregunta) — pero solo si algo cambio o el cliente pidio
+  algo este turno; si ya se hizo exactamente esa misma pregunta el turno
+  anterior y el cliente no aporto nada nuevo (un agradecimiento, un
+  comentario), no se repite, y el turno cae en redactar/conversar (bug
+  real, P-13: "gracias" quedaba tapado por la misma pregunta de siempre).
+  Si el plan ya armado quedo desactualizado por un cambio de dato (ver
+  estado.detectar_cambios), se re-arma solo; las acciones que pidio el
+  cliente se agregan si sus precondiciones estan cubiertas.
 - ejecutar_acciones: corre cada accion pendiente en un solo nodo, con un
   loop de Python (no un nodo de grafo por tool: ver D-12, mismo
   criterio de arquitectura.md de no complicar el flujo mas de lo que
@@ -77,7 +81,11 @@ from asistente_viajes.preguntas import (
     tipo_destino_de,
     valores_sugeridos,
 )
+from asistente_viajes.presentacion import escapar, tarjeta
 from asistente_viajes.prompts import PROMPT_CONVERSAR, PROMPT_INTERPRETAR_TURNO
+from asistente_viajes.services.cambio import convertir_desde_usd
+from asistente_viajes.services.rapidapi.booking import buscar_alojamiento, buscar_vuelos
+from asistente_viajes.services.rapidapi.models import Alojamiento, OpcionVuelo
 from asistente_viajes.tools.armar_plan import (
     ErrorFechasIncompletas,
     PlanDeViaje,
@@ -95,8 +103,16 @@ from asistente_viajes.tools.responder_faq_viajero import responder_faq_viajero
 logger = logging.getLogger(__name__)
 
 TipoAccion = Literal[
-    "armar_plan", "recomendar_actividades", "recomendar_locales", "responder_faq_viajero"
+    "armar_plan",
+    "recomendar_actividades",
+    "recomendar_locales",
+    "responder_faq_viajero",
+    "buscar_alojamiento",
+    "buscar_vuelos",
+    "convertir_moneda",
 ]
+
+MONEDA_DESTINO_DEFECTO = "ARS"  # el publico de este TP es de Argentina
 
 MAXIMO_FRAGMENTOS_POR_TURNO = 4
 CANTIDAD_RESULTADOS_DEFECTO = 3
@@ -122,6 +138,9 @@ class AccionPedida(BaseModel):
     # accion diluye la busqueda semantica de cada una. None si el mensaje
     # ya es una sola consulta (se usa el mensaje completo en ese caso).
     consulta: str | None = None
+    # Solo para convertir_moneda: codigo ISO de la moneda pedida (ej.
+    # "ARS", "EUR"). Si el cliente no la menciona, se usa MONEDA_DESTINO_DEFECTO.
+    moneda_destino: str | None = None
 
 
 class InterpretacionTurno(BaseModel):
@@ -138,6 +157,7 @@ class InterpretacionTurno(BaseModel):
     fecha_fin: str | None = None
     duracion_dias: int | None = None
     cantidad_personas: int | None = None
+    origen: str | None = None  # ciudad de salida, solo relevante para buscar_vuelos (RF7)
     usar_sugerencias: bool = False
     acciones: list[AccionPedida] = Field(default_factory=list)
 
@@ -166,6 +186,7 @@ class EstadoGrafo(TypedDict):
     estado_anterior: dict
     ultimo_plan: dict | None
     info_destino_mostrada_para: str | None
+    pedir_datos_mostrado_para: list[str] | None
     interpretacion: dict | None
     destino_no_soportado: str | None
     acciones_pedidas: list[dict]
@@ -223,6 +244,7 @@ def nodo_actualizar_estado(estado_grafo: EstadoGrafo) -> dict:
         fecha_fin=_parsear_fecha(interpretacion.fecha_fin),
         duracion_dias=interpretacion.duracion_dias,
         cantidad_personas=interpretacion.cantidad_personas,
+        origen=interpretacion.origen,
     )
     fusionado = fusionar_preferencias(estado_actual, extraidos)
 
@@ -254,17 +276,31 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
     estado = PreferenciasViaje(**estado_grafo["estado"])
     estado_anterior = PreferenciasViaje(**estado_grafo["estado_anterior"])
     faltantes = estado.slots_faltantes()
+    faltantes_ordenados = sorted(faltantes)
     pendientes: list[dict] = []
 
     if estado_grafo.get("destino_no_soportado"):
         pendientes.append({"tipo": "destino_no_soportado"})
 
+    pedir_datos_mostrado_para = estado_grafo.get("pedir_datos_mostrado_para")
     if faltantes:
-        pendientes.append({"tipo": "pedir_datos"})
-        if estado.destino:
-            # Nunca se deja al cliente solo con la pregunta: si ya hay
-            # destino, se suma algo util en el mismo turno.
-            pendientes.append({"tipo": "recomendar_actividades", "cantidad_resultados": 3})
+        # P-13: si ya se hizo exactamente esta misma pregunta el turno
+        # anterior, y el cliente no aporto ningun dato nuevo ni pidio
+        # ninguna accion, no se repite (tapaba respuestas a "gracias" o
+        # comentarios sueltos con la misma pregunta de siempre). Un
+        # cambio de estado o un pedido explicito si la vuelve a disparar.
+        ya_se_pregunto_lo_mismo = pedir_datos_mostrado_para == faltantes_ordenados
+        hubo_cambio = detectar_cambios(estado_anterior, estado)
+        hay_pedido_explicito = bool(estado_grafo["acciones_pedidas"])
+        if not ya_se_pregunto_lo_mismo or hubo_cambio or hay_pedido_explicito:
+            pendientes.append({"tipo": "pedir_datos"})
+            if estado.destino:
+                # Nunca se deja al cliente solo con la pregunta: si ya hay
+                # destino, se suma algo util en el mismo turno.
+                pendientes.append({"tipo": "recomendar_actividades", "cantidad_resultados": 3})
+            pedir_datos_mostrado_para = faltantes_ordenados
+    else:
+        pedir_datos_mostrado_para = None
 
     for accion in estado_grafo["acciones_pedidas"]:
         tipo = accion["tipo"]
@@ -273,6 +309,20 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
         if tipo == "armar_plan" and (faltantes or not estado.tiene_cuando()):
             continue
         if tipo != "armar_plan" and not estado.destino:
+            continue
+        if tipo in ("buscar_alojamiento", "buscar_vuelos") and not (
+            estado.fecha_inicio and estado.fecha_fin
+        ):
+            # Alojamiento y vuelos (RapidAPI) necesitan fechas de calendario
+            # reales para buscar disponibilidad, a diferencia del plan
+            # (armar_plan), que puede armarse solo con duracion_dias.
+            pendientes.append({"tipo": "pedir_fechas_exactas"})
+            continue
+        if tipo == "buscar_vuelos" and not estado.origen:
+            pendientes.append({"tipo": "pedir_origen_vuelo"})
+            continue
+        if tipo == "convertir_moneda" and not estado_grafo.get("ultimo_plan"):
+            pendientes.append({"tipo": "pedir_plan_para_convertir"})
             continue
         pendientes.append(accion)
 
@@ -286,34 +336,80 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
     ):
         pendientes.append({"tipo": "armar_plan"})
 
-    return {"pendientes": pendientes[:MAXIMO_FRAGMENTOS_POR_TURNO]}
+    return {
+        "pendientes": pendientes[:MAXIMO_FRAGMENTOS_POR_TURNO],
+        "pedir_datos_mostrado_para": pedir_datos_mostrado_para,
+    }
 
 
 def _resumen_plan(plan: PlanDeViaje) -> str:
-    lineas = [f"Armé un plan de {len(plan.dias)} día(s) para **{plan.destino}**:"]
+    filas = []
     for dia in plan.dias:
-        nombres = ", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades)
+        nombres = escapar(", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades))
         etiqueta = f"Día {dia.dia}" + (f" ({dia.fecha.strftime('%d/%m')})" if dia.fecha else "")
-        lineas.append(f"- **{etiqueta}**: {nombres} (costo estimado ${dia.costo_dia:.0f})")
-    lineas.append(
-        f"\nCosto total estimado: {plan.moneda} {plan.costo_total_estimado:.0f} por persona, "
-        f"{plan.moneda} {plan.costo_total_grupo:.0f} para el grupo de {plan.cantidad_personas}."
+        filas.append(
+            f"<strong>{escapar(etiqueta)}</strong>: {nombres} (costo estimado ${dia.costo_dia:.0f})"
+        )
+    pie = escapar("; ".join(plan.supuestos)) if plan.supuestos else None
+    tarjeta_html = tarjeta(f"Plan de viaje: {escapar(plan.destino)}", filas, pie)
+    total = (
+        f"Costo total estimado: {escapar(plan.moneda)} {plan.costo_total_estimado:.0f} por persona, "
+        f"{escapar(plan.moneda)} {plan.costo_total_grupo:.0f} para el grupo de {plan.cantidad_personas}."
     )
-    if plan.supuestos:
-        lineas.append("(" + "; ".join(plan.supuestos) + ")")
-    return "\n".join(lineas)
+    return (
+        f"Armé un plan de {len(plan.dias)} día(s) para <strong>{escapar(plan.destino)}</strong>:\n\n"
+        f"{tarjeta_html}\n\n{total}"
+    )
 
 
 def _resumen_actividades(actividades: list[ActividadRecomendada]) -> str:
     if not actividades:
         return "No encontré actividades para recomendarle con esos intereses en este destino."
-    return "\n".join(f"- **{a.nombre}**: {a.justificacion}" for a in actividades)
+    filas = [
+        f"<strong>{escapar(a.nombre)}</strong>: {escapar(a.justificacion)}" for a in actividades
+    ]
+    return tarjeta("Actividades recomendadas", filas)
 
 
 def _resumen_locales(locales: list[LocalRecomendado]) -> str:
     if not locales:
         return "No encontré locales para recomendarle con esa consulta en este destino."
-    return "\n".join(f"- **{local.nombre}**: {local.justificacion}" for local in locales)
+    filas = [
+        f"<strong>{escapar(local.nombre)}</strong>: {escapar(local.justificacion)}"
+        for local in locales
+    ]
+    return tarjeta("Locales recomendados", filas)
+
+
+def _marca_fixture(es_fixture: bool) -> str:
+    # RF6/RF7: si la API real falla, la tool sirve datos de ejemplo
+    # (es_fixture=True) para no dejar al cliente sin nada, pero nunca se
+    # le puede afirmar que son precios reales (regla dura 5).
+    return " (dato de ejemplo, no una tarifa real vigente)" if es_fixture else ""
+
+
+def _resumen_alojamiento(alojamientos: list[Alojamiento]) -> str:
+    if not alojamientos:
+        return "No encontré opciones de alojamiento para esas fechas."
+    filas = [
+        f"<strong>{escapar(alojamiento.nombre)}</strong>: {alojamiento.precio_total:.0f} "
+        f"{escapar(alojamiento.moneda)}{escapar(_marca_fixture(alojamiento.es_fixture))}"
+        for alojamiento in alojamientos[:3]
+    ]
+    return tarjeta("Opciones de alojamiento", filas)
+
+
+def _resumen_vuelos(vuelos: list[OpcionVuelo]) -> str:
+    if not vuelos:
+        return "No encontré opciones de vuelo para ese origen y esas fechas."
+    filas = []
+    for vuelo in vuelos[:3]:
+        aerolineas = escapar(", ".join(vuelo.aerolineas) or "aerolínea sin especificar")
+        filas.append(
+            f"<strong>{aerolineas}</strong>: {vuelo.precio_total:.0f} {escapar(vuelo.moneda)}, "
+            f"{vuelo.escalas or 0} escala(s){escapar(_marca_fixture(vuelo.es_fixture))}"
+        )
+    return tarjeta("Opciones de vuelo", filas)
 
 
 def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
@@ -355,6 +451,48 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
             elif tipo == "responder_faq_viajero":
                 respuesta = responder_faq_viajero(conexion, rotador, estado.destino, consulta, k=k)
                 fragmentos.append({"tipo": tipo, "texto": respuesta.respuesta})
+            elif tipo == "pedir_fechas_exactas":
+                fragmentos.append(
+                    {
+                        "tipo": tipo,
+                        "texto": "Para buscar alojamiento o vuelos necesito fechas exactas de ida y vuelta, no solo la cantidad de días. ¿Me las confirma?",
+                    }
+                )
+            elif tipo == "pedir_origen_vuelo":
+                fragmentos.append({"tipo": tipo, "texto": "¿Desde qué ciudad sale el vuelo?"})
+            elif tipo == "pedir_plan_para_convertir":
+                fragmentos.append(
+                    {
+                        "tipo": tipo,
+                        "texto": "Todavía no armé un plan con un costo para convertir. ¿Quiere que lo arme primero?",
+                    }
+                )
+            elif tipo == "convertir_moneda":
+                monto = (ultimo_plan or {}).get("costo_total_grupo", 0.0)
+                moneda_destino = accion.get("moneda_destino") or MONEDA_DESTINO_DEFECTO
+                cotizacion = convertir_desde_usd(monto, moneda_destino)
+                fragmentos.append({"tipo": tipo, "texto": cotizacion.detalle})
+            elif tipo == "buscar_alojamiento":
+                habitaciones = -(-(estado.cantidad_personas or 1) // 2)  # ceil(personas/2)
+                alojamientos = buscar_alojamiento(
+                    conexion,
+                    estado.destino,
+                    estado.fecha_inicio,
+                    estado.fecha_fin,
+                    adultos=estado.cantidad_personas or 1,
+                    habitaciones=habitaciones,
+                )
+                fragmentos.append({"tipo": tipo, "texto": _resumen_alojamiento(alojamientos)})
+            elif tipo == "buscar_vuelos":
+                vuelos = buscar_vuelos(
+                    conexion,
+                    estado.origen,
+                    estado.destino,
+                    estado.fecha_inicio,
+                    estado.fecha_fin,
+                    adultos=estado.cantidad_personas or 1,
+                )
+                fragmentos.append({"tipo": tipo, "texto": _resumen_vuelos(vuelos)})
         except ErrorFechasIncompletas:
             fragmentos.append(
                 {
@@ -404,7 +542,11 @@ def nodo_disparar_info_destino(estado_grafo: EstadoGrafo) -> dict:
         logger.exception("fallo info_destino, se omite en este turno")
         return {"info_destino_mostrada_para": estado.destino}
 
-    texto = f"{info.clima.detalle} Idioma: {info.idioma_moneda.idioma}, moneda: {info.idioma_moneda.moneda}."
+    filas = [
+        escapar(info.clima.detalle),
+        f"Idioma: {escapar(info.idioma_moneda.idioma)}, moneda: {escapar(info.idioma_moneda.moneda)}.",
+    ]
+    texto = tarjeta(f"Sobre {escapar(estado.destino)}", filas)
     fragmentos = [*estado_grafo["fragmentos"], {"tipo": "info_destino", "texto": texto}]
     return {"fragmentos": fragmentos, "info_destino_mostrada_para": estado.destino}
 
@@ -474,6 +616,7 @@ def procesar_turno(
     estado: dict,
     ultimo_plan: dict | None,
     info_destino_mostrada_para: str | None,
+    pedir_datos_mostrado_para: list[str] | None = None,
     hoy: date | None = None,
 ) -> EstadoGrafo:
     """Punto de entrada del grafo para un turno. agente.py lo envuelve en
@@ -487,6 +630,7 @@ def procesar_turno(
         "estado_anterior": estado,
         "ultimo_plan": ultimo_plan,
         "info_destino_mostrada_para": info_destino_mostrada_para,
+        "pedir_datos_mostrado_para": pedir_datos_mostrado_para,
         "interpretacion": None,
         "destino_no_soportado": None,
         "acciones_pedidas": [],

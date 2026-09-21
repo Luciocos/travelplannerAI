@@ -169,3 +169,39 @@ Formato de cada entrada:
 - **Decisión:** `normalizar.py` excluye POIs cuyo kind **primario** esté en `CATEGORIAS_EXCLUIDAS_COMO_PRIMARIO` (`skyscrapers`, `resorts`, `accomodations`, `other_buildings`), a diferencia del filtro de inclusión (por intersección) que ya existía. Se cura a mano, verificado contra Wikipedia, un corpus nuevo de 10 lugares reales de Miami (South Beach, Wynwood Walls, Little Havana, Vizcaya...) para compensar la exclusión, y 7 atractivos más de Cancún (llega a 20/20 solo con datos curados). `scripts/cargar_todos.py --reemplazar` borra las filas de un destino antes de recargarlo, porque el upsert por xid actualiza o agrega pero nunca borra una fila cuyo xid ya no se genera con la nueva regla.
 - **Alternativas descartadas:** filtrar por kind secundario también (excluir cualquier POI que tenga `skyscrapers` en la lista, no solo como primario) — descartado porque un atractivo real puede tener `architecture` como kind secundario sin ser una torre genérica; filtrar por intersección completa hubiera sido demasiado agresivo.
 - **Consecuencias:** los 3 destinos piloto quedan por encima del mínimo con `scripts/verificar_corpus.py` (Barcelona 39, Cancún 20, Miami 35 atractivos, cero duplicados, cero rascacielos). Verificado con un plan real para Miami/playa/vida nocturna: ya no aparece ningún edificio.
+
+## D-18, RF6/RF7 (alojamiento y vuelos) enganchados al grafo, con sus propias precondiciones
+
+- **Fecha:** 2026-09-17
+- **Fase:** 7D
+- **Contexto:** `buscar_alojamiento`/`buscar_vuelos` ya existían como tools standalone (D-05/D-06) pero `planificar`/`ejecutar_acciones` de `grafo.py` (D-12) nunca las llamaba: pedirle alojamiento o vuelos al agente conversacional no hacía nada.
+- **Decisión:** se agregan como `TipoAccion` más en `AccionPedida`, con precondición propia en `planificar`: ambas necesitan fechas exactas de ida y vuelta (no alcanza con `duracion_dias`), y vuelos además necesita `origen`; si falta algo, se agrega un pseudo-fragmento (`pedir_fechas_exactas`/`pedir_origen_vuelo`) en vez de llamar la tool con datos incompletos. `habitaciones` se deriva de `cantidad_personas` (`ceil(personas/2)`).
+- **Alternativas descartadas:** dejar que la tool misma valide y devuelva un error de vuelta al LLM para que reformule la pregunta — descartado por el mismo criterio que el resto de `planificar`: las precondiciones son deterministas, no dependen de que el LLM interprete bien un error de tool.
+- **Consecuencias:** verificado en vivo contra las APIs reales: una búsqueda de hoteles en Booking.com15 devolvió resultados reales; un timeout real de red en la búsqueda de vuelos cayó al fixture marcado como tal (regla dura 5), no a una excepción cruda.
+
+## D-19, conversión de moneda en vivo, ARS por defecto
+
+- **Fecha:** 2026-09-17
+- **Fase:** 7D
+- **Contexto:** pedido explícito del usuario. El público de este TP es de Argentina; el costo de un plan se calcula en USD (D-16), pero lo que le importa a un viajero argentino es cuánto sale en pesos, y a qué cotización (oficial vs. tarjeta cambian mucho).
+- **Decisión:** `services/cambio.py` consulta dolarapi.com (sin API key) para ARS, con oficial y tarjeta por separado ya que un viajero paga con tarjeta el segundo, no el primero; para cualquier otra moneda, open.er-api.com. Cacheado 1 hora en memoria de proceso. Si ninguna fuente responde, se lo dice honestamente en vez de inventar un número (regla dura 5) o de dejar el turno sin respuesta.
+- **Alternativas descartadas:** una tabla de cotizaciones fija en el código — descartada porque el dólar argentino cambia todos los días y una cifra hardcodeada sería mentira a los pocos días de la entrega.
+- **Consecuencias:** `convertir_moneda` como acción nueva del grafo (D-12), con precondición propia (necesita un `ultimo_plan` armado; si no hay ninguno, pide armarlo primero). Verificado contra las APIs reales el mismo día (oficial 1535 / tarjeta 1995.5 ARS por USD).
+
+## D-20, tarjetas HTML para los resultados del chat, no texto/markdown plano
+
+- **Fecha:** 2026-09-17
+- **Fase:** 7D
+- **Contexto:** pedido explícito del usuario ("generar html integrado en el chat para... dar de una manera más linda, más presentable"). El plan de Fase 7C proponía una arquitectura de bloques tipados (`respuesta.py` + `presentacion/html.py`, un renderer por tipo de bloque) que nunca se construyó: el grafo quedó devolviendo texto plano con bullets markdown (`- **X**: Y`), igual que la Fase 7B.
+- **Decisión:** en vez de la reescritura completa a bloques tipados (que hubiera tocado el contrato de `EstadoGrafo`/`Fragmento` y buena parte de los tests de `test_grafo.py`), se agrega `presentacion.py`: un helper de tarjeta HTML genérico (`tarjeta(titulo, filas, pie)`) más `escapar()`, y las funciones `_resumen_*` de `grafo.py` (que ya existían y ya se llamaban desde `ejecutar_acciones`) pasan a devolver esa tarjeta en vez de una lista de bullets. El contrato de `EstadoGrafo`/`Fragmento` no cambia: sigue siendo `texto: str`, solo que ese string ahora puede contener HTML. `ui/chat_app.py` renderiza con `st.markdown(..., unsafe_allow_html=True)` **solo para los mensajes del asistente**, nunca para lo que el usuario escribe (para no habilitar HTML sobre texto no controlado). `scripts/chat.py` (CLI secundario) usa `presentacion.texto_terminal()` para sacar las etiquetas antes de imprimir.
+- **Alternativas descartadas:** la arquitectura de bloques tipados del plan original — descartada por costo/beneficio dado el calendario de entrega (30/09): el resultado visual pedido (tarjetas separadas del texto conversacional) se logra igual sin tocar el contrato del grafo ni los tests existentes. Queda como posible trabajo futuro si hace falta, por ejemplo, que la UI reaccione distinto a cada tipo de bloque (hoy es indiferente, todo es un string).
+- **Consecuencias:** todo dato dinámico (nombre de una actividad, justificación de una recomendación, cotización) pasa por `escapar()` antes de entrar al HTML — verificado con un test que mete un `<script>` en un nombre y confirma que llega escapado. Verificado visualmente con Playwright: las tarjetas se ven como cajas separadas del texto, sin ninguna etiqueta HTML cruda visible en pantalla.
+
+## D-21, `pedir_datos` recuerda qué faltantes ya preguntó, para no repetirse (P-13)
+
+- **Fecha:** 2026-09-17
+- **Fase:** 7D
+- **Contexto:** corriendo `scripts/evaluar_conversaciones.py` de verdad contra Gemini se encontró (P-13) que `nodo_planificar` repetía la misma pregunta consolidada en cada turno mientras faltara algún dato, sin importar si el mensaje de ese turno era un agradecimiento u otro comentario sin datos nuevos.
+- **Decisión:** nuevo campo de sesión `pedir_datos_mostrado_para: list[str] | None`, con el mismo patrón que `info_destino_mostrada_para` (persistido en `SesionAgente`/`conversacion.sesion`, threaded por `procesar_turno`). `pedir_datos` solo se agrega si los `faltantes` de este turno son distintos de los que ya se preguntaron, si el estado cambió (`detectar_cambios`), o si el cliente pidió algo explícito este turno.
+- **Alternativas descartadas:** dejar que el LLM de `redactar` decida cuándo repetir la pregunta — descartado por el mismo criterio que el resto de `planificar` (D-14): la decisión de qué preguntar es determinista, no delegable al LLM turno a turno.
+- **Consecuencias:** verificado en vivo, antes y después del fix, con el mismo escenario del harness (`agradecimiento_small_talk`): antes, "Gracias, me sirvió mucho" devolvía la pregunta de siempre; después, un agradecimiento contextual ("Me alegro mucho de que le haya servido... para su próximo viaje a Barcelona del 5 al 10 de marzo de 2027"). Tests nuevos en `test_grafo.py` cubren no-repetir / repetir-si-cambia-algo / repetir-si-hay-pedido-explícito / primera-vez / limpieza cuando ya no falta nada.

@@ -14,6 +14,7 @@ from asistente_viajes.agente import SesionAgente, procesar_mensaje
 from asistente_viajes.config import ConfiguracionInvalida
 from asistente_viajes.db import obtener_conexion
 from asistente_viajes.llm import crear_rotador
+from asistente_viajes.presentacion import texto_terminal
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(message)s")
 
@@ -40,7 +41,7 @@ def main() -> int:
                 if not mensaje:
                     continue
                 respuesta = procesar_mensaje(conexion, rotador, sesion, mensaje)
-                print(f"\nAsistente: {respuesta}\n")
+                print(f"\nAsistente: {texto_terminal(respuesta)}\n")
     except KeyboardInterrupt:
         print("\nChau!")
 

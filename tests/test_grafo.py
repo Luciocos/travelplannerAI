@@ -12,6 +12,7 @@ import pytest
 from asistente_viajes import grafo as mod
 from asistente_viajes.estado import PreferenciasViaje
 from asistente_viajes.grafo import AccionPedida, InterpretacionTurno, procesar_turno
+from asistente_viajes.services.rapidapi.models import Alojamiento, OpcionVuelo
 from asistente_viajes.tools.armar_plan import (
     ActividadDelPlan,
     DiaDelPlan,
@@ -43,7 +44,15 @@ def _rotador_con_interpretacion(interpretacion: InterpretacionTurno) -> MagicMoc
     return rotador
 
 
-def _turno(rotador, mensaje, estado=None, historial=None, ultimo_plan=None, info_destino_para=None):
+def _turno(
+    rotador,
+    mensaje,
+    estado=None,
+    historial=None,
+    ultimo_plan=None,
+    info_destino_para=None,
+    pedir_datos_para=None,
+):
     return procesar_turno(
         conexion=MagicMock(),
         rotador=rotador,
@@ -52,6 +61,7 @@ def _turno(rotador, mensaje, estado=None, historial=None, ultimo_plan=None, info
         estado=(estado or PreferenciasViaje()).model_dump(mode="json"),
         ultimo_plan=ultimo_plan,
         info_destino_mostrada_para=info_destino_para,
+        pedir_datos_mostrado_para=pedir_datos_para,
         hoy=HOY,
     )
 
@@ -156,6 +166,95 @@ def test_planificar_no_pide_datos_si_ya_esta_completo(monkeypatch) -> None:
     rotador = _rotador_con_interpretacion(InterpretacionTurno())
     resultado = _turno(rotador, "hola", estado=estado)
     assert resultado["pendientes"] == []
+
+
+# --- pedir_datos no se repite sin motivo (P-13) ---------------------------
+
+
+def _estado_con_intereses_faltante() -> PreferenciasViaje:
+    return PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        presupuesto="medio",
+        fecha_inicio=date(2026, 12, 1),
+        fecha_fin=date(2026, 12, 5),
+        cantidad_personas=2,
+    )  # falta unicamente "intereses"
+
+
+def test_pedir_datos_no_se_repite_si_nada_cambio_y_no_hay_pedido() -> None:
+    """Bug real: un 'gracias' sin datos nuevos repetia la misma pregunta
+    consolidada de siempre en vez de reconocer el agradecimiento."""
+    rotador = _rotador_con_interpretacion(InterpretacionTurno())
+
+    resultado = _turno(
+        rotador,
+        "gracias, me sirvió mucho",
+        estado=_estado_con_intereses_faltante(),
+        pedir_datos_para=["intereses"],
+    )
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" not in tipos
+
+
+def test_pedir_datos_se_repite_si_algo_cambio_aunque_ya_se_habia_preguntado() -> None:
+    rotador = _rotador_con_interpretacion(InterpretacionTurno(cantidad_personas=4))
+
+    resultado = _turno(
+        rotador,
+        "somos 4 en vez de 2",
+        estado=_estado_con_intereses_faltante(),
+        pedir_datos_para=["intereses"],
+    )
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" in tipos
+
+
+def test_pedir_datos_se_repite_si_hay_un_pedido_explicito_aunque_ya_se_habia_preguntado() -> None:
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="armar_plan")])
+    )
+
+    resultado = _turno(
+        rotador,
+        "armame el plan",
+        estado=_estado_con_intereses_faltante(),
+        pedir_datos_para=["intereses"],
+    )
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" in tipos
+
+
+def test_pedir_datos_se_repite_la_primera_vez_aunque_nada_cambie() -> None:
+    """pedir_datos_mostrado_para arranca en None: la primera pregunta
+    siempre tiene que salir, aunque "nada cambio" respecto de un estado
+    vacio inicial (no hay confundir "primera vez" con "ya se pregunto")."""
+    rotador = _rotador_con_interpretacion(InterpretacionTurno())
+
+    resultado = _turno(rotador, "hola", estado=_estado_con_intereses_faltante())
+
+    tipos = [p["tipo"] for p in resultado["pendientes"]]
+    assert "pedir_datos" in tipos
+
+
+def test_pedir_datos_mostrado_para_se_limpia_cuando_ya_no_falta_nada() -> None:
+    estado = PreferenciasViaje(
+        destino="Cancun",
+        tipo_destino="playa",
+        intereses=["naturaleza"],
+        presupuesto="medio",
+        fecha_inicio=date(2026, 12, 1),
+        fecha_fin=date(2026, 12, 5),
+        cantidad_personas=2,
+    )
+    rotador = _rotador_con_interpretacion(InterpretacionTurno())
+
+    resultado = _turno(rotador, "hola", estado=estado, pedir_datos_para=["intereses"])
+
+    assert resultado["pedir_datos_mostrado_para"] is None
 
 
 def test_planificar_multiples_acciones_en_un_solo_mensaje(monkeypatch) -> None:
@@ -391,6 +490,162 @@ def test_accion_sin_consulta_propia_usa_el_mensaje_completo(monkeypatch) -> None
     _turno(rotador, "donde como algo tipico y barato", estado=estado)
 
     assert consultas_recibidas["locales"] == "donde como algo tipico y barato"
+
+
+# --- buscar_alojamiento / buscar_vuelos (RF6/RF7) -------------------------
+
+
+def _estado_completo(**overrides) -> PreferenciasViaje:
+    base = {
+        "destino": "Barcelona",
+        "tipo_destino": "ciudad",
+        "intereses": ["historia"],
+        "presupuesto": "medio",
+        "fecha_inicio": date(2027, 3, 5),
+        "fecha_fin": date(2027, 3, 10),
+        "cantidad_personas": 2,
+    }
+    base.update(overrides)
+    return PreferenciasViaje(**base)
+
+
+def test_actualizar_estado_extrae_origen() -> None:
+    rotador = _rotador_con_interpretacion(InterpretacionTurno(origen="Buenos Aires"))
+    resultado = _turno(rotador, "el vuelo sale de Buenos Aires")
+    assert resultado["estado"]["origen"] == "Buenos Aires"
+
+
+def test_planificar_pide_fechas_exactas_si_solo_hay_duracion_dias() -> None:
+    estado = _estado_completo(fecha_inicio=None, fecha_fin=None, duracion_dias=5)
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_alojamiento")])
+    )
+    resultado = _turno(rotador, "buscame un hotel", estado=estado)
+    assert resultado["pendientes"] == [{"tipo": "pedir_fechas_exactas"}]
+    assert "fechas exactas" in resultado["respuesta_texto"].lower()
+
+
+def test_planificar_pide_origen_si_falta_para_vuelos() -> None:
+    estado = _estado_completo()
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_vuelos")])
+    )
+    resultado = _turno(rotador, "quiero vuelos", estado=estado)
+    assert resultado["pendientes"] == [{"tipo": "pedir_origen_vuelo"}]
+    assert "qué ciudad" in resultado["respuesta_texto"].lower()
+
+
+def test_buscar_alojamiento_se_ejecuta_con_datos_completos(monkeypatch) -> None:
+    estado = _estado_completo(cantidad_personas=3)
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_alojamiento")])
+    )
+    llamada = MagicMock(
+        return_value=[
+            Alojamiento(nombre="Hotel Test", proveedor="booking", precio_total=500.0, moneda="USD")
+        ]
+    )
+    monkeypatch.setattr(mod, "buscar_alojamiento", llamada)
+
+    resultado = _turno(rotador, "buscame alojamiento", estado=estado)
+
+    assert llamada.call_args.args[0] is not None
+    assert llamada.call_args.kwargs["adultos"] == 3
+    assert llamada.call_args.kwargs["habitaciones"] == 2  # ceil(3/2)
+    assert "Hotel Test" in resultado["respuesta_texto"]
+    assert "500" in resultado["respuesta_texto"]
+
+
+def test_buscar_alojamiento_marca_los_datos_de_ejemplo(monkeypatch) -> None:
+    estado = _estado_completo()
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_alojamiento")])
+    )
+    monkeypatch.setattr(
+        mod,
+        "buscar_alojamiento",
+        lambda *a, **k: [
+            Alojamiento(
+                nombre="Hotel Fixture",
+                proveedor="booking",
+                precio_total=100.0,
+                moneda="USD",
+                es_fixture=True,
+            )
+        ],
+    )
+
+    resultado = _turno(rotador, "buscame alojamiento", estado=estado)
+
+    assert "dato de ejemplo" in resultado["respuesta_texto"]
+
+
+def test_buscar_vuelos_se_ejecuta_con_origen(monkeypatch) -> None:
+    estado = _estado_completo(origen="Buenos Aires")
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="buscar_vuelos")])
+    )
+    llamada = MagicMock(
+        return_value=[
+            OpcionVuelo(
+                proveedor="fly_scraper",
+                precio_total=300.0,
+                moneda="USD",
+                aerolineas=["Aerolineas Test"],
+                escalas=0,
+            )
+        ]
+    )
+    monkeypatch.setattr(mod, "buscar_vuelos", llamada)
+
+    resultado = _turno(rotador, "buscame vuelos", estado=estado)
+
+    assert llamada.call_args.args[1] == "Buenos Aires"  # args[0] es la conexion
+    assert "Aerolineas Test" in resultado["respuesta_texto"]
+
+
+# --- convertir_moneda (D-18) -----------------------------------------------
+
+
+def test_convertir_moneda_pide_el_plan_primero_si_no_hay_ninguno() -> None:
+    estado = _estado_completo()
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="convertir_moneda")])
+    )
+    resultado = _turno(rotador, "cuanto es en pesos", estado=estado)
+    assert resultado["pendientes"] == [{"tipo": "pedir_plan_para_convertir"}]
+    assert "armé un plan" in resultado["respuesta_texto"].lower()
+
+
+def test_convertir_moneda_convierte_el_costo_del_ultimo_plan(monkeypatch) -> None:
+    estado = _estado_completo()
+    plan_previo = {"destino": "Barcelona", "costo_total_grupo": 500.0, "moneda": "USD"}
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="convertir_moneda", moneda_destino="ARS")])
+    )
+    llamada = MagicMock()
+    llamada.return_value.detalle = "USD 500 = ARS 750000 (dólar oficial)."
+    monkeypatch.setattr(mod, "convertir_desde_usd", llamada)
+
+    resultado = _turno(rotador, "cuanto es en pesos", estado=estado, ultimo_plan=plan_previo)
+
+    llamada.assert_called_once_with(500.0, "ARS")
+    assert "750000" in resultado["respuesta_texto"]
+
+
+def test_convertir_moneda_usa_ars_por_defecto_sin_moneda_explicita(monkeypatch) -> None:
+    estado = _estado_completo()
+    plan_previo = {"destino": "Barcelona", "costo_total_grupo": 200.0, "moneda": "USD"}
+    rotador = _rotador_con_interpretacion(
+        InterpretacionTurno(acciones=[AccionPedida(tipo="convertir_moneda")])
+    )
+    llamada = MagicMock()
+    llamada.return_value.detalle = "listo"
+    monkeypatch.setattr(mod, "convertir_desde_usd", llamada)
+
+    _turno(rotador, "cuanto sale eso?", estado=estado, ultimo_plan=plan_previo)
+
+    llamada.assert_called_once_with(200.0, mod.MONEDA_DESTINO_DEFECTO)
 
 
 # --- disparar_info_destino -----------------------------------------------
