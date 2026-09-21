@@ -2,7 +2,7 @@
 
 **Archivo vivo. Leer al empezar cada sesión, actualizar al cerrar cada fase.**
 
-Última actualización: 2026-09-17 (Fase 7D)
+Última actualización: 2026-09-21 (Fase 7D mergeada a main)
 
 ---
 
@@ -19,9 +19,9 @@
 | Límite diario real por clave | Sigue sin poder verificarse de forma estática (bloqueo abierto, ver abajo). |
 | Postgres | Local vía `docker-compose` (`DATABASE_URL` en `.env` apunta a `localhost:5432`). Esquema en 2 archivos, `sql/001_schema.sql` y `sql/002_conversaciones.sql` (D-13); `scripts/inicializar_db.py` aplica todos los `sql/*.sql` en orden. |
 
-## Fase actual: Fase 7D, extensiones sobre el grafo nuevo
+## Fase actual: Fase 7D, mergeada a main
 
-Rama `fase/7d-extensiones`, creada desde `main` justo después de mergear el notebook (commit `db3c598`). Fase 7C + el notebook ya están en `main` (mergeados con el "push to main" pedido por el usuario). Esta rama agrega lo que había quedado afuera de 7C: RF6/RF7 enganchados, conversión de moneda, descarga de itinerario, tarjetas HTML en el chat, harness de evaluación y tests de `AppTest`. Se encontraron y arreglaron 3 bugs reales probando todo esto en vivo: P-11 (UI), P-12 (tests) y P-13 (conversación). **Nada de esta rama está todavía en `main`.**
+Rama `fase/7d-extensiones`, creada desde `main` justo después de mergear el notebook (commit `db3c598`). Fase 7C + el notebook ya estaban en `main`. Esta rama agregó lo que había quedado afuera de 7C: RF6/RF7 enganchados, conversión de moneda, descarga de itinerario, tarjetas HTML en el chat, harness de evaluación y tests de `AppTest`. Se encontraron y arreglaron 3 bugs reales probando todo esto en vivo: P-11 (UI), P-12 (tests) y P-13 (conversación). **Mergeada a `main` y pusheada el 2026-09-21** (commit de merge `0484775`, pedido explícito del usuario para que el equipo, Elias, pueda testear), previa corrida de la suite completa (248 passed, 5 skipped).
 
 **Lo que se agregó, de mayor a menor impacto:**
 
@@ -38,13 +38,12 @@ Rama `fase/7d-extensiones`, creada desde `main` justo después de mergear el not
 
 **No hecho todavía** (quedan para la próxima sesión, ninguno bloquea lo demás):
 - Repository secrets de GitHub y protección de `main` (bloqueo, requiere acceso del usuario/equipo a GitHub).
-- Mergear `fase/7d-extensiones` a `main` (todavía no se pidió).
 
 ## Fases cerradas
 
 - **Fases 0 a 6** (núcleo, RF1/RF2/RF3/RF5/RF11/RF12): cerradas en sesiones anteriores. Con el núcleo cerrado el TP ya era aprobable según `plan-de-fases.md`.
 - **Fase 7C** (orquestador LangGraph + persistencia de chats + fine-tuning conversacional): cerrada y **mergeada a `main`**.
-- **Fase 7D** (este documento, en curso): RF6/RF7 enganchados, moneda, descarga de itinerario, tarjetas HTML, harness de evaluación, tests de `AppTest`, P-11, P-12, P-13. Todo sigue en `fase/7d-extensiones`, sin mergear a `main` todavía.
+- **Fase 7D**: RF6/RF7 enganchados, moneda, descarga de itinerario, tarjetas HTML, harness de evaluación, tests de `AppTest`, P-11, P-12, P-13. **Mergeada a `main`** (commit `0484775`, 2026-09-21).
 
 ## Decisiones tomadas
 
@@ -86,9 +85,8 @@ Decisiones que vienen dadas y no se rediscuten sin motivo nuevo:
 
 ## Próximo paso
 
-1. Mergear `fase/7d-extensiones` a `main` cuando el usuario lo pida (ver "push to main now!" como precedente: el usuario pide el merge explícitamente, no se asume).
-2. Cargar los repository secrets en GitHub y proteger `main` (bloqueo, requiere al usuario).
-3. Opcional: correr el resto de los escenarios de `scripts/evaluar_conversaciones.py` para tener más evidencia real en `docs/evaluacion/` antes de la defensa.
+1. Cargar los repository secrets en GitHub y proteger `main` (bloqueo, requiere al usuario).
+2. Opcional: correr el resto de los escenarios de `scripts/evaluar_conversaciones.py` para tener más evidencia real en `docs/evaluacion/` antes de la defensa.
 
 ---
 
