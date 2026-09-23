@@ -89,7 +89,7 @@ def _sidebar(conexion, conversacion_id: str) -> bool:
     se confirmo."""
     necesita_rerun = False
     with st.sidebar:
-        if st.button("➕ Nueva conversación", width="stretch"):
+        if st.button("Nueva conversación", icon=":material/add:", width="stretch"):
             _cambiar_de_chat(servicio.nueva_conversacion(conexion))
             necesita_rerun = True
 
@@ -105,10 +105,17 @@ def _sidebar(conexion, conversacion_id: str) -> bool:
                     _cambiar_de_chat(chat.id)
                     necesita_rerun = True
             with columnas[1]:
-                if st.button("✏️", key=f"renombrar_{chat.id}", help="Renombrar"):
+                # Iconos Material (los trae Streamlit como fuente propia), no
+                # emoji: los emoji dependen de la fuente del sistema y en
+                # Chrome/macOS los botones salian literalmente vacios.
+                if st.button(
+                    "", icon=":material/edit:", key=f"renombrar_{chat.id}", help="Renombrar"
+                ):
                     st.session_state["renombrando"] = chat.id
             with columnas[2]:
-                if st.button("🗑️", key=f"borrar_{chat.id}", help="Eliminar"):
+                if st.button(
+                    "", icon=":material/delete:", key=f"borrar_{chat.id}", help="Eliminar"
+                ):
                     servicio.eliminar_chat(conexion, chat.id)
                     if es_actual:
                         _cambiar_de_chat(servicio.nueva_conversacion(conexion))
@@ -180,7 +187,8 @@ def _cuerpo_principal(conexion) -> bool:
     itinerario_md = servicio.itinerario_descargable(st.session_state.sesion)
     if itinerario_md:
         st.download_button(
-            "⬇️ Descargar itinerario",
+            "Descargar itinerario",
+            icon=":material/download:",
             data=itinerario_md,
             file_name=f"itinerario_{st.session_state.sesion.estado.destino or 'viaje'}.md",
             mime="text/markdown",
