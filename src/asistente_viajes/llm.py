@@ -156,11 +156,28 @@ class RotadorClavesGemini:
         backoff mas corto si las tres claves estan agotadas."""
         return self._ejecutar_con_rotacion(lambda cliente: cliente.invoke(mensajes, **kwargs))
 
+    def con_herramientas(self, herramientas: list) -> _ConHerramientasRotado:
+        """Equivalente rotado de ChatModel.bind_tools(). Lo usa el agente de
+        tool calling (D-25): el modelo ve el catalogo de tools y decide solo
+        cuales llamar, en vez de que lo decida un if en Python."""
+        return _ConHerramientasRotado(self, herramientas)
+
     def con_salida_estructurada(self, esquema: type) -> _SalidaEstructuradaRotada:
         """Equivalente rotado de ChatModel.with_structured_output(esquema).
         Devuelve un objeto con .invoke(mensajes) que aplica la misma logica
         de rotacion y failover que invocar()."""
         return _SalidaEstructuradaRotada(self, esquema)
+
+
+class _ConHerramientasRotado:
+    def __init__(self, rotador: RotadorClavesGemini, herramientas: list) -> None:
+        self._rotador = rotador
+        self._herramientas = herramientas
+
+    def invoke(self, mensajes: object, **kwargs: object) -> object:
+        return self._rotador._ejecutar_con_rotacion(
+            lambda cliente: cliente.bind_tools(self._herramientas).invoke(mensajes, **kwargs)
+        )
 
 
 class _SalidaEstructuradaRotada:
