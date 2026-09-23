@@ -36,27 +36,52 @@ from asistente_viajes.ingesta.normalizar import (
 )
 from asistente_viajes.ingesta.opentripmap import (
     ErrorOpenTripMap,
+    buscar_en_varios_puntos,
+    detalles_de_xids,
     geolocalizar,
-    ingerir_destino,
 )
 
 logger = logging.getLogger(__name__)
 
 DIRECTORIO_RAW = Path(__file__).resolve().parent.parent.parent / "data" / "raw"
 
-RADIO_METROS = 12000
-LIMITE_POIS = 60
+# Radio amplio a proposito: el geocoder devuelve UN punto (en Tokio cae en
+# Shinjuku) y los atractivos de una ciudad grande estan repartidos. Con un
+# radio chico el corpus se llena de lo que rodea ese punto exacto.
+RADIO_METROS = 25000
+# La lista del paso 1 es una sola llamada, asi que se pide grande y se
+# filtra por relevancia; los detalles, que son una llamada por POI, se le
+# traen solo a los mejores (ver ingerir_destino, limite_detalles).
+LIMITE_LISTA = 300
+LIMITE_POIS = 45
 
-# Filtro de significancia de OpenTripMap ('1' a '3', 'h'). Sin esto, la
-# busqueda por radio devuelve los primeros N POIs por cercania y en un
-# centro historico eso llena el cupo de casas y edificios anonimos que
-# igual tienen articulo de Wikipedia (fue exactamente lo que le paso al
-# corpus de Barcelona: 39 "atractivos" sin la Sagrada Familia). Con rate=2
-# entran primero los lugares con relevancia turistica declarada.
-RATE_MINIMO_ATRACTIVOS = "2"
+# Filtro de significancia de OpenTripMap. El campo `rate` va de 0 a 7 (los
+# valores altos son patrimonio declarado), aunque el parametro de la API
+# acepte '1'..'3'/'h' como minimo. Con rate=3 quedan afuera los comercios y
+# edificios anonimos que igual tienen articulo de Wikipedia, que es lo que
+# arruino los corpus de Barcelona y Tokio.
+RATE_MINIMO_ATRACTIVOS = "3"
 
-KINDS_ATRACTIVOS = ["historic", "museums", "natural", "cultural", "architecture"]
-KINDS_COMERCIOS = ["foods", "shops", "marketplaces"]  # no se usan en el camino interactivo, ver _ingerir
+KINDS_ATRACTIVOS = [
+    "historic",
+    "museums",
+    "natural",
+    "cultural",
+    "architecture",
+    "religion",
+    "urban_environment",
+    "amusements",
+]
+
+# Cuantos POIs se puntuan (ver _puntaje_relevancia) para quedarse con los
+# LIMITE_POIS mejores. Traer el detalle de mas candidatos cuesta tiempo,
+# pero es la unica forma de elegir por relevancia real: el paso 1 no dice
+# nada util para ordenar (en Barcelona hay cientos de POIs empatados en
+# rate=7, el maximo, asi que el rate no discrimina).
+CANDIDATOS_A_PUNTUAR = 110
+# No se usan en el camino interactivo (ver _ingerir); quedan para la
+# ingesta offline de scripts/ingestar_destino.py.
+KINDS_COMERCIOS = ["foods", "shops", "marketplaces"]
 
 SQL_CONTAR_DOCUMENTOS = """
 SELECT corpus, count(*)
@@ -109,6 +134,62 @@ def _coordenadas_conocidas(destino: str) -> tuple[str, float, float, str | None]
     return nombre, datos["lat"], datos["lon"], datos.get("pais")
 
 
+def _puntaje_relevancia(detalle: dict) -> float:
+    """Cuán "visitable" parece un POI, con lo que ya vino en su detalle (no
+    cuesta ninguna llamada extra).
+
+    Se intentaron primero señales externas y ninguna sirvió: el `rate` de
+    OpenTripMap satura (en Barcelona cientos de POIs empatan en 7, el
+    máximo), los pageviews de la API de Wikipedia vuelven vacíos para
+    artículos que claramente tienen visitas, y la consulta SPARQL a
+    Wikidata por cantidad de idiomas da timeout sobre una búsqueda
+    geográfica. Lo que sí discrimina, y está gratis en la respuesta:
+
+    - Tener imagen. Un lugar que la gente visita y fotografía tiene foto en
+      Wikimedia; una casa anónima del Eixample, no.
+    - El largo del extracto de Wikipedia. Un artículo largo es proxy de
+      cuánto se escribió sobre el lugar.
+    - Estar en varias categorías (un sitio importante suele ser a la vez
+      histórico, arquitectónico y cultural).
+    """
+    extracto = (detalle.get("wikipedia_extracts") or {}).get("text") or ""
+    tiene_imagen = bool(detalle.get("preview") or detalle.get("image"))
+    kinds = [k for k in (detalle.get("kinds") or "").split(",") if k]
+
+    # `rate` puede venir como numero o como "3h": el sufijo 'h' marca
+    # patrimonio declarado (UNESCO y similares), asi que ademas de no
+    # romper el float(), suma como senial fuerte de relevancia.
+    rate_crudo = str(detalle.get("rate") or "0")
+    digitos = "".join(c for c in rate_crudo if c.isdigit())
+    puntaje = float(digitos or 0)
+    if "h" in rate_crudo.lower():
+        puntaje += 5.0
+
+    puntaje += 4.0 if tiene_imagen else 0.0
+    puntaje += min(len(extracto) / 400.0, 6.0)
+    puntaje += min(len(kinds) * 0.3, 2.0)
+    return puntaje
+
+
+def _puntos_de_muestreo(lat: float, lon: float) -> list[tuple[float, float]]:
+    """Solo el centro del destino, y eso es una conclusion, no una
+    simplificacion pendiente.
+
+    Se probo muestrear tambien desde un anillo de 4 puntos a 4 km,
+    intercalando los resultados, para que el cupo de la busqueda por radio
+    no se agotara en el centro. Medido contra la API real, empeoro las dos
+    ciudades de prueba: al repartir el cupo en partes iguales, 4 de cada 5
+    candidatos salian de zonas residenciales. Barcelona paso a devolver
+    casonas de barrio ("Can Bacardi", "Can Querol") y Tokio perdio el
+    Castillo Edo y el santuario Meiji Jingu a cambio de plazas de Suginami.
+    El centro concentra los atractivos, asi que darle el cupo entero es lo
+    que mejor corpus produce. Se deja la funcion (y el parametro `puntos`
+    de buscar_en_varios_puntos) porque la forma correcta de retomarlo seria
+    ponderar, no repartir en partes iguales.
+    """
+    return [(lat, lon)]
+
+
 def _ingerir(nombre: str, lat: float, lon: float, api_key: str) -> int:
     """Trae los atractivos del destino y los carga a pgvector. Devuelve
     cuantos documentos se escribieron."""
@@ -118,23 +199,27 @@ def _ingerir(nombre: str, lat: float, lon: float, api_key: str) -> int:
     # (D-07), asi que no justifica el costo en el camino interactivo; se
     # sigue pudiendo cargar aparte con scripts/ingestar_destino.py.
     documentos: list[DocumentoCorpus] = []
-    try:
-        detalles = ingerir_destino(
-            destino=nombre,
-            lat=lat,
-            lon=lon,
-            radio_metros=RADIO_METROS,
-            api_key=api_key,
-            directorio_raw=DIRECTORIO_RAW,
-            kinds=KINDS_ATRACTIVOS,
-            limite=LIMITE_POIS,
-            rate=RATE_MINIMO_ATRACTIVOS,
-        )
-    except ErrorOpenTripMap:
-        logger.warning("fallo la ingesta de %s", nombre, exc_info=True)
+    candidatos = buscar_en_varios_puntos(
+        api_key,
+        puntos=_puntos_de_muestreo(lat, lon),
+        radio_metros=RADIO_METROS,
+        kinds=KINDS_ATRACTIVOS,
+        limite_por_punto=LIMITE_LISTA,
+        rate=RATE_MINIMO_ATRACTIVOS,
+    )
+    if not candidatos:
+        logger.warning("no se encontraron POIs para %s", nombre)
         return 0
 
-    for detalle in detalles:
+    # `candidatos` ya viene intercalado por punto de muestreo, y ese orden
+    # se respeta: re-ordenarlo por `rate` aca fue un error real, porque el
+    # rate satura en 7 y la lista volvia a quedar dominada por el centro,
+    # tirando a la basura la diversidad geografica recien ganada.
+    xids = [poi["xid"] for poi in candidatos[:CANDIDATOS_A_PUNTUAR] if poi.get("xid")]
+    detalles = detalles_de_xids(api_key, xids)
+
+    mejores = sorted(detalles, key=_puntaje_relevancia, reverse=True)[:LIMITE_POIS]
+    for detalle in mejores:
         documento = normalizar_poi_opentripmap(detalle, destino=nombre)
         if documento is not None:
             documentos.append(documento)

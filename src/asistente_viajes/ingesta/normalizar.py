@@ -17,7 +17,22 @@ from asistente_viajes.texto import normalizar
 
 LONGITUD_MINIMA_TEXTO = 200
 
-CATEGORIAS_ATRACTIVOS = {"historic", "museums", "natural", "cultural", "architecture"}
+# religion y urban_environment faltaban, y no era un detalle: dejaban fuera
+# del corpus a catedrales, templos, parques y plazas, o sea buena parte de
+# lo mas visitado de cualquier ciudad (la Sagrada Familia y el Senso-ji son
+# 'religion'; el Retiro o Central Park, 'urban_environment'). Un POI cuyos
+# kinds no matchean ningun corpus se descarta en silencio, asi que el
+# efecto era invisible salvo mirando el corpus resultante.
+CATEGORIAS_ATRACTIVOS = {
+    "historic",
+    "museums",
+    "natural",
+    "cultural",
+    "architecture",
+    "religion",
+    "urban_environment",
+    "amusements",
+}
 CATEGORIAS_COMERCIOS = {"foods", "shops", "marketplaces"}
 
 # Kinds que OpenTripMap mete bajo "architecture"/"interesting_places" pero que

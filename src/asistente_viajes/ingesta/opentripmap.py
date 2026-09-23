@@ -39,9 +39,16 @@ class ErrorOpenTripMap(RuntimeError):
     """La API no respondio o respondio con error. No tiene que voltear el pipeline."""
 
 
-def _ruta_cruda(directorio_raw: Path, destino: str, sufijo: str) -> Path:
-    nombre_archivo = f"{destino.lower().replace(' ', '_')}_{sufijo}.json"
-    return directorio_raw / nombre_archivo
+def _ruta_cruda(directorio_raw: Path, destino: str, sufijo: str, grupo: str = "") -> Path:
+    """`grupo` separa los archivos crudos de cada conjunto de kinds. Sin
+    esto, ingerir atractivos y despues comercios del mismo destino escribia
+    las dos veces en el MISMO archivo y la segunda pisaba a la primera (se
+    vio con Tokio: su lista de 'atractivos' termino llena de 7-Eleven y
+    cafeterias, que son comercios)."""
+    partes = [destino.lower().replace(" ", "_"), sufijo]
+    if grupo:
+        partes.insert(1, grupo)
+    return directorio_raw / f"{'_'.join(partes)}.json"
 
 
 def buscar_por_radio(
@@ -139,6 +146,76 @@ def obtener_detalle(api_key: str, xid: str) -> dict[str, Any]:
     raise ErrorOpenTripMap(f"fallo el detalle de xid={xid}: rate limit persistente")
 
 
+def detalles_de_xids(api_key: str, xids: list[str]) -> list[dict[str, Any]]:
+    """Paso 2 sobre una lista ya elegida de xids, en paralelo. Separado de
+    ingerir_destino para poder armar la lista de candidatos con varias
+    busquedas (ver buscar_en_varios_puntos) antes de gastar una llamada por
+    POI."""
+    detalles: list[dict[str, Any]] = []
+    if not xids:
+        return detalles
+
+    with ThreadPoolExecutor(max_workers=WORKERS_DETALLE) as ejecutor:
+        futuros = {ejecutor.submit(obtener_detalle, api_key, xid): xid for xid in xids}
+        for futuro in as_completed(futuros):
+            try:
+                detalles.append(futuro.result())
+            except ErrorOpenTripMap as error:
+                logger.warning("no se pudo obtener detalle de %s: %s", futuros[futuro], error)
+    return detalles
+
+
+def buscar_en_varios_puntos(
+    api_key: str,
+    puntos: list[tuple[float, float]],
+    radio_metros: int,
+    kinds: list[str],
+    limite_por_punto: int,
+    rate: str | None = None,
+) -> list[dict[str, Any]]:
+    """Une la busqueda por radio hecha desde varios centros, deduplicando
+    por xid.
+
+    Existe por un limite concreto de la API: /radius devuelve los N POIs
+    MAS CERCANOS al centro, sin forma de ordenar por relevancia. En una
+    ciudad con centro historico denso eso satura el cupo a pocas cuadras
+    del punto: en Barcelona hay mas de 500 POIs catalogados alrededor de
+    Placa Catalunya, asi que la Sagrada Familia (a 2,5 km) no entraba en la
+    lista por mas que se subiera el limite. Muestrear desde varios puntos
+    reparte el cupo por la ciudad. Son llamadas de lista, baratas: la cara
+    es la de detalle, que sigue siendo una por POI elegido.
+
+    El resultado viene intercalado por punto (round robin), no concatenado,
+    y ese orden importa: quien llama se queda con los primeros N para
+    traerles el detalle. Concatenando, esos N salian casi todos del primer
+    punto y se perdia la diversidad que el muestreo acababa de ganar. No
+    se puede ordenar por `rate` para elegirlos porque tambien satura: la
+    Sagrada Familia tiene rate 7, igual que cientos de casas del Eixample.
+    """
+    por_punto: list[list[dict[str, Any]]] = []
+    for lat, lon in puntos:
+        try:
+            por_punto.append(
+                buscar_por_radio(
+                    api_key, lat, lon, radio_metros, kinds=kinds, limite=limite_por_punto, rate=rate
+                )
+            )
+        except ErrorOpenTripMap as error:
+            logger.warning("fallo la busqueda en (%s, %s): %s", lat, lon, error)
+
+    encontrados: dict[str, dict[str, Any]] = {}
+    for posicion in range(max((len(lista) for lista in por_punto), default=0)):
+        for lista in por_punto:
+            if posicion >= len(lista):
+                continue
+            xid = lista[posicion].get("xid")
+            if xid and xid not in encontrados:
+                encontrados[xid] = lista[posicion]
+
+    logger.info("%s POIs unicos desde %s puntos de muestreo", len(encontrados), len(por_punto))
+    return list(encontrados.values())
+
+
 def ingerir_destino(
     destino: str,
     lat: float,
@@ -149,14 +226,25 @@ def ingerir_destino(
     kinds: list[str] | None = None,
     limite: int = 200,
     rate: str | None = None,
+    limite_detalles: int | None = None,
+    grupo: str = "",
 ) -> list[dict[str, Any]]:
     """Corre los dos pasos para un destino y persiste las respuestas crudas
     en directorio_raw. Si la API falla en cualquier paso, intenta recuperar
     lo ya guardado de una corrida anterior y avisa, no rompe el pipeline.
+
+    `limite_detalles` es la pieza que define la calidad del corpus. El paso
+    1 devuelve los POIs ordenados por CERCANIA al centro, no por
+    relevancia: pedir 60 y traerles el detalle a esos 60 llena el corpus
+    con lo que haya alrededor del punto exacto del geocoder (en Tokio, las
+    galerias y cines de Shinjuku; en Barcelona, casas anonimas del Eixample).
+    Con `limite_detalles`, el paso 1 pide una lista grande —es UNA sola
+    llamada, barata— y se le traen los detalles solo a los N POIs de mayor
+    `rate`, que es el indice de relevancia turistica de OpenTripMap.
     """
     directorio_raw.mkdir(parents=True, exist_ok=True)
-    ruta_lista = _ruta_cruda(directorio_raw, destino, "lista")
-    ruta_detalles = _ruta_cruda(directorio_raw, destino, "detalles")
+    ruta_lista = _ruta_cruda(directorio_raw, destino, "lista", grupo)
+    ruta_detalles = _ruta_cruda(directorio_raw, destino, "detalles", grupo)
 
     try:
         lista = buscar_por_radio(
@@ -177,6 +265,12 @@ def ingerir_destino(
     # ciudad nueva), asi que el cliente esperaria mirando un spinner. En
     # paralelo baja a segundos. El limite de workers es deliberadamente
     # bajo para no gatillar el rate limit de OpenTripMap.
+    if limite_detalles is not None:
+        lista = sorted(lista, key=lambda poi: poi.get("rate") or 0, reverse=True)[:limite_detalles]
+        logger.info(
+            "%s: %s POIs de mayor relevancia elegidos para traer detalle", destino, len(lista)
+        )
+
     xids = [poi["xid"] for poi in lista if poi.get("xid")]
     detalles: list[dict[str, Any]] = []
     fallo_alguno = False
