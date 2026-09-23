@@ -270,6 +270,11 @@ justificación. Si el texto de un lugar no alcanza para justificarlo,
 marque relevante en falso: no agregue datos que no estén en el texto de
 ESE lugar, ni invente una justificación de todos modos.
 
+La justificación describe EL LUGAR, no la fuente. Escriba "Monumento
+funerario de la época republicana, levantado por un liberto", nunca "el
+texto menciona que es un monumento…" ni "el texto relata…". El cliente
+está leyendo sobre un lugar al que puede ir, no sobre un documento.
+
 Lugares:
 {lugares}
 """
