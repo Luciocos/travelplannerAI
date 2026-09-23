@@ -10,14 +10,18 @@ def test_tarjeta_incluye_titulo_y_filas() -> None:
     html = mod.tarjeta("Mi título", ["fila uno", "fila dos"])
 
     assert "Mi título" in html
-    assert "<li>fila uno</li>" in html
-    assert "<li>fila dos</li>" in html
+    # Desde D-22 las filas son divs flex, no <li>: se verifica el contenido
+    # y que cada fila sea su propio bloque, no el markup exacto.
+    assert "fila uno" in html
+    assert "fila dos" in html
+    assert html.count("display:flex") == 2
 
 
 def test_tarjeta_descarta_filas_vacias() -> None:
     html = mod.tarjeta("Título", ["algo", "", None])  # type: ignore[list-item]
 
-    assert html.count("<li>") == 1
+    assert html.count("display:flex") == 1
+    assert "algo" in html
 
 
 def test_tarjeta_agrega_el_pie_solo_si_se_pasa() -> None:

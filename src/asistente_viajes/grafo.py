@@ -83,7 +83,7 @@ from asistente_viajes.preguntas import (
     tipo_destino_de,
     valores_sugeridos,
 )
-from asistente_viajes.presentacion import escapar, tarjeta
+from asistente_viajes.presentacion import escapar, tarjeta, tarjeta_detallada
 from asistente_viajes.prompts import PROMPT_INTERPRETAR_TURNO, PROMPT_REDACTAR
 from asistente_viajes.services.cambio import convertir_desde_usd
 from asistente_viajes.services.rapidapi.booking import buscar_alojamiento, buscar_vuelos
@@ -394,23 +394,32 @@ def nodo_planificar(estado_grafo: EstadoGrafo) -> dict:
 
 
 def _resumen_plan(plan: PlanDeViaje) -> str:
-    filas = []
+    """La tarjeta del itinerario. Ya no lleva frase de presentación: esa la
+    escribe el LLM arriba de la tarjeta (D-22), aca van solo los datos."""
+    filas: list[dict[str, str | None]] = []
     for dia in plan.dias:
-        nombres = escapar(", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades))
-        etiqueta = f"Día {dia.dia}" + (f" ({dia.fecha.strftime('%d/%m')})" if dia.fecha else "")
+        etiqueta = f"Día {dia.dia}"
+        if dia.fecha:
+            etiqueta += f"<br><span style='opacity:0.6'>{dia.fecha.strftime('%d/%m')}</span>"
         filas.append(
-            f"<strong>{escapar(etiqueta)}</strong>: {nombres} (costo estimado ${dia.costo_dia:.0f})"
+            {
+                "etiqueta": etiqueta,
+                "cuerpo": escapar(
+                    ", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades)
+                ),
+                "monto": f"${dia.costo_dia:.0f}",
+            }
         )
-    pie = escapar("; ".join(plan.supuestos)) if plan.supuestos else None
-    tarjeta_html = tarjeta(f"Plan de viaje: {escapar(plan.destino)}", filas, pie)
+
     total = (
-        f"Costo total estimado: {escapar(plan.moneda)} {plan.costo_total_estimado:.0f} por persona, "
-        f"{escapar(plan.moneda)} {plan.costo_total_grupo:.0f} para el grupo de {plan.cantidad_personas}."
+        f"<strong>Total estimado: {escapar(plan.moneda)} {plan.costo_total_estimado:.0f} "
+        f"por persona</strong> · {escapar(plan.moneda)} {plan.costo_total_grupo:.0f} "
+        f"para {plan.cantidad_personas} persona(s)"
     )
-    return (
-        f"Armé un plan de {len(plan.dias)} día(s) para <strong>{escapar(plan.destino)}</strong>:\n\n"
-        f"{tarjeta_html}\n\n{total}"
-    )
+    if plan.supuestos:
+        total += f"<br>{escapar('; '.join(plan.supuestos))}"
+
+    return tarjeta_detallada(f"Itinerario · {escapar(plan.destino)}", filas, total)
 
 
 def _resumen_actividades(actividades: list[ActividadRecomendada]) -> str:
@@ -442,12 +451,15 @@ def _marca_fixture(es_fixture: bool) -> str:
 def _resumen_alojamiento(alojamientos: list[Alojamiento]) -> str:
     if not alojamientos:
         return "No encontré opciones de alojamiento para esas fechas."
-    filas = [
-        f"<strong>{escapar(alojamiento.nombre)}</strong>: {alojamiento.precio_total:.0f} "
-        f"{escapar(alojamiento.moneda)}{escapar(_marca_fixture(alojamiento.es_fixture))}"
+    filas: list[dict[str, str | None]] = [
+        {
+            "cuerpo": escapar(alojamiento.nombre)
+            + escapar(_marca_fixture(alojamiento.es_fixture)),
+            "monto": f"{alojamiento.precio_total:.0f} {escapar(alojamiento.moneda)}",
+        }
         for alojamiento in alojamientos[:3]
     ]
-    return tarjeta("Opciones de alojamiento", filas)
+    return tarjeta_detallada("Opciones de alojamiento", filas)
 
 
 def _resumen_vuelos(vuelos: list[OpcionVuelo]) -> str:
