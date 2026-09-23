@@ -19,6 +19,7 @@ import psycopg
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 
+from asistente_viajes import ajustes as ajustes_plan
 from asistente_viajes.costos import estimar_costo, estimar_gasto_diario
 from asistente_viajes.estado import PreferenciasViaje
 from asistente_viajes.recuperacion._consulta import ResultadoRecuperado
@@ -28,6 +29,7 @@ ACTIVIDADES_POR_DIA_MIN = 2
 ACTIVIDADES_POR_DIA_MAX = 3
 
 NOMBRE_DIA_LIBRE = "Dia libre para explorar por su cuenta"
+NOMBRE_DIA_LIBRE_A_PEDIDO = "Dia libre, sin actividades programadas"
 
 SQL_INSERTAR_ITINERARIO = """
 INSERT INTO itinerario (destino, fecha_inicio, fecha_fin, cantidad_personas, presupuesto, costo_estimado)
@@ -76,6 +78,11 @@ class PlanDeViaje(BaseModel):
     cantidad_personas: int
     costo_total_grupo: float
     supuestos: list[str] = Field(default_factory=list)
+    # Fase 7E (D-22): que pidio el cliente que se pudo aplicar y que no.
+    # Lo consume la redaccion (ver PROMPT_REDACTAR) para acusar recibo o
+    # admitir el limite con sus propias palabras.
+    ajustes_aplicados: list[str] = Field(default_factory=list)
+    ajustes_no_aplicados: list[str] = Field(default_factory=list)
 
 
 class ArgsArmarPlan(BaseModel):
@@ -135,18 +142,36 @@ def _candidatos_en_orden_de_visita(
 
 
 def _repartir_por_dia(
-    candidatos: list[ResultadoRecuperado], dias_totales: int
+    candidatos: list[ResultadoRecuperado],
+    dias_totales: int,
+    libres: set[int] | None = None,
+    por_dia_max: int = ACTIVIDADES_POR_DIA_MAX,
 ) -> list[list[ResultadoRecuperado]]:
-    """2 o 3 actividades reales por dia, sin repetir, mas actividades por
-    delante en los primeros dias para no dejar un ultimo dia vacio."""
+    """2 o 3 actividades reales por dia (o las que pidio el cliente), sin
+    repetir, mas actividades por delante en los primeros dias para no dejar
+    un ultimo dia vacio.
+
+    Los dias en `libres` quedan con una lista vacia a proposito (el cliente
+    los pidio sin actividades, ver ajustes.py) y no consumen candidatos: lo
+    que les hubiera tocado se reparte entre los demas dias, en vez de
+    perderse."""
+    libres = libres or set()
+    por_dia_min = min(ACTIVIDADES_POR_DIA_MIN, por_dia_max)
     ordenados = _candidatos_en_orden_de_visita(candidatos)
     grupos: list[list[ResultadoRecuperado]] = []
     indice = 0
     for numero_dia in range(1, dias_totales + 1):
-        restantes_para_dias_futuros = (dias_totales - numero_dia) * ACTIVIDADES_POR_DIA_MIN
-        cantidad_hoy = ACTIVIDADES_POR_DIA_MAX
+        if numero_dia in libres:
+            grupos.append([])
+            continue
+
+        dias_con_actividades_despues = len(
+            [d for d in range(numero_dia + 1, dias_totales + 1) if d not in libres]
+        )
+        restantes_para_dias_futuros = dias_con_actividades_despues * por_dia_min
+        cantidad_hoy = por_dia_max
         if len(ordenados) - indice - cantidad_hoy < restantes_para_dias_futuros:
-            cantidad_hoy = ACTIVIDADES_POR_DIA_MIN
+            cantidad_hoy = por_dia_min
 
         grupo = ordenados[indice : indice + cantidad_hoy]
         indice += len(grupo)
@@ -154,10 +179,13 @@ def _repartir_por_dia(
     return grupos
 
 
-def _actividad_dia_libre() -> ActividadDelPlan:
-    return ActividadDelPlan(
-        documento_id=None, nombre=NOMBRE_DIA_LIBRE, categoria=None, costo_estimado=0.0
-    )
+def _actividad_dia_libre(a_pedido: bool = False) -> ActividadDelPlan:
+    """El dia sin actividades. `a_pedido` distingue las dos razones por las
+    que un dia puede quedar libre, que para el cliente no son lo mismo: o lo
+    pidio el (y hay que confirmarselo), o el corpus se quedo sin candidatos
+    reales (y hay que ser honesto al respecto, ver P-08)."""
+    nombre = NOMBRE_DIA_LIBRE_A_PEDIDO if a_pedido else NOMBRE_DIA_LIBRE
+    return ActividadDelPlan(documento_id=None, nombre=nombre, categoria=None, costo_estimado=0.0)
 
 
 def _armar_dias(
@@ -165,9 +193,13 @@ def _armar_dias(
     dias_totales: int,
     fecha_inicio: date | None,
     gasto_diario: float,
+    libres: set[int] | None = None,
+    por_dia_max: int = ACTIVIDADES_POR_DIA_MAX,
 ) -> list[DiaDelPlan]:
+    libres = libres or set()
     dias: list[DiaDelPlan] = []
-    for indice_dia, grupo in enumerate(_repartir_por_dia(candidatos, dias_totales)):
+    grupos = _repartir_por_dia(candidatos, dias_totales, libres, por_dia_max)
+    for indice_dia, grupo in enumerate(grupos):
         numero_dia = indice_dia + 1
         actividades = [
             ActividadDelPlan(
@@ -181,10 +213,10 @@ def _armar_dias(
             for resultado in grupo
         ]
         if not actividades:
-            # Nunca un dia vacio: si el corpus se quedo sin candidatos
-            # reales, se lo decimos honestamente en vez de mostrar un
-            # hueco (ver P-08 en DIFICULTADES.md).
-            actividades = [_actividad_dia_libre()]
+            # Nunca un dia vacio: o el cliente lo pidio libre (D-22), o el
+            # corpus se quedo sin candidatos reales y se lo decimos
+            # honestamente en vez de mostrar un hueco (ver P-08).
+            actividades = [_actividad_dia_libre(a_pedido=numero_dia in libres)]
 
         costo_actividades = sum(actividad.costo_estimado for actividad in actividades)
         fecha = fecha_inicio + timedelta(days=indice_dia) if fecha_inicio is not None else None
@@ -209,15 +241,31 @@ def armar_plan(conexion: psycopg.Connection, estado: PreferenciasViaje) -> PlanD
     vez de un TypeError crudo."""
     dias_totales = _cantidad_dias(estado)
     intereses = estado.intereses or []
+    ajustes = estado.ajustes_activos()
+
+    libres = ajustes_plan.dias_libres(ajustes, dias_totales)
+    por_dia_max = ajustes_plan.actividades_por_dia(ajustes, ACTIVIDADES_POR_DIA_MAX)
+    dias_con_actividades = dias_totales - len(libres)
+
+    # Se piden candidatos solo para los dias que van a tener actividades, y
+    # de mas, porque la exclusion filtra despues de recuperar (el filtro es
+    # sobre texto del cliente, no algo que se pueda pasar al SQL del RAG).
     candidatos = buscar_atractivos(
         conexion,
         destino=estado.destino,
         intereses=intereses,
-        k=dias_totales * ACTIVIDADES_POR_DIA_MAX,
+        k=max(dias_con_actividades, 1) * por_dia_max * 2,
     )
+    candidatos = [
+        candidato
+        for candidato in candidatos
+        if not ajustes_plan.excluye(ajustes, candidato.nombre, candidato.categoria)
+    ]
 
     gasto_diario = estimar_gasto_diario(estado.destino, estado.presupuesto)
-    dias = _armar_dias(candidatos, dias_totales, estado.fecha_inicio, gasto_diario)
+    dias = _armar_dias(
+        candidatos, dias_totales, estado.fecha_inicio, gasto_diario, libres, por_dia_max
+    )
 
     costo_actividades_total = sum(dia.costo_actividades for dia in dias)
     gasto_estimado_total = sum(dia.gasto_estimado_dia for dia in dias)
@@ -230,9 +278,31 @@ def armar_plan(conexion: psycopg.Connection, estado: PreferenciasViaje) -> PlanD
     if estado.fecha_inicio is None:
         supuestos.append("sin fecha de inicio confirmada, el plan es por cantidad de dias")
 
+    # Que se aplico y que no. Esto es lo que despues le permite a la
+    # redaccion acusar recibo de verdad ("le deje el dia 6 libre") o admitir
+    # el limite ("eso no lo puedo aplicar"), en vez de devolver el mismo
+    # plan en silencio, que es el bug que origino todo esto (P-14).
+    aplicados = [
+        descripcion
+        for ajuste in ajustes
+        if (descripcion := ajustes_plan.describir(ajuste, dias_totales))
+    ]
+    no_aplicados = [
+        ajuste.pedido_original or "un pedido sobre el plan"
+        for ajuste in ajustes_plan.ajustes_no_aplicables(ajustes)
+    ]
+    for fuera_de_rango in ajustes_plan.dias_fuera_de_rango(ajustes, dias_totales):
+        no_aplicados.append(
+            f"{fuera_de_rango.pedido_original or 'dejar un dia libre'} "
+            f"(el plan tiene {dias_totales} dia(s))"
+        )
+    supuestos.extend(aplicados)
+
     return PlanDeViaje(
         destino=estado.destino,
         dias=dias,
+        ajustes_aplicados=aplicados,
+        ajustes_no_aplicados=no_aplicados,
         costo_actividades_total=costo_actividades_total,
         gasto_estimado_total=gasto_estimado_total,
         costo_total_estimado=costo_total,

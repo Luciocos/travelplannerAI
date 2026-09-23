@@ -66,6 +66,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import get_runtime
 from pydantic import BaseModel, Field
 
+from asistente_viajes.ajustes import AjustePlan
 from asistente_viajes.destinos import blurb_caracteristicas_destinos, buscar_destino_piloto
 from asistente_viajes.estado import (
     PreferenciasViaje,
@@ -82,7 +83,7 @@ from asistente_viajes.preguntas import (
     valores_sugeridos,
 )
 from asistente_viajes.presentacion import escapar, tarjeta
-from asistente_viajes.prompts import PROMPT_CONVERSAR, PROMPT_INTERPRETAR_TURNO
+from asistente_viajes.prompts import PROMPT_INTERPRETAR_TURNO, PROMPT_REDACTAR
 from asistente_viajes.services.cambio import convertir_desde_usd
 from asistente_viajes.services.rapidapi.booking import buscar_alojamiento, buscar_vuelos
 from asistente_viajes.services.rapidapi.models import Alojamiento, OpcionVuelo
@@ -160,6 +161,11 @@ class InterpretacionTurno(BaseModel):
     origen: str | None = None  # ciudad de salida, solo relevante para buscar_vuelos (RF7)
     usar_sugerencias: bool = False
     acciones: list[AccionPedida] = Field(default_factory=list)
+    # Fase 7E (D-22): restricciones sobre como armar el plan. None (no una
+    # lista vacia) significa "este turno no hablo de ajustes": ver el
+    # comentario de PreferenciasViaje.ajustes, de esa distincion depende
+    # que el merge no borre los ajustes vigentes en cada turno.
+    ajustes: list[AjustePlan] | None = None
 
 
 @dataclass
@@ -175,8 +181,23 @@ class ContextoGrafo:
 
 
 class Fragmento(TypedDict):
+    """Resultado de una accion del turno, en dos formas que cumplen roles
+    distintos desde la Fase 7E (D-22):
+
+    - `texto`: la tarjeta HTML que ve el cliente, armada en Python a partir
+      de datos reales. Vacia si esta accion no tiene nada que tabular.
+    - `datos`: los mismos hechos en texto plano, que se le pasan al LLM
+      para que redacte el mensaje del turno (PROMPT_REDACTAR).
+
+    La separacion es deliberada: la prosa la escribe el modelo (que es lo
+    que saca la rigidez), pero ningun numero ni nombre sale de el, salen de
+    la tarjeta. Asi se gana flexibilidad de redaccion sin poder inventar un
+    precio o un lugar.
+    """
+
     tipo: str
     texto: str
+    datos: str
 
 
 class EstadoGrafo(TypedDict):
@@ -245,6 +266,7 @@ def nodo_actualizar_estado(estado_grafo: EstadoGrafo) -> dict:
         duracion_dias=interpretacion.duracion_dias,
         cantidad_personas=interpretacion.cantidad_personas,
         origen=interpretacion.origen,
+        ajustes=interpretacion.ajustes,
     )
     fusionado = fusionar_preferencias(estado_actual, extraidos)
 
@@ -412,6 +434,66 @@ def _resumen_vuelos(vuelos: list[OpcionVuelo]) -> str:
     return tarjeta("Opciones de vuelo", filas)
 
 
+def _fragmento(tipo: str, texto: str = "", datos: str = "") -> Fragmento:
+    """Un fragmento con sus dos caras (ver Fragmento). `texto` vacio es lo
+    normal en las acciones que no tienen nada que tabular: esas viven solo
+    como datos para que el LLM las exprese con sus palabras."""
+    return {"tipo": tipo, "texto": texto, "datos": datos}
+
+
+def _datos_plan(plan: PlanDeViaje) -> str:
+    """El plan en texto plano para el redactor. Incluye el detalle completo
+    aunque la tarjeta ya lo muestre: el modelo necesita ver los nombres
+    para poder destacar alguno, y asi no tiene que inventarlo."""
+    lineas = [f"Plan de {len(plan.dias)} dia(s) para {plan.destino}:"]
+    for dia in plan.dias:
+        nombres = ", ".join(a.nombre or "actividad sin nombre" for a in dia.actividades)
+        fecha = f" ({dia.fecha.strftime('%d/%m')})" if dia.fecha else ""
+        lineas.append(f"  Dia {dia.dia}{fecha}: {nombres} (USD {dia.costo_dia:.0f})")
+    lineas.append(
+        f"Costo total: USD {plan.costo_total_estimado:.0f} por persona, "
+        f"USD {plan.costo_total_grupo:.0f} para {plan.cantidad_personas} persona(s)."
+    )
+    if plan.supuestos:
+        lineas.append("Supuestos: " + "; ".join(plan.supuestos) + ".")
+    return "\n".join(lineas)
+
+
+def _datos_recomendaciones(
+    clase: str, recomendaciones: list[ActividadRecomendada] | list[LocalRecomendado]
+) -> str:
+    if not recomendaciones:
+        return f"No se encontraron {clase} para esa consulta en este destino."
+    lineas = [f"Se recuperaron estas {clase} del corpus:"]
+    lineas += [f"  {r.nombre}: {r.justificacion}" for r in recomendaciones]
+    return "\n".join(lineas)
+
+
+def _datos_alojamiento(alojamientos: list[Alojamiento]) -> str:
+    if not alojamientos:
+        return "No se encontraron opciones de alojamiento para esas fechas."
+    lineas = ["Opciones de alojamiento encontradas:"]
+    for alojamiento in alojamientos[:3]:
+        lineas.append(
+            f"  {alojamiento.nombre}: {alojamiento.precio_total:.0f} {alojamiento.moneda}"
+            f"{_marca_fixture(alojamiento.es_fixture)}"
+        )
+    return "\n".join(lineas)
+
+
+def _datos_vuelos(vuelos: list[OpcionVuelo]) -> str:
+    if not vuelos:
+        return "No se encontraron opciones de vuelo para ese origen y esas fechas."
+    lineas = ["Opciones de vuelo encontradas:"]
+    for vuelo in vuelos[:3]:
+        aerolineas = ", ".join(vuelo.aerolineas) or "aerolinea sin especificar"
+        lineas.append(
+            f"  {aerolineas}: {vuelo.precio_total:.0f} {vuelo.moneda}, "
+            f"{vuelo.escalas or 0} escala(s){_marca_fixture(vuelo.es_fixture)}"
+        )
+    return "\n".join(lineas)
+
+
 def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
     runtime = get_runtime(ContextoGrafo)
     conexion = runtime.context.conexion
@@ -429,49 +511,82 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
         try:
             if tipo == "destino_no_soportado":
                 nombre = estado_grafo.get("destino_no_soportado") or "ese destino"
-                texto = f'Por ahora no tengo datos de "{nombre}". ' + destinos_piloto_destacados()
-                fragmentos.append({"tipo": tipo, "texto": texto})
-            elif tipo == "pedir_datos":
                 fragmentos.append(
-                    {"tipo": tipo, "texto": armar_pregunta_consolidada(estado.slots_faltantes())}
+                    _fragmento(
+                        tipo,
+                        datos=(
+                            f'El cliente nombro "{nombre}", que no es un destino disponible. '
+                            + destinos_piloto_destacados()
+                        ),
+                    )
                 )
+            elif tipo == "pedir_datos":
+                # Ya no se arma la pregunta en Python (D-14): los faltantes
+                # van al prompt de redaccion y la pregunta la escribe el
+                # LLM con sus palabras. armar_pregunta_consolidada queda
+                # como red de seguridad si la redaccion falla.
+                fragmentos.append(_fragmento(tipo))
             elif tipo == "armar_plan":
                 plan = armar_plan(conexion, estado)
                 guardar_itinerario(conexion, estado, plan)
-                fragmentos.append({"tipo": tipo, "texto": _resumen_plan(plan)})
+                fragmentos.append(
+                    _fragmento(tipo, texto=_resumen_plan(plan), datos=_datos_plan(plan))
+                )
                 ultimo_plan = plan.model_dump(mode="json")
             elif tipo == "recomendar_actividades":
                 actividades = recomendar_actividades(
                     conexion, rotador, estado.destino, estado.intereses or [], k=k
                 )
-                fragmentos.append({"tipo": tipo, "texto": _resumen_actividades(actividades)})
+                fragmentos.append(
+                    _fragmento(
+                        tipo,
+                        texto=_resumen_actividades(actividades),
+                        datos=_datos_recomendaciones("actividades", actividades),
+                    )
+                )
             elif tipo == "recomendar_locales":
                 locales = recomendar_locales(conexion, rotador, estado.destino, consulta, k=k)
-                fragmentos.append({"tipo": tipo, "texto": _resumen_locales(locales)})
+                fragmentos.append(
+                    _fragmento(
+                        tipo,
+                        texto=_resumen_locales(locales),
+                        datos=_datos_recomendaciones("locales", locales),
+                    )
+                )
             elif tipo == "responder_faq_viajero":
                 respuesta = responder_faq_viajero(conexion, rotador, estado.destino, consulta, k=k)
-                fragmentos.append({"tipo": tipo, "texto": respuesta.respuesta})
+                fragmentos.append(_fragmento(tipo, datos=respuesta.respuesta))
             elif tipo == "pedir_fechas_exactas":
                 fragmentos.append(
-                    {
-                        "tipo": tipo,
-                        "texto": "Para buscar alojamiento o vuelos necesito fechas exactas de ida y vuelta, no solo la cantidad de días. ¿Me las confirma?",
-                    }
+                    _fragmento(
+                        tipo,
+                        datos=(
+                            "Para buscar alojamiento o vuelos hacen falta fechas exactas de ida "
+                            "y vuelta, no alcanza con la cantidad de dias. Hay que pedirselas."
+                        ),
+                    )
                 )
             elif tipo == "pedir_origen_vuelo":
-                fragmentos.append({"tipo": tipo, "texto": "¿Desde qué ciudad sale el vuelo?"})
+                fragmentos.append(
+                    _fragmento(
+                        tipo, datos="Falta saber desde que ciudad sale el vuelo. Hay que preguntarlo."
+                    )
+                )
             elif tipo == "pedir_plan_para_convertir":
                 fragmentos.append(
-                    {
-                        "tipo": tipo,
-                        "texto": "Todavía no armé un plan con un costo para convertir. ¿Quiere que lo arme primero?",
-                    }
+                    _fragmento(
+                        tipo,
+                        datos=(
+                            "Todavia no hay un plan armado con un costo para convertir. "
+                            "Se le puede ofrecer armarlo primero."
+                        ),
+                    )
                 )
             elif tipo == "convertir_moneda":
                 monto = (ultimo_plan or {}).get("costo_total_grupo", 0.0)
                 moneda_destino = accion.get("moneda_destino") or MONEDA_DESTINO_DEFECTO
                 cotizacion = convertir_desde_usd(monto, moneda_destino)
-                fragmentos.append({"tipo": tipo, "texto": cotizacion.detalle})
+                fragmentos.append(_fragmento(tipo, datos=cotizacion.detalle))
             elif tipo == "buscar_alojamiento":
                 habitaciones = -(-(estado.cantidad_personas or 1) // 2)  # ceil(personas/2)
                 alojamientos = buscar_alojamiento(
@@ -482,7 +597,13 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
                     adultos=estado.cantidad_personas or 1,
                     habitaciones=habitaciones,
                 )
-                fragmentos.append({"tipo": tipo, "texto": _resumen_alojamiento(alojamientos)})
+                fragmentos.append(
+                    _fragmento(
+                        tipo,
+                        texto=_resumen_alojamiento(alojamientos),
+                        datos=_datos_alojamiento(alojamientos),
+                    )
+                )
             elif tipo == "buscar_vuelos":
                 vuelos = buscar_vuelos(
                     conexion,
@@ -492,21 +613,29 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
                     estado.fecha_fin,
                     adultos=estado.cantidad_personas or 1,
                 )
-                fragmentos.append({"tipo": tipo, "texto": _resumen_vuelos(vuelos)})
+                fragmentos.append(
+                    _fragmento(tipo, texto=_resumen_vuelos(vuelos), datos=_datos_vuelos(vuelos))
+                )
         except ErrorFechasIncompletas:
             fragmentos.append(
-                {
-                    "tipo": tipo,
-                    "texto": "Para armar el plan necesito fechas exactas o la cantidad de días del viaje.",
-                }
+                _fragmento(
+                    tipo,
+                    datos=(
+                        "No se pudo armar el plan: faltan las fechas exactas o la cantidad de "
+                        "dias del viaje. Hay que pedirselas."
+                    ),
+                )
             )
         except Exception:
             logger.exception("fallo la accion '%s', se sigue con las demas del turno", tipo)
             fragmentos.append(
-                {
-                    "tipo": tipo,
-                    "texto": "Tuve un problema puntual con esa parte, pero sigamos con el resto.",
-                }
+                _fragmento(
+                    tipo,
+                    datos=(
+                        f"Hubo un problema tecnico puntual ejecutando '{tipo}'. Hay que "
+                        "avisarselo con naturalidad y seguir con el resto del turno."
+                    ),
+                )
             )
 
     return {"fragmentos": fragmentos, "ultimo_plan": ultimo_plan}
@@ -551,26 +680,63 @@ def nodo_disparar_info_destino(estado_grafo: EstadoGrafo) -> dict:
     return {"fragmentos": fragmentos, "info_destino_mostrada_para": estado.destino}
 
 
-def nodo_redactar(estado_grafo: EstadoGrafo) -> dict:
-    fragmentos = [f for f in estado_grafo["fragmentos"] if f["texto"]]
-    if fragmentos:
-        return {"respuesta_texto": "\n\n".join(f["texto"] for f in fragmentos)}
+def _respuesta_de_reserva(estado_grafo: EstadoGrafo, tarjetas: list[str]) -> str:
+    """Red de seguridad para cuando la redaccion falla (cuota agotada,
+    timeout). Vuelve al comportamiento determinista de la Fase 7D: la
+    pregunta armada en Python mas las tarjetas. Feo, pero nunca deja al
+    cliente sin respuesta."""
+    estado = PreferenciasViaje(**estado_grafo["estado"])
+    partes = []
+    if any(f["tipo"] == "pedir_datos" for f in estado_grafo["fragmentos"]):
+        partes.append(armar_pregunta_consolidada(estado.slots_faltantes()))
+    partes.extend(tarjetas)
+    if not partes:
+        partes.append("Estoy para ayudarlo a planear su viaje. ¿En qué le puedo dar una mano?")
+    return "\n\n".join(parte for parte in partes if parte)
 
+
+def nodo_redactar(estado_grafo: EstadoGrafo) -> dict:
+    """UN llamado al LLM redacta el mensaje del turno, siempre (D-22).
+
+    Hasta la Fase 7D esto era al reves: si alguna accion habia producido
+    texto, se concatenaban las plantillas de Python y el LLM no escribia
+    nada; solo redactaba cuando no habia pasado nada. El resultado era un
+    asistente que contestaba siempre igual y no podia acusar recibo de lo
+    que el cliente pedia (P-14). Ahora el modelo escribe la prosa de todos
+    los turnos, y las tarjetas (armadas en Python con datos reales) se
+    adjuntan debajo: la flexibilidad la pone el LLM, los datos duros no
+    pasan nunca por el.
+    """
     runtime = get_runtime(ContextoGrafo)
     estado = PreferenciasViaje(**estado_grafo["estado"])
-    prompt = PROMPT_CONVERSAR.format(
-        estado_actual=estado.model_dump(),
-        ultimo_plan=estado_grafo.get("ultimo_plan") or "(todavía no hay plan armado)",
+    fragmentos = estado_grafo["fragmentos"]
+    tarjetas = [f["texto"] for f in fragmentos if f.get("texto")]
+
+    ultimo_plan = estado_grafo.get("ultimo_plan") or {}
+    prompt = PROMPT_REDACTAR.format(
+        fecha_hoy=runtime.context.hoy.isoformat(),
+        estado_actual=estado.model_dump(mode="json"),
+        faltantes=", ".join(estado.slots_faltantes()) or "(ninguno)",
+        ajustes_aplicados="; ".join(ultimo_plan.get("ajustes_aplicados") or []) or "(ninguno)",
+        ajustes_no_aplicados=(
+            "; ".join(ultimo_plan.get("ajustes_no_aplicados") or []) or "(ninguno)"
+        ),
+        resultados="\n\n".join(f["datos"] for f in fragmentos if f.get("datos"))
+        or "(no se ejecuto ninguna accion en este turno)",
         historial=_historial_como_texto(estado_grafo["historial"]),
         mensaje=estado_grafo["mensaje"],
     )
+
     try:
-        respuesta = runtime.context.rotador.invocar(prompt)
-        texto = contenido_texto(respuesta)
+        prosa = contenido_texto(runtime.context.rotador.invocar(prompt))
     except Exception:
-        logger.exception("fallo redactar, se usa una respuesta de reserva")
-        texto = "Estoy para ayudarlo a planear su viaje. ¿En qué le puedo dar una mano?"
-    return {"respuesta_texto": texto}
+        logger.exception("fallo redactar, se usa la respuesta determinista de reserva")
+        return {"respuesta_texto": _respuesta_de_reserva(estado_grafo, tarjetas)}
+
+    if not prosa:
+        return {"respuesta_texto": _respuesta_de_reserva(estado_grafo, tarjetas)}
+
+    return {"respuesta_texto": "\n\n".join([prosa, *tarjetas])}
 
 
 def construir_grafo():

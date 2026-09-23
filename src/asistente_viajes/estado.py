@@ -11,6 +11,8 @@ from datetime import date
 
 from pydantic import BaseModel
 
+from asistente_viajes.ajustes import AjustePlan
+
 SLOTS_OBLIGATORIOS = (
     "destino",
     "tipo_destino",
@@ -54,6 +56,22 @@ class PreferenciasViaje(BaseModel):
     # exactas (D-14).
     origen: str | None = None
     duracion_dias: int | None = None
+    # Nuevo (Fase 7E, D-22): restricciones del cliente sobre COMO armar el
+    # plan ("dejeme el ultimo dia libre", "sacame los teatros"). No es un
+    # dato del viaje, pero vive aca para heredar el merge no destructivo y
+    # la deteccion de cambios que re-arma el plan sola. Ver ajustes.py.
+    #
+    # None y [] NO son lo mismo, y de eso depende el merge (RF2): None es
+    # "este turno no hablo de ajustes, conserve los que ya habia", [] es
+    # "el cliente los dio de baja". Por eso el default es None y no una
+    # lista vacia: con default_factory=list, cualquier turno que no
+    # mencionara ajustes habria borrado los anteriores al fusionar.
+    ajustes: list[AjustePlan] | None = None
+
+    def ajustes_activos(self) -> list[AjustePlan]:
+        """Los ajustes vigentes, ya normalizados a lista. Unico punto de
+        lectura, para que nadie tenga que acordarse del `or []`."""
+        return self.ajustes or []
 
     def tiene_cuando(self) -> bool:
         """El 'cuando' del viaje esta resuelto si hay fechas exactas o, al
@@ -169,6 +187,9 @@ CAMPOS_QUE_AFECTAN_EL_PLAN = (
     "cantidad_personas",
     "presupuesto",
     "intereses",
+    # Fase 7E (D-22): sin esto, pedir "dejame el dia 6 libre" no contaba
+    # como cambio y el orquestador devolvia el plan anterior sin tocar.
+    "ajustes",
 )
 
 

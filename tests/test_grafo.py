@@ -36,12 +36,28 @@ def _sin_recomendacion_de_regalo_por_defecto(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.setattr(mod, "recomendar_actividades", lambda *_a, **_k: [])
 
 
+PROSA_REDACTADA = "(prosa redactada por el LLM)"
+
+
 def _rotador_con_interpretacion(interpretacion: InterpretacionTurno) -> MagicMock:
     rotador = MagicMock()
     modelo_estructurado = MagicMock()
     modelo_estructurado.invoke.return_value = interpretacion
     rotador.con_salida_estructurada.return_value = modelo_estructurado
+    # Desde D-22 el texto del turno lo escribe el LLM (nodo_redactar via
+    # rotador.invocar), asi que devolvemos una prosa fija: estos tests
+    # verifican QUE HECHOS llegan al redactor, no como los redacta. Lo
+    # contrario seria testear la salida de un modelo generativo.
+    rotador.invocar.return_value.content = PROSA_REDACTADA
     return rotador
+
+
+def _hechos_del_turno(rotador: MagicMock) -> str:
+    """El prompt con el que se llamo a redactar. Ahi estan los resultados,
+    los faltantes y los ajustes del turno: es el contrato que reemplaza a
+    las plantillas de Python que se asertaban antes de la Fase 7E."""
+    assert rotador.invocar.called, "no se llamo a redactar en este turno"
+    return rotador.invocar.call_args[0][0]
 
 
 def _turno(
@@ -116,8 +132,9 @@ def test_destino_fuera_de_alcance_no_se_pierde_en_silencio() -> None:
     )
     resultado = _turno(rotador, "quiero ir a Tokio, me gusta la comida")
     assert resultado["estado"]["destino"] is None
-    assert "Tokio" in resultado["respuesta_texto"]
-    assert "Barcelona" in resultado["respuesta_texto"]
+    hechos = _hechos_del_turno(rotador)
+    assert "Tokio" in hechos
+    assert "Barcelona" in hechos
 
 
 # --- planificar ----------------------------------------------------------
@@ -128,8 +145,12 @@ def test_planificar_pide_todo_lo_que_falta_de_una_vez() -> None:
     resultado = _turno(rotador, "hola")
     tipos = [p["tipo"] for p in resultado["pendientes"]]
     assert "pedir_datos" in tipos
-    assert "Barcelona" in resultado["respuesta_texto"]
-    assert "usar sugerencias" in resultado["respuesta_texto"]
+    # La pregunta ya no se arma en Python (D-22 redefine D-14): lo que se
+    # verifica es que el redactor reciba la lista completa de faltantes,
+    # para poder pedirlos todos de una vez con sus palabras.
+    hechos = _hechos_del_turno(rotador)
+    for slot in ("destino", "intereses", "presupuesto", "cantidad_personas"):
+        assert slot in hechos
 
 
 def test_planificar_da_una_respuesta_util_ademas_de_la_pregunta_si_hay_destino(monkeypatch) -> None:
@@ -313,7 +334,7 @@ def test_planificar_multiples_acciones_en_un_solo_mensaje(monkeypatch) -> None:
     assert len(resultado["pendientes"]) == 3
     assert "Museo" in resultado["respuesta_texto"]
     assert "No encontré locales" in resultado["respuesta_texto"]
-    assert "Tome precauciones." in resultado["respuesta_texto"]
+    assert "Tome precauciones." in _hechos_del_turno(rotador)
 
 
 def test_planificar_reconstruye_el_plan_solo_si_cambio_un_dato_relevante(monkeypatch) -> None:
@@ -389,7 +410,12 @@ def test_armar_plan_sin_fechas_ni_duracion_no_rompe_el_turno(monkeypatch) -> Non
 
     resultado = _turno(rotador, "armame el plan", estado=estado)
 
-    assert "fechas exactas" in resultado["respuesta_texto"].lower()
+    # planificar ni siquiera deja pasar la accion (precondicion: tiene_cuando),
+    # asi que el turno no explota y el redactor recibe el faltante para
+    # poder pedirlo con sus palabras.
+    assert resultado["respuesta_texto"]
+    hechos = _hechos_del_turno(rotador)
+    assert "fecha_inicio" in hechos
 
 
 def test_una_accion_rota_no_tira_abajo_las_demas(monkeypatch) -> None:
@@ -420,10 +446,11 @@ def test_una_accion_rota_no_tira_abajo_las_demas(monkeypatch) -> None:
         lambda *a, **k: RespuestaFaq(respondida=True, respuesta="Todo bien."),
     )
 
-    resultado = _turno(rotador, "donde como y es seguro", estado=estado)
+    _turno(rotador, "donde como y es seguro", estado=estado)
 
-    assert "Todo bien." in resultado["respuesta_texto"]
-    assert "problema puntual" in resultado["respuesta_texto"]
+    hechos = _hechos_del_turno(rotador)
+    assert "Todo bien." in hechos
+    assert "problema tecnico puntual" in hechos
 
 
 def test_cada_accion_usa_su_propia_consulta_no_el_mensaje_completo(monkeypatch) -> None:
@@ -522,7 +549,7 @@ def test_planificar_pide_fechas_exactas_si_solo_hay_duracion_dias() -> None:
     )
     resultado = _turno(rotador, "buscame un hotel", estado=estado)
     assert resultado["pendientes"] == [{"tipo": "pedir_fechas_exactas"}]
-    assert "fechas exactas" in resultado["respuesta_texto"].lower()
+    assert "fechas exactas" in _hechos_del_turno(rotador).lower()
 
 
 def test_planificar_pide_origen_si_falta_para_vuelos() -> None:
@@ -532,7 +559,7 @@ def test_planificar_pide_origen_si_falta_para_vuelos() -> None:
     )
     resultado = _turno(rotador, "quiero vuelos", estado=estado)
     assert resultado["pendientes"] == [{"tipo": "pedir_origen_vuelo"}]
-    assert "qué ciudad" in resultado["respuesta_texto"].lower()
+    assert "que ciudad sale el vuelo" in _hechos_del_turno(rotador).lower()
 
 
 def test_buscar_alojamiento_se_ejecuta_con_datos_completos(monkeypatch) -> None:
@@ -614,7 +641,7 @@ def test_convertir_moneda_pide_el_plan_primero_si_no_hay_ninguno() -> None:
     )
     resultado = _turno(rotador, "cuanto es en pesos", estado=estado)
     assert resultado["pendientes"] == [{"tipo": "pedir_plan_para_convertir"}]
-    assert "armé un plan" in resultado["respuesta_texto"].lower()
+    assert "no hay un plan armado" in _hechos_del_turno(rotador).lower()
 
 
 def test_convertir_moneda_convierte_el_costo_del_ultimo_plan(monkeypatch) -> None:
@@ -627,10 +654,10 @@ def test_convertir_moneda_convierte_el_costo_del_ultimo_plan(monkeypatch) -> Non
     llamada.return_value.detalle = "USD 500 = ARS 750000 (dólar oficial)."
     monkeypatch.setattr(mod, "convertir_desde_usd", llamada)
 
-    resultado = _turno(rotador, "cuanto es en pesos", estado=estado, ultimo_plan=plan_previo)
+    _turno(rotador, "cuanto es en pesos", estado=estado, ultimo_plan=plan_previo)
 
     llamada.assert_called_once_with(500.0, "ARS")
-    assert "750000" in resultado["respuesta_texto"]
+    assert "750000" in _hechos_del_turno(rotador)
 
 
 def test_convertir_moneda_usa_ars_por_defecto_sin_moneda_explicita(monkeypatch) -> None:
@@ -734,7 +761,7 @@ def test_conversar_responde_desde_el_historial_sin_tools(monkeypatch) -> None:
         rotador, "a que destino dijimos que queria ir?", estado=estado, info_destino_para="Miami"
     )
 
-    assert resultado["respuesta_texto"] == "Habíamos quedado en Miami, del 1 al 7 de agosto."
+    assert "Habíamos quedado en Miami" in resultado["respuesta_texto"]
     prompt_enviado = rotador.invocar.call_args.args[0]
     assert "Miami" in prompt_enviado
 
