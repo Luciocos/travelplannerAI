@@ -56,12 +56,14 @@ Flujo (ver tambien construir_grafo().get_graph().draw_mermaid()):
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Literal, TypedDict
 from zoneinfo import ZoneInfo
 
 import psycopg
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import get_runtime
 from pydantic import BaseModel, Field
@@ -77,6 +79,7 @@ from asistente_viajes.estado import (
     normalizar_presupuesto,
     validar_preferencias,
 )
+from asistente_viajes.herramientas import construir_herramientas
 from asistente_viajes.llm import RotadorClavesGemini, contenido_texto
 from asistente_viajes.preguntas import (
     armar_pregunta_consolidada,
@@ -85,7 +88,11 @@ from asistente_viajes.preguntas import (
     valores_sugeridos,
 )
 from asistente_viajes.presentacion import escapar, tarjeta, tarjeta_detallada
-from asistente_viajes.prompts import PROMPT_INTERPRETAR_TURNO, PROMPT_REDACTAR
+from asistente_viajes.prompts import (
+    PROMPT_AGENTE,
+    PROMPT_INTERPRETAR_TURNO,
+    PROMPT_REDACTAR,
+)
 from asistente_viajes.services.cambio import convertir_desde_usd
 from asistente_viajes.services.rapidapi.booking import buscar_alojamiento, buscar_vuelos
 from asistente_viajes.services.rapidapi.models import Alojamiento, OpcionVuelo
@@ -700,6 +707,80 @@ def nodo_ejecutar_acciones(estado_grafo: EstadoGrafo) -> dict:
     return {"fragmentos": fragmentos, "ultimo_plan": ultimo_plan}
 
 
+MAXIMO_VUELTAS_DE_HERRAMIENTAS = 4
+
+
+def _agente_de_herramientas_activo() -> bool:
+    """D-25: el agente de tool calling convive con el orquestador de
+    precondiciones detras de un flag, en vez de reemplazarlo de una. Es un
+    cambio de fondo en como se decide que hacer cada turno, y el camino
+    viejo ya estaba verificado; hasta que el nuevo acumule uso real, el
+    default sigue siendo el conocido."""
+    return os.environ.get("AGENTE_TOOL_CALLING", "").strip().lower() in ("1", "true", "si")
+
+
+def nodo_agente_herramientas(estado_grafo: EstadoGrafo) -> dict:
+    """El LLM ve el catalogo de tools y decide solo cuales llamar, pudiendo
+    encadenar varias, en vez de que lo decida `nodo_planificar` con ifs.
+
+    Las tools ejecutan y devuelven hechos; la redaccion sigue siendo la de
+    siempre (D-22), asi que ningun dato duro sale del modelo. Si algo falla,
+    el turno cae al camino de precondiciones en vez de quedarse sin
+    respuesta."""
+    runtime = get_runtime(ContextoGrafo)
+    estado = PreferenciasViaje(**estado_grafo["estado"])
+
+    herramientas, acumulador = construir_herramientas(
+        conexion=runtime.context.conexion,
+        rotador=runtime.context.rotador,
+        estado=estado,
+        hoy=runtime.context.hoy,
+        ultimo_plan=estado_grafo.get("ultimo_plan"),
+    )
+    por_nombre = {herramienta.name: herramienta for herramienta in herramientas}
+
+    mensajes: list = [
+        SystemMessage(
+            content=PROMPT_AGENTE.format(
+                fecha_hoy=runtime.context.hoy.isoformat(),
+                estado_actual=estado.model_dump(mode="json"),
+                faltantes=", ".join(estado.slots_faltantes()) or "(ninguno)",
+                hay_plan="sí" if estado_grafo.get("ultimo_plan") else "no",
+            )
+        ),
+        *[
+            (HumanMessage(content=t["texto"]) if t["rol"] == "usuario" else AIMessage(content=t["texto"]))
+            for t in estado_grafo["historial"][-TURNOS_DE_HISTORIAL:]
+        ],
+        HumanMessage(content=estado_grafo["mensaje"]),
+    ]
+
+    modelo = runtime.context.rotador.con_herramientas(herramientas)
+    for _vuelta in range(MAXIMO_VUELTAS_DE_HERRAMIENTAS):
+        respuesta = modelo.invoke(mensajes)
+        llamadas = getattr(respuesta, "tool_calls", None) or []
+        if not llamadas:
+            break
+
+        mensajes.append(respuesta)
+        for llamada in llamadas:
+            herramienta = por_nombre.get(llamada["name"])
+            if herramienta is None:
+                salida = f"La herramienta '{llamada['name']}' no existe."
+            else:
+                try:
+                    salida = herramienta.invoke(llamada["args"]).get("datos", "")
+                except Exception as error:
+                    logger.exception("fallo la tool %s", llamada["name"])
+                    salida = f"No se pudo ejecutar: {error}"
+            mensajes.append(ToolMessage(content=str(salida), tool_call_id=llamada["id"]))
+
+    return {
+        "fragmentos": [*estado_grafo["fragmentos"], *acumulador["fragmentos"]],
+        "ultimo_plan": acumulador["ultimo_plan"],
+    }
+
+
 def nodo_disparar_info_destino(estado_grafo: EstadoGrafo) -> dict:
     """RF12, unica excepcion a que decida el LLM: se dispara sola la
     primera vez que el destino queda confirmado con fecha de inicio, y de
@@ -833,14 +914,22 @@ def construir_grafo():
     grafo.add_node("actualizar_estado", nodo_actualizar_estado)
     grafo.add_node("planificar", nodo_planificar)
     grafo.add_node("ejecutar_acciones", nodo_ejecutar_acciones)
+    grafo.add_node("agente_herramientas", nodo_agente_herramientas)
     grafo.add_node("disparar_info_destino", nodo_disparar_info_destino)
     grafo.add_node("redactar", nodo_redactar)
 
     grafo.add_edge(START, "interpretar")
     grafo.add_edge("interpretar", "actualizar_estado")
     grafo.add_edge("actualizar_estado", "planificar")
-    grafo.add_edge("planificar", "ejecutar_acciones")
+    grafo.add_conditional_edges(
+        "planificar",
+        lambda _estado: (
+            "agente_herramientas" if _agente_de_herramientas_activo() else "ejecutar_acciones"
+        ),
+        ["agente_herramientas", "ejecutar_acciones"],
+    )
     grafo.add_edge("ejecutar_acciones", "disparar_info_destino")
+    grafo.add_edge("agente_herramientas", "disparar_info_destino")
     grafo.add_edge("disparar_info_destino", "redactar")
     grafo.add_edge("redactar", END)
 
