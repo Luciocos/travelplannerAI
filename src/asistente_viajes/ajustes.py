@@ -90,19 +90,68 @@ def dias_fuera_de_rango(ajustes: list[AjustePlan], dias_totales: int) -> list[Aj
     ]
 
 
+# El cliente pide en espanol ("sacame los teatros") pero `categoria` es el
+# kind crudo de OpenTripMap, en INGLES ("theatres_and_entertainments"). Con
+# match por substring literal eso no cruza nunca: "teatro" no esta contenido
+# ni en "theatres_and_entertainments" ni siquiera en "Teatre Tivoli", que es
+# catalan. Esta tabla es el puente, y es chica a proposito porque el
+# conjunto de kinds de OpenTripMap es acotado y conocido.
+_CATEGORIAS_EN_ESPANOL: dict[str, tuple[str, ...]] = {
+    "museo": ("museums",),
+    "iglesia": ("churches", "cathedrals", "religion"),
+    "catedral": ("cathedrals",),
+    "templo": ("temples", "religion"),
+    "religios": ("religion", "churches", "cathedrals", "temples"),
+    "teatro": ("theatres_and_entertainments",),
+    "cine": ("cinemas",),
+    "parque": ("gardens_and_parks", "urban_environment"),
+    "jardin": ("gardens_and_parks",),
+    "monumento": ("monuments_and_memorials",),
+    "castillo": ("castles",),
+    "palacio": ("palaces",),
+    "fortaleza": ("fortifications",),
+    "playa": ("beaches",),
+    "mercado": ("marketplaces",),
+    "puente": ("bridges",),
+    "torre": ("towers",),
+    "fuente": ("fountains",),
+    "edificio": ("historic_architecture", "architecture", "other_buildings"),
+    "arquitectura": ("architecture", "historic_architecture"),
+    "galeria": ("art_galleries",),
+    "zoo": ("zoos",),
+}
+
+
 def _coincide(texto: str | None, patron: str) -> bool:
     return bool(texto) and normalizar(patron) in normalizar(texto)
 
 
+def _equivalentes(valor: str) -> tuple[str, ...]:
+    """El termino tal como lo dijo el cliente, mas los kinds de OpenTripMap
+    que le correspondan. Se compara por prefijo para que el singular y el
+    plural entren igual ("teatro" y "teatros")."""
+    normalizado = normalizar(valor)
+    equivalentes = [valor]
+    for espanol, kinds in _CATEGORIAS_EN_ESPANOL.items():
+        if normalizado.startswith(espanol) or espanol.startswith(normalizado):
+            equivalentes.extend(kinds)
+    return tuple(equivalentes)
+
+
 def excluye(ajustes: list[AjustePlan], nombre: str | None, categoria: str | None) -> bool:
     """True si algun ajuste de exclusion matchea el nombre o la categoria de
-    un candidato. Match por substring normalizado (sin tildes ni mayusculas):
-    "teatro" tiene que sacar "Teatre Tivoli" y "theatres_and_entertainments"."""
+    un candidato.
+
+    Match por substring normalizado (sin tildes ni mayusculas) contra el
+    termino del cliente y, si es una categoria conocida, contra sus kinds
+    equivalentes en ingles: "sacame los teatros" tiene que excluir un POI
+    cuya categoria es "theatres_and_entertainments"."""
     for ajuste in ajustes:
         if ajuste.tipo != "excluir" or not ajuste.valor:
             continue
-        if _coincide(nombre, ajuste.valor) or _coincide(categoria, ajuste.valor):
-            return True
+        for termino in _equivalentes(ajuste.valor):
+            if _coincide(nombre, termino) or _coincide(categoria, termino):
+                return True
     return False
 
 

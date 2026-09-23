@@ -114,18 +114,29 @@ def test_excluye_matchea_por_categoria() -> None:
     assert excluye(ajustes, nombre="algo", categoria="museums") is True
 
 
-def test_excluye_no_matchea_palabra_en_espanol_contra_categoria_en_ingles() -> None:
-    """Documenta un hallazgo: el docstring de excluye() da como ejemplo que
-    "teatro" debería sacar tanto "Teatre Tivoli" como la categoria cruda de
-    OpenTripMap "theatres_and_entertainments", pero el match es substring
-    literal y ninguna de esas dos cadenas contiene "teatro" (ni "Teatre",
-    que termina en 'e' y no en 'o', ni la categoria, que esta en ingles).
-    Las categorias reales que carga normalizar_poi_opentripmap son los
-    kinds crudos de OpenTripMap (ingles), asi que una exclusion por
-    categoria en español como la del docstring no aplica en la practica."""
-    ajustes = [_ajuste(tipo="excluir", valor="teatro")]
+def test_excluye_traduce_la_categoria_del_cliente_al_kind_en_ingles() -> None:
+    """El cliente pide en español ("sacame los teatros") pero `categoria` es
+    el kind crudo de OpenTripMap, en inglés. Con match por substring literal
+    eso no cruzaba nunca, asi que una exclusion por categoria simplemente no
+    funcionaba: bug real encontrado escribiendo estos tests. `excluye` usa
+    una tabla de equivalencias para cerrar esa brecha."""
+    ajustes = [_ajuste(tipo="excluir", valor="teatros")]
 
-    assert excluye(ajustes, nombre="Teatre Tivoli", categoria="theatres_and_entertainments") is False
+    assert excluye(ajustes, nombre="Teatre Tivoli", categoria="theatres_and_entertainments") is True
+
+
+def test_excluye_traduce_tambien_en_singular_y_para_otras_categorias() -> None:
+    assert excluye([_ajuste(tipo="excluir", valor="museo")], nombre="X", categoria="museums")
+    assert excluye([_ajuste(tipo="excluir", valor="iglesias")], nombre="X", categoria="churches")
+    assert excluye([_ajuste(tipo="excluir", valor="parques")], nombre="X", categoria="gardens_and_parks")
+
+
+def test_excluye_una_categoria_no_arrastra_a_las_demas() -> None:
+    """La traduccion no puede volverse un cajon de sastre: pedir sacar los
+    teatros no tiene que sacar tambien los parques."""
+    ajustes = [_ajuste(tipo="excluir", valor="teatros")]
+
+    assert excluye(ajustes, nombre="Parque Güell", categoria="gardens_and_parks") is False
 
 
 def test_excluye_ignora_tildes_y_mayusculas() -> None:
