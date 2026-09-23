@@ -5,7 +5,7 @@ sesión en la que se hizo. Si ya terminó la fase, este archivo se borra.
 
 **Ramas:** `fase/7e-flexibilidad` (funcional, todo verificado en vivo) y
 `fase/7e-tool-calling` (la Etapa 2, sin verificar). Nada mergeado a `main`.
-**Última verificación:** suite en verde (248 passed, 5 skipped) y `ruff check` limpio.
+**Última verificación:** suite en verde (316 passed, 5 skipped) y `ruff check` limpio.
 
 ---
 
@@ -50,32 +50,11 @@ actividades, baja el total de USD 556 a 526 y lo confirma en palabras.
 
 ## Lo que queda pendiente
 
-### 1. Itinerarios multi-ciudad y multi-país (pedido explícito)
+### 1. Itinerarios multi-ciudad — HECHO (commit `187c345`)
 
-Hoy `PreferenciasViaje.destino` es un único `str`. Diseño ya pensado, sin
-implementar:
-
-- Agregar `tramos: list[Tramo] | None` a `PreferenciasViaje`, con
-  `Tramo = {destino: str, dias: int | None}`. **Mantener** el campo `destino`
-  como el destino "actual" para no romper `conversaciones.py`, la UI, ni los
-  248 tests de un saque: `recomendar_actividades`, `info_destino` y
-  `buscar_alojamiento` lo siguen usando.
-- Ojo con el merge (RF2): igual que `ajustes`, `tramos` tiene que distinguir
-  `None` ("este turno no habló de tramos") de `[]` ("se dieron de baja"). Con
-  `default_factory=list` cualquier turno sin tramos borraría los anteriores.
-  Ver el comentario largo en `PreferenciasViaje.ajustes`.
-- Sumar `tramos` a `CAMPOS_QUE_AFECTAN_EL_PLAN` en `estado.py`, para que
-  cambiarlos dispare el re-armado que ya existe.
-- `armar_plan` itera los tramos, numera los días de corrido y suma costos por
-  tramo: `estimar_gasto_diario` es **por destino**, así que no se puede usar un
-  único valor para todo el viaje.
-- Cada tramo se carga con `asegurar_destino()` (D-23), que ya resuelve ciudad
-  nueva → geocodificar → ingerir → cachear.
-- La tarjeta tiene que mostrar a qué ciudad corresponde cada día
-  (`_resumen_plan` en `grafo.py` usa `tarjeta_detallada`, la columna de
-  etiqueta ya admite dos líneas).
-- El prompt de extracción tiene que capturar "quiero ir a Roma y Florencia,
-  3 días en cada una".
+`PreferenciasViaje` tiene `tramos` (ciudad + días opcionales) y `armar_plan`
+los recorre. Probar con *"Roma y Florencia, 3 días en cada una"*. Lo único
+pendiente de este punto es escribir **D-24** en `docs/DECISIONES.md`.
 
 ### 2. Etapa 2: agente de tool-calling — YA ESCRITA, SIN VERIFICAR EN VIVO
 
