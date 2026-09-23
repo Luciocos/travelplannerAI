@@ -97,7 +97,23 @@ pieza existe y está desconectada.
 - El usuario se quejó de que *"no extiende más ni es más flexible"*: tiene que
   poder **agregar** atractivos a un plan existente, no solo rearmarlo entero.
 
-### 3. Corpus de Barcelona (conocido, sin resolver)
+### 3. El RAG no tiene noción de prominencia (encontrado al final)
+
+Distinto del problema de corpus de abajo, y probablemente más importante.
+Aunque el corpus tenga los lugares buenos, la recuperación ordena **solo por
+similitud semántica**, así que para "historia" en Roma elige "Sepolcro del
+fornaio Eurisace" por encima de la Basílica de San Juan de Letrán: el texto del
+POI oscuro habla más explícitamente de historia. El corpus está bien; el
+ranking es el que no distingue lo famoso de lo anónimo.
+
+Idea no implementada: `_puntaje_relevancia()` (en `destinos_bajo_demanda.py`)
+ya calcula un puntaje razonable en la ingesta, pero **se usa para elegir qué
+guardar y después se tira**. Persistirlo como columna en `documento_rag` y
+usarlo como desempate en la consulta (`ORDER BY embedding <=> consulta`, con el
+puntaje ponderando) debería cerrar la brecha sin tocar el patrón de una sola
+query que se defiende en la cátedra.
+
+### 4. Corpus de Barcelona (conocido, sin resolver)
 
 Barcelona es el caso patológico. OpenTripMap tiene cientos de edificios
 catalogados con `rate=7` (el máximo) en el Eixample, así que esa señal **no
@@ -120,7 +136,7 @@ queda es curaduría a mano, como se hizo con Miami y Cancún (D-17), en
 Tokio, en cambio, quedó bien tras los arreglos: Meiji Jingu, Edo Castle,
 Palacio de Akasaka, jardines Koishikawa.
 
-### 4. Pendientes heredados
+### 5. Pendientes heredados
 
 - Cargar los repository secrets de GitHub (`GEMINI_API_KEY_1/2/3`) y proteger
   `main`. Requiere acceso del equipo a GitHub, no se resuelve desde el código.
