@@ -61,6 +61,10 @@ class ActividadDelPlan(BaseModel):
 
 class DiaDelPlan(BaseModel):
     dia: int
+    # En un viaje de varias ciudades (D-24) hace falta saber a cual
+    # corresponde cada dia, tanto para mostrarlo como para cobrar el gasto
+    # diario del destino correcto.
+    destino: str | None = None
     fecha: date | None = None
     actividades: list[ActividadDelPlan]
     costo_actividades: float
@@ -195,12 +199,17 @@ def _armar_dias(
     gasto_diario: float,
     libres: set[int] | None = None,
     por_dia_max: int = ACTIVIDADES_POR_DIA_MAX,
+    destino: str | None = None,
+    dia_inicial: int = 1,
 ) -> list[DiaDelPlan]:
+    """`dia_inicial` permite encadenar tramos de un viaje multi-ciudad
+    (D-24) numerando los dias de corrido: el segundo tramo arranca donde
+    termino el primero, y `libres` ya viene en numeracion local del tramo."""
     libres = libres or set()
     dias: list[DiaDelPlan] = []
     grupos = _repartir_por_dia(candidatos, dias_totales, libres, por_dia_max)
     for indice_dia, grupo in enumerate(grupos):
-        numero_dia = indice_dia + 1
+        numero_dia = dia_inicial + indice_dia
         actividades = [
             ActividadDelPlan(
                 documento_id=resultado.id,
@@ -216,13 +225,16 @@ def _armar_dias(
             # Nunca un dia vacio: o el cliente lo pidio libre (D-22), o el
             # corpus se quedo sin candidatos reales y se lo decimos
             # honestamente en vez de mostrar un hueco (ver P-08).
-            actividades = [_actividad_dia_libre(a_pedido=numero_dia in libres)]
+            actividades = [_actividad_dia_libre(a_pedido=(indice_dia + 1) in libres)]
 
         costo_actividades = sum(actividad.costo_estimado for actividad in actividades)
-        fecha = fecha_inicio + timedelta(days=indice_dia) if fecha_inicio is not None else None
+        fecha = (
+            fecha_inicio + timedelta(days=numero_dia - 1) if fecha_inicio is not None else None
+        )
         dias.append(
             DiaDelPlan(
                 dia=numero_dia,
+                destino=destino,
                 fecha=fecha,
                 actividades=actividades,
                 costo_actividades=costo_actividades,
@@ -245,27 +257,51 @@ def armar_plan(conexion: psycopg.Connection, estado: PreferenciasViaje) -> PlanD
 
     libres = ajustes_plan.dias_libres(ajustes, dias_totales)
     por_dia_max = ajustes_plan.actividades_por_dia(ajustes, ACTIVIDADES_POR_DIA_MAX)
-    dias_con_actividades = dias_totales - len(libres)
 
-    # Se piden candidatos solo para los dias que van a tener actividades, y
-    # de mas, porque la exclusion filtra despues de recuperar (el filtro es
-    # sobre texto del cliente, no algo que se pueda pasar al SQL del RAG).
-    candidatos = buscar_atractivos(
-        conexion,
-        destino=estado.destino,
-        intereses=intereses,
-        k=max(dias_con_actividades, 1) * por_dia_max * 2,
-    )
-    candidatos = [
-        candidato
-        for candidato in candidatos
-        if not ajustes_plan.excluye(ajustes, candidato.nombre, candidato.categoria)
-    ]
+    # D-24: el viaje puede tener varias ciudades. Un viaje de una sola
+    # ciudad es el caso particular de un tramo unico, asi que no hay dos
+    # caminos distintos. Cada tramo recupera SUS atractivos y cobra SU
+    # gasto diario (estimar_gasto_diario es por destino).
+    dias: list[DiaDelPlan] = []
+    dia_inicial = 1
+    for destino_tramo, dias_tramo in estado.distribuir_dias(dias_totales):
+        # Los dias libres estan numerados sobre el viaje completo; el tramo
+        # los necesita en su propia numeracion.
+        libres_del_tramo = {
+            numero - dia_inicial + 1
+            for numero in libres
+            if dia_inicial <= numero < dia_inicial + dias_tramo
+        }
+        dias_con_actividades = dias_tramo - len(libres_del_tramo)
 
-    gasto_diario = estimar_gasto_diario(estado.destino, estado.presupuesto)
-    dias = _armar_dias(
-        candidatos, dias_totales, estado.fecha_inicio, gasto_diario, libres, por_dia_max
-    )
+        # Se piden de mas porque la exclusion filtra despues de recuperar
+        # (el filtro es sobre texto del cliente, no algo que se pueda pasar
+        # al SQL del RAG).
+        candidatos = buscar_atractivos(
+            conexion,
+            destino=destino_tramo,
+            intereses=intereses,
+            k=max(dias_con_actividades, 1) * por_dia_max * 2,
+        )
+        candidatos = [
+            candidato
+            for candidato in candidatos
+            if not ajustes_plan.excluye(ajustes, candidato.nombre, candidato.categoria)
+        ]
+
+        dias.extend(
+            _armar_dias(
+                candidatos,
+                dias_tramo,
+                estado.fecha_inicio,
+                estimar_gasto_diario(destino_tramo, estado.presupuesto),
+                libres_del_tramo,
+                por_dia_max,
+                destino=destino_tramo,
+                dia_inicial=dia_inicial,
+            )
+        )
+        dia_inicial += dias_tramo
 
     costo_actividades_total = sum(dia.costo_actividades for dia in dias)
     gasto_estimado_total = sum(dia.gasto_estimado_dia for dia in dias)
@@ -298,8 +334,14 @@ def armar_plan(conexion: psycopg.Connection, estado: PreferenciasViaje) -> PlanD
         )
     supuestos.extend(aplicados)
 
+    # En multi-destino el "destino" del plan son todas las ciudades, para
+    # que el encabezado y la descarga digan el viaje real (D-24).
+    nombre_del_viaje = " y ".join(
+        dict.fromkeys(d for d, _ in estado.distribuir_dias(dias_totales))
+    ) or (estado.destino or "")
+
     return PlanDeViaje(
-        destino=estado.destino,
+        destino=nombre_del_viaje,
         dias=dias,
         ajustes_aplicados=aplicados,
         ajustes_no_aplicados=no_aplicados,

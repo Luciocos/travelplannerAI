@@ -71,6 +71,7 @@ from asistente_viajes.destinos import blurb_caracteristicas_destinos, buscar_des
 from asistente_viajes.destinos_bajo_demanda import DestinoResuelto, asegurar_destino
 from asistente_viajes.estado import (
     PreferenciasViaje,
+    Tramo,
     detectar_cambios,
     fusionar_preferencias,
     normalizar_presupuesto,
@@ -167,6 +168,9 @@ class InterpretacionTurno(BaseModel):
     # comentario de PreferenciasViaje.ajustes, de esa distincion depende
     # que el merge no borre los ajustes vigentes en cada turno.
     ajustes: list[AjustePlan] | None = None
+    # Fase 7E (D-24): viajes de varias ciudades. Misma convencion de
+    # None vs [] que `ajustes`.
+    tramos: list[Tramo] | None = None
 
 
 @dataclass
@@ -281,6 +285,7 @@ def nodo_actualizar_estado(estado_grafo: EstadoGrafo) -> dict:
         cantidad_personas=interpretacion.cantidad_personas,
         origen=interpretacion.origen,
         ajustes=interpretacion.ajustes,
+        tramos=interpretacion.tramos,
     )
     fusionado = fusionar_preferencias(estado_actual, extraidos)
 
@@ -301,8 +306,18 @@ def nodo_actualizar_estado(estado_grafo: EstadoGrafo) -> dict:
     # D-23: cualquier ciudad es un destino valido. Si todavia no tiene
     # corpus, se ingiere en este mismo turno y queda cargada para siempre;
     # solo si el geocoder no la reconoce se la trata como no soportada.
+    # D-24: `destino` sigue apuntando al primer tramo, que es lo que usan
+    # las tools de una sola ciudad (info_destino, alojamiento, vuelos).
+    if fusionado.tramos and fusionado.tramos[0].destino != fusionado.destino:
+        fusionado = fusionado.model_copy(update={"destino": fusionado.tramos[0].destino})
+
     destino_no_soportado = interpretacion.destino_fuera_de_alcance
     destino_recien_ingerido = None
+    for tramo in fusionado.tramos_activos()[1:]:
+        # Cada ciudad del viaje tiene que quedar cargada en pgvector, no
+        # solo la primera, o el tramo se arma sin atractivos.
+        _resolver_destino(runtime.context.conexion, tramo.destino)
+
     if fusionado.destino:
         resuelto = _resolver_destino(runtime.context.conexion, fusionado.destino)
         if resuelto is None:
@@ -399,6 +414,9 @@ def _resumen_plan(plan: PlanDeViaje) -> str:
     filas: list[dict[str, str | None]] = []
     for dia in plan.dias:
         etiqueta = f"Día {dia.dia}"
+        ciudades = {d.destino for d in plan.dias if d.destino}
+        if len(ciudades) > 1 and dia.destino:
+            etiqueta += f"<br><span style='opacity:0.7'>{escapar(dia.destino)}</span>"
         if dia.fecha:
             etiqueta += f"<br><span style='opacity:0.6'>{dia.fecha.strftime('%d/%m')}</span>"
         filas.append(

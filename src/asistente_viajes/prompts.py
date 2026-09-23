@@ -54,6 +54,15 @@ cosas a la vez:
      ciudades suelen servir de sugerencia cuando el cliente no sabe a
      dónde ir, pero NO son un límite:
      {destinos_piloto}
+   - tramos: SOLO si el viaje incluye más de una ciudad ("Roma y
+     Florencia", "una semana entre Lisboa y Oporto"). Devuelva la lista
+     completa de ciudades en el orden en que las va a visitar, cada una
+     con `destino` y, si el cliente lo dijo, `dias`. Si no aclaró cuántos
+     días en cada una, deje `dias` sin completar y se reparten solos.
+     Complete `destino` (arriba) con la PRIMERA ciudad de la lista.
+     Si el viaje es a una sola ciudad, deje tramos sin completar: el campo
+     `destino` alcanza. Si este mensaje no habla de las ciudades del
+     viaje, déjelo nulo, que significa "sin novedades".
    - destino_fuera_de_alcance: solo para cuando el cliente nombra algo
      que no es una ciudad a la que se pueda viajar (la Luna, un lugar de
      ficción). Un destino real, por remoto que sea, va en destino.

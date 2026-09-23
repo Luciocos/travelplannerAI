@@ -43,6 +43,19 @@ _SINONIMOS_PRESUPUESTO = {
 }
 
 
+class Tramo(BaseModel):
+    """Una parada del viaje: una ciudad y cuántos días se le dedican.
+
+    Existe para los viajes multi-ciudad y multi-país ("Roma y Florencia, 3
+    días en cada una"), que con un único campo `destino` no se podían
+    expresar. `dias` es opcional: si el cliente no lo dice, los días del
+    viaje se reparten entre los tramos.
+    """
+
+    destino: str
+    dias: int | None = None
+
+
 class PreferenciasViaje(BaseModel):
     destino: str | None = None
     tipo_destino: str | None = None
@@ -67,6 +80,64 @@ class PreferenciasViaje(BaseModel):
     # lista vacia: con default_factory=list, cualquier turno que no
     # mencionara ajustes habria borrado los anteriores al fusionar.
     ajustes: list[AjustePlan] | None = None
+    # Nuevo (Fase 7E, D-24): viajes de varias ciudades. `destino` se
+    # conserva y apunta siempre al PRIMER tramo, porque es lo que usan las
+    # tools que trabajan sobre una sola ciudad (info_destino, alojamiento,
+    # recomendar_actividades) y la persistencia de chats. Misma convencion
+    # de None vs [] que `ajustes`, y por el mismo motivo.
+    tramos: list[Tramo] | None = None
+
+    def tramos_activos(self) -> list[Tramo]:
+        """Los tramos del viaje, siempre como lista. Si no se declararon
+        tramos pero hay destino, el viaje es de una sola ciudad y se
+        devuelve como un tramo unico: asi quien planifica no necesita dos
+        caminos distintos."""
+        if self.tramos:
+            return self.tramos
+        if self.destino:
+            return [Tramo(destino=self.destino, dias=None)]
+        return []
+
+    def es_multidestino(self) -> bool:
+        return len(self.tramos_activos()) > 1
+
+    def distribuir_dias(self, dias_totales: int) -> list[tuple[str, int]]:
+        """Reparte los dias del viaje entre los tramos y devuelve
+        (destino, dias) por tramo.
+
+        Se respetan los dias que el cliente haya fijado explicitamente y el
+        resto se reparte en partes iguales entre los tramos que no los
+        declararon; lo que sobra de la division entera se le suma a los
+        primeros, para no perder ni inventar dias. Si los dias declarados
+        ya superan el total, se recortan proporcionalmente en vez de armar
+        un viaje mas largo del que el cliente pidio."""
+        tramos = self.tramos_activos()
+        if not tramos:
+            return []
+        if len(tramos) == 1:
+            return [(tramos[0].destino, max(dias_totales, 1))]
+
+        declarados = {i: t.dias for i, t in enumerate(tramos) if t.dias and t.dias > 0}
+        total_declarado = sum(declarados.values())
+        sin_declarar = [i for i in range(len(tramos)) if i not in declarados]
+
+        if total_declarado >= dias_totales and not sin_declarar:
+            # El cliente fijo todos los dias: manda lo que dijo por tramo,
+            # aunque no coincida con el total, antes que recortarle un
+            # tramo a cero.
+            return [(t.destino, declarados[i]) for i, t in enumerate(tramos)]
+
+        restantes = max(dias_totales - total_declarado, len(sin_declarar))
+        base, sobra = divmod(restantes, len(sin_declarar)) if sin_declarar else (0, 0)
+
+        reparto: list[tuple[str, int]] = []
+        for indice, tramo in enumerate(tramos):
+            if indice in declarados:
+                reparto.append((tramo.destino, declarados[indice]))
+                continue
+            posicion = sin_declarar.index(indice)
+            reparto.append((tramo.destino, max(base + (1 if posicion < sobra else 0), 1)))
+        return reparto
 
     def ajustes_activos(self) -> list[AjustePlan]:
         """Los ajustes vigentes, ya normalizados a lista. Unico punto de
@@ -190,6 +261,8 @@ CAMPOS_QUE_AFECTAN_EL_PLAN = (
     # Fase 7E (D-22): sin esto, pedir "dejame el dia 6 libre" no contaba
     # como cambio y el orquestador devolvia el plan anterior sin tocar.
     "ajustes",
+    # Fase 7E (D-24): agregar o sacar una ciudad cambia el viaje entero.
+    "tramos",
 )
 
 
