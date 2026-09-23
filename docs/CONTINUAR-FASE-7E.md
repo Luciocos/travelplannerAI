@@ -3,7 +3,8 @@
 Documento de traspaso. Sirve para seguir el trabajo sin el contexto de la
 sesión en la que se hizo. Si ya terminó la fase, este archivo se borra.
 
-**Rama:** `fase/7e-flexibilidad`. Nada mergeado a `main`.
+**Ramas:** `fase/7e-flexibilidad` (funcional, todo verificado en vivo) y
+`fase/7e-tool-calling` (la Etapa 2, sin verificar). Nada mergeado a `main`.
 **Última verificación:** suite en verde (248 passed, 5 skipped) y `ruff check` limpio.
 
 ---
@@ -76,26 +77,51 @@ implementar:
 - El prompt de extracción tiene que capturar "quiero ir a Roma y Florencia,
   3 días en cada una".
 
-### 2. Etapa 2: agente de tool-calling (lo más importante)
+### 2. Etapa 2: agente de tool-calling — YA ESCRITA, SIN VERIFICAR EN VIVO
 
-Es lo que falta para que se sienta como ChatGPT/Claude. Hoy `grafo.py` decide
-todo con `if`s de precondición en `nodo_planificar` y llama las funciones de
-Python directo.
+**Está implementada en la rama `fase/7e-tool-calling`** (commit `ddce4d3`), no
+en esta. Compila, la suite pasa (316) y `ruff` está limpio, pero **nunca se
+probó contra Gemini real**. Eso es lo primero al retomar:
 
-**El dato clave:** el proyecto **ya tiene las `@tool` construidas**
-(`crear_tool_armar_plan()` en `tools/armar_plan.py` y equivalentes), con sus
-docstrings escritos para que el agente los lea... y `grafo.py` las esquiva. La
-pieza existe y está desconectada.
+```bash
+git checkout fase/7e-tool-calling
+AGENTE_TOOL_CALLING=1 streamlit run ui/chat_app.py
+```
 
-- Reemplazar el pipeline rígido por un loop de tool-calling de LangGraph.
-  LangChain/LangGraph es requisito textual de la cátedra, no se cambia.
-- El LLM decide solo qué tools llamar y puede encadenar varias. Eso cumple RF12
-  mejor que el diseño actual.
-- **Conservar** lo que ya funciona y costó encontrar: la redacción libre (D-22),
-  los ajustes del plan, el disparo automático de `info_destino` (RF12), la
-  persistencia de chats, y que ningún dato duro salga del LLM (regla dura 5).
-- El usuario se quejó de que *"no extiende más ni es más flexible"*: tiene que
-  poder **agregar** atractivos a un plan existente, no solo rearmarlo entero.
+Sin esa variable de entorno el sistema usa el orquestador de precondiciones de
+siempre, que sí está verificado. Se hizo así a propósito: cambia de fondo cómo
+se decide qué hacer en cada turno, y dejar el camino viejo como default evita
+romper algo que funciona a días de la defensa.
+
+Qué se agregó:
+
+- `herramientas.py` (nuevo): el catálogo de tools de LangChain, con la conexión
+  y el rotador inyectados por closure. El estado del viaje **no** se le pide al
+  modelo como argumento: son datos que el sistema ya tiene, y hacérselos
+  repetir es una invitación a que los altere.
+- `llm.py`: `RotadorClavesGemini.con_herramientas()`, el equivalente rotado de
+  `bind_tools()`, con el mismo failover que el resto.
+- `grafo.py`: `nodo_agente_herramientas` corre el loop (máximo 4 vueltas) y un
+  `add_conditional_edges` después de `planificar` elige camino según el flag.
+- `prompts.py`: `PROMPT_AGENTE`, que **solo** decide qué tools llamar. La
+  redacción sigue siendo la de D-22, así que ningún dato duro sale del modelo.
+
+Qué falta:
+
+1. **Probarlo en vivo** con las dos cosas que lo motivaron: pedir un cambio
+   sobre un plan ya armado, y pedir "más opciones" (la queja textual fue *"no
+   extiende más ni es más flexible"*).
+2. Decidir si pasa a ser el default. Ojo: `nodo_planificar` sigue corriendo
+   antes del agente y es el que arma `pedir_datos`, así que el slot filling
+   (RF1/RF2) quedó intacto; hay que definir qué se hace con eso.
+3. Tests del nodo nuevo, con el rotador mockeado.
+4. Escribir **D-25** en `docs/DECISIONES.md`: el código ya la referencia pero la
+   entrada no está.
+
+El dato que lo hizo barato: el proyecto **ya tenía las `@tool` construidas**
+(`crear_tool_armar_plan()` y equivalentes), con sus docstrings escritos para que
+un agente los leyera, y `grafo.py` las esquivaba llamando las funciones de
+Python directo. La pieza existía y estaba desconectada.
 
 ### 3. Corpus de Barcelona (conocido, sin resolver)
 
@@ -125,6 +151,8 @@ Palacio de Akasaka, jardines Koishikawa.
 - Cargar los repository secrets de GitHub (`GEMINI_API_KEY_1/2/3`) y proteger
   `main`. Requiere acceso del equipo a GitHub, no se resuelve desde el código.
 - Mergear `fase/7e-flexibilidad` a `main` cuando el usuario dé el visto bueno.
+- Documentar **D-24** (multi-destino) en `docs/DECISIONES.md`: el código está
+  hecho y commiteado, pero la entrada de la decisión no se escribió.
 
 ---
 
