@@ -129,6 +129,20 @@ def obtener_idioma_moneda(pais: str, ruta_paises: Path = RUTA_PAISES) -> InfoIdi
     necesita LLM, es un diccionario chico que casi no cambia."""
     datos = json.loads(ruta_paises.read_text(encoding="utf-8"))
     registro = datos.get(pais)
+
+    if registro is None and pais:
+        # D-23: un destino ingerido bajo demanda trae el pais como codigo
+        # ISO-2 (lo que devuelve el geocoder), no como nombre en espanol.
+        codigo = pais.strip().upper()
+        registro = next(
+            (
+                valor
+                for clave, valor in datos.items()
+                if not clave.startswith("_") and valor.get("iso") == codigo
+            ),
+            None,
+        )
+
     if registro is None:
         logger.warning("pais sin entrada en paises.json: %s", pais)
         return InfoIdiomaMoneda(idioma=None, moneda=None)

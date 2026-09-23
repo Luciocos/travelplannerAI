@@ -68,6 +68,7 @@ from pydantic import BaseModel, Field
 
 from asistente_viajes.ajustes import AjustePlan
 from asistente_viajes.destinos import blurb_caracteristicas_destinos, buscar_destino_piloto
+from asistente_viajes.destinos_bajo_demanda import DestinoResuelto, asegurar_destino
 from asistente_viajes.estado import (
     PreferenciasViaje,
     detectar_cambios,
@@ -210,6 +211,7 @@ class EstadoGrafo(TypedDict):
     pedir_datos_mostrado_para: list[str] | None
     interpretacion: dict | None
     destino_no_soportado: str | None
+    destino_recien_ingerido: str | None
     acciones_pedidas: list[dict]
     pendientes: list[dict]
     fragmentos: list[Fragmento]
@@ -252,6 +254,18 @@ def nodo_interpretar(estado_grafo: EstadoGrafo) -> dict:
     return {"interpretacion": interpretacion.model_dump()}
 
 
+def _resolver_destino(conexion: psycopg.Connection, destino: str) -> DestinoResuelto | None:
+    """asegurar_destino() blindado: la ingesta bajo demanda toca la red y
+    el modelo de embeddings, y ninguno de los dos puede voltear un turno.
+    Ante cualquier error se sigue con el destino tal como lo dijo el
+    cliente (si ya tenia corpus, las consultas van a funcionar igual)."""
+    try:
+        return asegurar_destino(conexion, destino)
+    except Exception:
+        logger.exception("fallo resolver el destino '%s', se sigue sin ingerirlo", destino)
+        return DestinoResuelto(nombre=destino, lat=0.0, lon=0.0)
+
+
 def nodo_actualizar_estado(estado_grafo: EstadoGrafo) -> dict:
     runtime = get_runtime(ContextoGrafo)
     interpretacion = InterpretacionTurno(**estado_grafo["interpretacion"])
@@ -284,12 +298,27 @@ def nodo_actualizar_estado(estado_grafo: EstadoGrafo) -> dict:
     if errores:
         logger.info("validacion de preferencias encontro observaciones: %s", errores)
 
+    # D-23: cualquier ciudad es un destino valido. Si todavia no tiene
+    # corpus, se ingiere en este mismo turno y queda cargada para siempre;
+    # solo si el geocoder no la reconoce se la trata como no soportada.
+    destino_no_soportado = interpretacion.destino_fuera_de_alcance
+    destino_recien_ingerido = None
+    if fusionado.destino:
+        resuelto = _resolver_destino(runtime.context.conexion, fusionado.destino)
+        if resuelto is None:
+            destino_no_soportado = fusionado.destino
+            fusionado = fusionado.model_copy(update={"destino": None, "tipo_destino": None})
+        else:
+            if resuelto.nombre != fusionado.destino:
+                fusionado = fusionado.model_copy(update={"destino": resuelto.nombre})
+            if resuelto.recien_ingerido:
+                destino_recien_ingerido = resuelto.nombre
+
     return {
         "estado": fusionado.model_dump(mode="json"),
         "estado_anterior": estado_grafo["estado"],
-        "destino_no_soportado": (
-            interpretacion.destino_fuera_de_alcance if fusionado.destino is None else None
-        ),
+        "destino_no_soportado": destino_no_soportado if fusionado.destino is None else None,
+        "destino_recien_ingerido": destino_recien_ingerido,
         "acciones_pedidas": [accion.model_dump() for accion in interpretacion.acciones],
     }
 
@@ -647,23 +676,34 @@ def nodo_disparar_info_destino(estado_grafo: EstadoGrafo) -> dict:
     nuevo si el destino cambia a mitad de conversacion (antes quedaba
     marcada como disparada para siempre en toda la sesion, sin importar
     si el destino cambiaba)."""
+    runtime = get_runtime(ContextoGrafo)
     estado = PreferenciasViaje(**estado_grafo["estado"])
     if not (estado.destino and estado.fecha_inicio):
         return {}
     if estado_grafo.get("info_destino_mostrada_para") == estado.destino:
         return {}
 
+    # D-23: las coordenadas ya no salen solo de destinos.json. Un destino
+    # ingerido bajo demanda tambien tiene lat/lon (de geoname), asi que el
+    # clima funciona para cualquier ciudad; idioma y moneda pueden faltar
+    # si el pais no esta en paises.json, y en ese caso se omiten en vez de
+    # inventarlos.
     encontrado = buscar_destino_piloto(estado.destino)
-    if encontrado is None:
-        return {"info_destino_mostrada_para": estado.destino}
+    if encontrado is not None:
+        _, datos = encontrado
+        lat, lon, pais = datos["lat"], datos["lon"], datos["pais"]
+    else:
+        resuelto = _resolver_destino(runtime.context.conexion, estado.destino)
+        if resuelto is None or not (resuelto.lat or resuelto.lon):
+            return {"info_destino_mostrada_para": estado.destino}
+        lat, lon, pais = resuelto.lat, resuelto.lon, resuelto.pais or ""
 
-    _, datos = encontrado
     try:
         info = info_destino(
             destino=estado.destino,
-            pais=datos["pais"],
-            lat=datos["lat"],
-            lon=datos["lon"],
+            pais=pais,
+            lat=lat,
+            lon=lon,
             fecha_inicio=estado.fecha_inicio,
             fecha_fin=estado.fecha_fin or estado.fecha_inicio,
         )
@@ -671,12 +711,27 @@ def nodo_disparar_info_destino(estado_grafo: EstadoGrafo) -> dict:
         logger.exception("fallo info_destino, se omite en este turno")
         return {"info_destino_mostrada_para": estado.destino}
 
-    filas = [
-        escapar(info.clima.detalle),
-        f"Idioma: {escapar(info.idioma_moneda.idioma)}, moneda: {escapar(info.idioma_moneda.moneda)}.",
-    ]
+    filas = [escapar(info.clima.detalle)]
+    if info.idioma_moneda.idioma and info.idioma_moneda.moneda:
+        filas.append(
+            f"Idioma: {escapar(info.idioma_moneda.idioma)}, "
+            f"moneda: {escapar(info.idioma_moneda.moneda)}."
+        )
     texto = tarjeta(f"Sobre {escapar(estado.destino)}", filas)
-    fragmentos = [*estado_grafo["fragmentos"], {"tipo": "info_destino", "texto": texto}]
+    datos_llm = f"Informacion de {estado.destino}: " + " ".join(
+        [
+            info.clima.detalle,
+            (
+                f"Idioma: {info.idioma_moneda.idioma}, moneda: {info.idioma_moneda.moneda}."
+                if info.idioma_moneda.idioma
+                else "No hay dato de idioma ni moneda para este pais."
+            ),
+        ]
+    )
+    fragmentos = [
+        *estado_grafo["fragmentos"],
+        _fragmento("info_destino", texto=texto, datos=datos_llm),
+    ]
     return {"fragmentos": fragmentos, "info_destino_mostrada_para": estado.destino}
 
 
@@ -799,6 +854,7 @@ def procesar_turno(
         "pedir_datos_mostrado_para": pedir_datos_mostrado_para,
         "interpretacion": None,
         "destino_no_soportado": None,
+        "destino_recien_ingerido": None,
         "acciones_pedidas": [],
         "pendientes": [],
         "fragmentos": [],

@@ -206,7 +206,8 @@ def _cuerpo_principal(conexion) -> bool:
             st.markdown(mensaje)
         with st.chat_message("assistant"):
             with st.spinner(
-                "Pensando... (puede tardar, la cuota gratis de Gemini a veces anda lenta)"
+                "Pensando... (si es la primera vez que menciona ese destino, lo estoy "
+                "cargando y puede tardar medio minuto; después queda guardado)"
             ):
                 try:
                     respuesta = _responder(conexion, conversacion_id, mensaje)
