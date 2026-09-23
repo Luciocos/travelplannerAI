@@ -2,7 +2,7 @@
 
 **Archivo vivo. Leer al empezar cada sesión, actualizar al cerrar cada fase.**
 
-Última actualización: 2026-09-21 (Fase 7D mergeada a main)
+Última actualización: 2026-09-23 (Fase 7E en curso, rama `fase/7e-flexibilidad`)
 
 ---
 
@@ -13,13 +13,32 @@
 | Repo | https://github.com/Luciocos/travelplannerAI |
 | Integrantes | Lucio Cosentino; Joaquin Carlos Fernandez Da Silva; Aaron de Bernardo; Elias Danteo |
 | Turno y fecha de defensa | (pendiente) |
-| Destinos piloto | Barcelona, Miami, Cancún (D-04). `data/reference/destinos.json` tiene coordenadas, `tipos` (deriva `tipo_destino`, D-14) y `descripcion` (para destinos sugeridos cuando no hay destino aún). |
+| Destinos | **Cualquier ciudad, vía ingesta bajo demanda (D-23)**. Barcelona, Miami y Cancún siguen siendo los curados a mano (D-04). `data/reference/destinos.json` tiene coordenadas, `tipos` (deriva `tipo_destino`, D-14) y `descripcion` (para destinos sugeridos cuando no hay destino aún). |
 | LLM | Gemini, `gemini-3.5-flash-lite` vía `GEMINI_MODEL` (D-03). `max_retries=1` y `timeout=45s` en el ChatModel (P-08/P-09): el SDK traía reintentos internos que escondían el failover del rotador. |
 | Claves de Gemini | 3 cargadas en `.env` local. `smoke_llm.py` responde 3/3. Repository secrets de GitHub, pendientes de cargar. |
 | Límite diario real por clave | Sigue sin poder verificarse de forma estática (bloqueo abierto, ver abajo). |
 | Postgres | Local vía `docker-compose` (`DATABASE_URL` en `.env` apunta a `localhost:5432`). Esquema en 2 archivos, `sql/001_schema.sql` y `sql/002_conversaciones.sql` (D-13); `scripts/inicializar_db.py` aplica todos los `sql/*.sql` en orden. |
 
-## Fase actual: Fase 7D, mergeada a main
+## Fase actual: Fase 7E, en curso (rama `fase/7e-flexibilidad`)
+
+Abierta el 2026-09-23 a partir de un reporte del usuario con capturas: el agente era rígido, no aceptaba ningún cambio y repetía el mismo plan. El diagnóstico fue más de fondo que un bug (ver P-14 y D-22). Lo hecho hasta ahora, todo commiteado en la rama:
+
+- **El LLM redacta todos los turnos (D-22).** Antes solo escribía cuando no había pasado nada; el resto eran plantillas de Python. Ahora `nodo_redactar` llama al modelo siempre con los hechos del turno y las tarjetas se adjuntan debajo. Se eliminó `PROMPT_CONVERSAR`.
+- **El plan se puede ajustar (D-22).** Nuevo `ajustes.py` y campo `ajustes` en el estado: días libres, exclusiones y ritmo. `armar_plan` dejó de ser una función pura de los slots y reporta qué aplicó y qué no.
+- **Cualquier destino (D-23).** `destinos_bajo_demanda.asegurar_destino()`: geocodifica con el `geoname` de OpenTripMap, ingiere, embebe y cachea en pgvector. Verificado con Roma (51 atractivos), Kioto (53), Lisboa (22), Praga (16), Estambul; "Ciudad Inventada Xyzzy" se rechaza bien.
+- **Off-by-one de fechas.** El prompt no decía que las fechas son inclusivas y un viaje de 5 días salía de 6.
+- **Tarjetas rehechas.** Tres columnas (día, actividades, costo), sin emoji, funcionando en tema claro y oscuro.
+- **Iconos de la sidebar.** Los botones de renombrar y eliminar salían vacíos en Chrome/macOS: eran emoji, ahora son iconos Material.
+
+Suite completa en verde (248 passed, 5 skipped) y ruff limpio en cada commit.
+
+**Pendiente de esta fase:**
+- Que el usuario lo pruebe en vivo (es el próximo paso inmediato).
+- Curar o re-ingerir Barcelona con `rate=2`: su corpus viejo son casas anónimas, cines y teatros, sin la Sagrada Familia y sin nada gastronómico.
+- Evaluar la Etapa 2 conversada con el usuario: reemplazar el pipeline rígido por un agente de tool-calling de LangGraph usando las `@tool` que ya existen y hoy están desconectadas.
+- Mergear a `main` cuando el usuario dé el visto bueno.
+
+## Fase 7D, mergeada a main
 
 Rama `fase/7d-extensiones`, creada desde `main` justo después de mergear el notebook (commit `db3c598`). Fase 7C + el notebook ya estaban en `main`. Esta rama agregó lo que había quedado afuera de 7C: RF6/RF7 enganchados, conversión de moneda, descarga de itinerario, tarjetas HTML en el chat, harness de evaluación y tests de `AppTest`. Se encontraron y arreglaron 3 bugs reales probando todo esto en vivo: P-11 (UI), P-12 (tests) y P-13 (conversación). **Mergeada a `main` y pusheada el 2026-09-21** (commit de merge `0484775`, pedido explícito del usuario para que el equipo, Elias, pueda testear), previa corrida de la suite completa (248 passed, 5 skipped).
 
